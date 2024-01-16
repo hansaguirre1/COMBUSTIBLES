@@ -15,16 +15,9 @@ import os, zipfile
 
 # Declarar ruta
 dir=os.getcwd()
+dir
 
 new_dir_path = f'{dir}\\data\\raw\\precios mayoristas'
-
-# Eliminar todo lo que no es excel
-
-for file in os.listdir(new_dir_path):
-    if not file.endswith('.xlsx'):
-        file_path = os.path.join(new_dir_path, file)
-        os.remove(file_path)
-        print(f"Deleted: {file_path}")
 
 # Guardar todo en lista
 
@@ -194,7 +187,7 @@ Precios_Mayoristas['PRECIO DE VENTA (SOLES)']=Precios_Mayoristas['PRECIO DE VENT
 
 # Guardar data de precios mayoristas sin imputar
 
-Precios_Mayoristas.to_csv("../data/interim/mayoristas_pre_imp.csv", sep=";", encoding="utf-8")
+Precios_Mayoristas.to_csv(f"{{dir}//data//interim//mayoristas_pre_imp.csv", sep=";", encoding="utf-8")
 
 
 

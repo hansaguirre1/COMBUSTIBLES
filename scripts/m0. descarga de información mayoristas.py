@@ -27,6 +27,7 @@ import os, zipfile
 # Configuración e inicio de navegación
 
 dir=os.getcwd()
+dir
 
 new_dir_path = f'{dir}\\data\\raw\\precios mayoristas'
 chrome_options = webdriver.ChromeOptions()
@@ -47,6 +48,9 @@ driver.get(url_1)
 
 # Encontrar elementos de interés
 driver.find_element(By.XPATH, '//*[@id="browser"]/li[13]/div').click()
+container=driver.find_element(By.XPATH, '//*[@id="browser"]/li[13]/ul')
+container_list=container.find_elements(By.TAG_NAME,'li')
+
 
 # Descarga de información
 
@@ -66,3 +70,10 @@ for file in os.listdir(new_dir_path):   # get the list of files
            item.extractall()
 
 
+# Eliminar todo lo que no es excel
+
+for file in os.listdir(new_dir_path):
+    if file.endswith('.zip') or file.endswith('.xml'):
+        file_path = os.path.join(new_dir_path, file)
+        os.remove(file_path)
+        print(f"Deleted: {file_path}")
