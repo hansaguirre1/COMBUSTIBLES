@@ -71,9 +71,11 @@ for file in os.listdir(new_dir_path):   # get the list of files
 
 
 # Eliminar todo lo que no es excel
-
-for file in os.listdir(new_dir_path):
-    if file.endswith('.zip') or file.endswith('.xml'):
-        file_path = os.path.join(new_dir_path, file)
-        os.remove(file_path)
-        print(f"Deleted: {file_path}")
+try:
+    for file in os.listdir(new_dir_path):
+        if file.endswith('.zip') or file.endswith('.xml'):
+            file_path = os.path.join(new_dir_path, file)
+            os.remove(file_path)
+            print(f"Deleted: {file_path}")
+except:
+    pass

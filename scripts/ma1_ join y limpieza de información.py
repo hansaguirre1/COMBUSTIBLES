@@ -1,17 +1,11 @@
 # importar libreria
-from selenium import webdriver
-import re
-import time 
+
 import os
-import random
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-import json
-import pytz 
-import statistics
-import requests
-import os, zipfile
+
+import os
 
 # Declarar ruta
 dir=os.getcwd()
@@ -69,12 +63,7 @@ Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("G95",
 
 Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("'Cilindros de 10 Kg de GLP","GLP - E")
 
-# Renombrar variables de ubicación
 
-Precios_Mayoristas=Precios_Mayoristas.rename(columns={'DEPARTAMENTO':'DEPARTAMENTO_VENDEDOR',
-                                   'PROVINCIA':'PROVINCIA_VENDEDOR',
-                                   'DISTRITO':'DISTRITO_VENDEDOR'
-                                   })
 
 # Eliminar productos que no utilizamos
 
@@ -187,7 +176,7 @@ Precios_Mayoristas['PRECIO DE VENTA (SOLES)']=Precios_Mayoristas['PRECIO DE VENT
 
 # Guardar data de precios mayoristas sin imputar
 
-Precios_Mayoristas.to_csv(f"{{dir}//data//interim//mayoristas_pre_imp.csv", sep=";", encoding="utf-8")
+Precios_Mayoristas.to_csv(f"{dir}//data//interim//mayoristas_pre_imp.csv", sep=";", encoding="utf-8")
 
 
 
