@@ -34,9 +34,9 @@ def extraer_tabla(file):
 
 def make_list(precio):
     precio.replace("", np.nan, inplace = True)
-    lista = precio.melt(id_vars=["Fecha", "DEPARTAMENTO"], var_name="Combustible", value_name="Precios")
+    lista = precio.melt(id_vars=["Fecha", "DEPARTAMENTO"], var_name="Combustible", value_name="Volumenes")
     lista = lista.sort_values(by= ["Fecha", "DEPARTAMENTO"])
-    lista = lista.dropna(subset=["Precios"])
+    lista = lista.dropna(subset=["Volumenes"])
     return lista
 
 #  Definir funcion para extraer los nombres de los files pdfs
@@ -116,6 +116,17 @@ Demanda_por_region = Demanda_por_region[~(Demanda_por_region['Combustible'].str.
                                         ~(Demanda_por_region['Combustible'].str.contains('Gasohol 98\nPlus'))
                                         ]
 
+#Arreglar fecha
+
+Demanda_por_region['Fecha']=Demanda_por_region['Fecha'].str.replace('-',' ')
+
+Demanda_por_region['Año']=Demanda_por_region['Fecha'].str.split().str[-1:].str[0].str.replace('pdf','').str.replace('.','')
+Demanda_por_region['Mes']=Demanda_por_region['Fecha'].str.split().str[-2:-1].str[0].str.replace('-' ,'')
+
+
+Demanda_por_region.drop('Fecha', axis=1, inplace=True)
+
+Demanda_por_region['Volumenes']=Demanda_por_region['Volumenes'].str.replace(',','')
 
 # guardar tabla
 
