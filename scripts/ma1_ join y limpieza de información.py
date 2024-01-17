@@ -1,23 +1,17 @@
 # importar libreria
-from selenium import webdriver
-import re
-import time 
+
 import os
-import random
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-import json
-import pytz 
-import statistics
-import requests
-import os, zipfile
+
+import os
 
 # Declarar ruta
 dir=os.getcwd()
 dir
 
-new_dir_path = f'{dir}\\data\\raw\\precios mayoristas'
+new_dir_path = f'..\\data\\raw\\precios mayoristas'
 
 # Guardar todo en lista
 
@@ -69,12 +63,7 @@ Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("G95",
 
 Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("'Cilindros de 10 Kg de GLP","GLP - E")
 
-# Renombrar variables de ubicación
 
-Precios_Mayoristas=Precios_Mayoristas.rename(columns={'DEPARTAMENTO':'DEPARTAMENTO_VENDEDOR',
-                                   'PROVINCIA':'PROVINCIA_VENDEDOR',
-                                   'DISTRITO':'DISTRITO_VENDEDOR'
-                                   })
 
 # Eliminar productos que no utilizamos
 
@@ -114,16 +103,18 @@ Precios_Mayoristas = Precios_Mayoristas[~(Precios_Mayoristas['PRODUCTO'].str.con
 
 
 #codificar producto
-Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOLINA REGULAR", 'COD_PROD'] = 62
-Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOLINA PREMIUM", 'COD_PROD'] = 61
-Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOHOL REGULAR", 'COD_PROD'] = 60
-Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOHOL PREMIUM", 'COD_PROD'] = 59
-Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Cilindros de 10 Kg de GLP", 'COD_PROD'] = 29
-Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GLP - G", 'COD_PROD'] = 30
-Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="DIESEL B5 S-50 UV", 'COD_PROD'] = 15
-Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="DIESEL B5 UV", 'COD_PROD'] = 9
-Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Diesel B5 S-50 UV", 'COD_PROD'] = 15
-Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="DIESEL B5 UV", 'COD_PROD'] = 9
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOLINA REGULAR", 'COD_PROD'] = 46
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOLINA PREMIUM", 'COD_PROD'] = 45
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOHOL REGULAR", 'COD_PROD'] = 37
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOHOL PREMIUM", 'COD_PROD'] = 36
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Cilindros de 10 Kg de GLP", 'COD_PROD'] = 47
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GLP - G", 'COD_PROD'] = 48
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="DIESEL B5 S-50 UV", 'COD_PROD'] = 28
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="DIESEL B5 UV", 'COD_PROD'] = 19
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Diesel B5 S-50 UV", 'COD_PROD'] = 28
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Diesel B5 UV", 'COD_PROD'] = 19
+
+
 
 # Declarar fecha
 
@@ -187,7 +178,7 @@ Precios_Mayoristas['PRECIO DE VENTA (SOLES)']=Precios_Mayoristas['PRECIO DE VENT
 
 # Guardar data de precios mayoristas sin imputar
 
-Precios_Mayoristas.to_csv(f"{{dir}//data//interim//mayoristas_pre_imp.csv", sep=";", encoding="utf-8")
+Precios_Mayoristas.to_csv(f"..//data//interim//precios mayoristas//mayoristas_pre_imp.csv", sep=";", encoding="utf-8")
 
 
 
