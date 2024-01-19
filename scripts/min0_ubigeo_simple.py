@@ -39,3 +39,16 @@ def ubigeos():
     ubi.to_csv(ruta4 + DF_ubi, index=False,encoding="utf-8",sep=";")
     ubi = ubi[["DPD","ID_DPD"]]
     return ubi
+
+ubi = ubigeos()
+
+
+
+
+
+
+
+
+
+
+

@@ -14,7 +14,7 @@ os.chdir(os.getcwd())
 
 def limpieza_masiva(data):
     # Tabla Ubicacion
-    ubi = ubigeos()
+    ubi = ubi[["DPD","ID_DPD"]]
     
     # Carga de datos
     a=1 # Indicador si es nuevo (0) o apilando (1) ¡SE CAMBIA SOLO! NO TOCAR

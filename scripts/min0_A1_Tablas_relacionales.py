@@ -7,7 +7,6 @@ import pandas as pd
 import os
 from minfut0_nombres import *
 from minfut1_utils import *
-from minfut2_ubigeo_simple import ubigeos
 
 # Cargando la base de datos general
 os.chdir(os.getcwd())
@@ -34,7 +33,7 @@ except:
 
 def limpieza_masiva(data):    
     # Tabla Ubicacion
-    ubi = ubigeos()
+    ubi = ubi[["DPD","ID_DPD"]]
     
     # Carga de datos
     a=1 # Indicador si es nuevo (0) o apilando (1) ¡SE CAMBIA SOLO! NO TOCAR
