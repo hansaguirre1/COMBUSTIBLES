@@ -34,37 +34,39 @@ ruta6 = r"..\data\interim\\"
 ruta7 = r"..\data\interim\precios mayoristas\\"
 
 # Bases para merge
-cod = pd.read_csv(ruta4 + DF_cod, encoding='utf-8', sep=";")
-ubi = pd.read_csv(ruta4 + DF_ubi, encoding='utf-8', sep=";")
-rs = pd.read_csv(ruta4 + DF_rs, encoding='utf-8', sep=";")
-prod = pd.read_csv(ruta4 + DF_prod, encoding='utf-8', sep=";")
-dir = pd.read_csv(ruta4 + DF_dir, encoding='utf-8', sep=";")
+try:
+    cod = pd.read_csv(ruta4 + DF_cod, encoding='utf-8', sep=";")
+    ubi = pd.read_csv(ruta4 + DF_ubi, encoding='utf-8', sep=";")
+    rs = pd.read_csv(ruta4 + DF_rs, encoding='utf-8', sep=";")
+    prod = pd.read_csv(ruta4 + DF_prod, encoding='utf-8', sep=";")
+    dir = pd.read_csv(ruta4 + DF_dir, encoding='utf-8', sep=";")
+    
+    # Listas
+    a = "DIESEL B5 UV"
+    b = "GAS NATURAL VEHICULAR"
+    c = "GASOHOL PREMIUM"
+    d = "GASOHOL REGULAR"
+    e = "GASOLINA PREMIUM"
+    f = "GASOLINA REGULAR"
+    g = "GLP - E"
+    h = "GLP - G"
+    m = "Diesel B5 S-50 UV"
+    
+    # Nombres productos
+    aa = prod["COD_PROD"].loc[prod["NOM_PROD"]==a].values[0]
+    bb = prod["COD_PROD"].loc[prod["NOM_PROD"]==b].values[0]
+    cc = prod["COD_PROD"].loc[prod["NOM_PROD"]==c].values[0]
+    dd = prod["COD_PROD"].loc[prod["NOM_PROD"]==d].values[0]
+    ee = prod["COD_PROD"].loc[prod["NOM_PROD"]==e].values[0]
+    ff = prod["COD_PROD"].loc[prod["NOM_PROD"]==f].values[0]
+    gg = prod["COD_PROD"].loc[prod["NOM_PROD"]==g].values[0]
+    hh = prod["COD_PROD"].loc[prod["NOM_PROD"]==h].values[0]
+    mm = prod["COD_PROD"].loc[prod["NOM_PROD"]==m].values[0]
+    nom_prods = {a: aa, b: bb, c: cc, d: dd, e: ee, f: ff, g: gg, h: hh, m: mm}
+    cod_prods=list(nom_prods.values())
 
-# Listas
-a = "DIESEL B5 UV"
-b = "GAS NATURAL VEHICULAR"
-c = "GASOHOL PREMIUM"
-d = "GASOHOL REGULAR"
-e = "GASOLINA PREMIUM"
-f = "GASOLINA REGULAR"
-g = "GLP - E"
-h = "GLP - G"
-m = "Diesel B5 S-50 UV"
-
-# Nombres productos
-aa = prod["COD_PROD"].loc[prod["NOM_PROD"]==a].values[0]
-bb = prod["COD_PROD"].loc[prod["NOM_PROD"]==b].values[0]
-cc = prod["COD_PROD"].loc[prod["NOM_PROD"]==c].values[0]
-dd = prod["COD_PROD"].loc[prod["NOM_PROD"]==d].values[0]
-ee = prod["COD_PROD"].loc[prod["NOM_PROD"]==e].values[0]
-ff = prod["COD_PROD"].loc[prod["NOM_PROD"]==f].values[0]
-gg = prod["COD_PROD"].loc[prod["NOM_PROD"]==g].values[0]
-hh = prod["COD_PROD"].loc[prod["NOM_PROD"]==h].values[0]
-mm = prod["COD_PROD"].loc[prod["NOM_PROD"]==m].values[0]
-nom_prods = {a: aa, b: bb, c: cc, d: dd, e: ee, f: ff, g: gg, h: hh, m: mm}
-cod_prods=list(nom_prods.values())
-
-
+except:
+    pass
 
 
 
