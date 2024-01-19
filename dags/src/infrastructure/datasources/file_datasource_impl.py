@@ -3,6 +3,8 @@ from src.infrastructure.datasources.process.process_minorista_file import limpie
 from src.domain.datasources.file_datasource import FileDatasource
 
 import src.infrastructure.datasources.process.process_petroperu_file as processFile
+import src.infrastructure.datasources.process.process_cv1_file as processCv1File
+import src.infrastructure.datasources.process.process_cv2_file as processCv2File
 import pandas as pd
 from glob import glob
 import numpy as np
@@ -12,6 +14,7 @@ from ast import literal_eval
 import zipfile
 import PyPDF2
 import re
+from itertools import product
 
 pathMinorista = 'data/interim/minoristas'
 
@@ -183,3 +186,148 @@ class FileDatasourceImpl(FileDatasource):
         # except Exception as e:
         #     print("Error al escribir el archivo:", e)
         
+    def cv1_processReadAndCleanNewValues(self) -> DataFrame:
+                
+        #DECLARAR TODOS LOS PDFS
+        directory_path = "data/raw/combustibles_validos"
+
+        file_list = processCv1File.list_pdf_files(directory_path)
+        file_list
+        # Acumular información de pdfs
+
+        Acumulado =[]
+        for file in file_list:
+            pagina_pdf = f"{directory_path}/{file}"   
+            for pagina in range(0,1):
+                for tabla in range(0,1):
+                    print(pagina)
+                    print(tabla)
+                    try:
+                        df=processCv1File.extraer_tabla(pagina_pdf)
+                        df=processCv1File.make_list(df)
+                        Acumulado.append(df)
+                    except:
+                        pass
+                    
+        Demanda_por_region=pd.concat(Acumulado)
+
+        #renombrar combustibles
+        Demanda_por_region['Combustible']=Demanda_por_region['Combustible'].str.replace("Gasohol 95\nPlus","GASOHOL PREMIUM")
+        Demanda_por_region['Combustible']=Demanda_por_region['Combustible'].str.replace("Gasohol 90\nPlus","GASOHOL REGULAR")
+        Demanda_por_region['Combustible']=Demanda_por_region['Combustible'].str.replace("GASOHOL\nPREMIUM","GASOHOL PREMIUM")
+        Demanda_por_region['Combustible']=Demanda_por_region['Combustible'].str.replace("GASOHOL\nREGULAR","GASOHOL REGULAR")
+
+
+        Demanda_por_region['Combustible']=Demanda_por_region['Combustible'].str.replace("Gasolina\n90","GASOLINA REGULAR")
+        Demanda_por_region['Combustible']=Demanda_por_region['Combustible'].str.replace("Gasolina\n95","GASOLINA PREMIUM")
+        Demanda_por_region['Combustible']=Demanda_por_region['Combustible'].str.replace("GASOLINA\nREGULAR","GASOLINA REGULAR")
+        Demanda_por_region['Combustible']=Demanda_por_region['Combustible'].str.replace("GASOLINA\nPREMIUM","GASOLINA PREMIUM")
+
+
+        Demanda_por_region['Combustible']=Demanda_por_region['Combustible'].str.replace("Diesel B5","DIESEL B5 UV")
+        Demanda_por_region['Combustible']=Demanda_por_region['Combustible'].str.replace("DB5 S-50","DIESEL B5 S-50 UV")
+
+
+        #codificar Combustible
+        Demanda_por_region.loc[Demanda_por_region.Combustible=="GASOLINA REGULAR", 'COD_PROD'] = 62
+        Demanda_por_region.loc[Demanda_por_region.Combustible=="GASOLINA PREMIUM", 'COD_PROD'] = 61
+        Demanda_por_region.loc[Demanda_por_region.Combustible=="GASOHOL REGULAR", 'COD_PROD'] = 60
+        Demanda_por_region.loc[Demanda_por_region.Combustible=="GASOHOL PREMIUM", 'COD_PROD'] = 59
+        Demanda_por_region.loc[Demanda_por_region.Combustible=="Cilindros de 10 Kg de GLP", 'COD_PROD'] = 29
+        Demanda_por_region.loc[Demanda_por_region.Combustible=="GLP - G", 'COD_PROD'] = 30
+        Demanda_por_region.loc[Demanda_por_region.Combustible=="DIESEL B5 S-50 UV", 'COD_PROD'] = 15
+        Demanda_por_region.loc[Demanda_por_region.Combustible=="DIESEL B5 UV", 'COD_PROD'] = 9
+        Demanda_por_region.loc[Demanda_por_region.Combustible=="Diesel B5 S-50 UV", 'COD_PROD'] = 15
+        Demanda_por_region.loc[Demanda_por_region.Combustible=="DIESEL B5 UV", 'COD_PROD'] = 9
+
+        # Eliminar productos que no utilizamos
+
+        Demanda_por_region = Demanda_por_region[~(Demanda_por_region['Combustible'].str.contains('Gasolina\n84')) &
+                                                ~(Demanda_por_region['Combustible'].str.contains('Total'))&
+                                                ~(Demanda_por_region['Combustible'].str.contains('Turbo'))&
+                                                ~(Demanda_por_region['Combustible'].str.contains('TOTAL'))&
+                                                ~(Demanda_por_region['Combustible'].str.contains('Gasohol 84\nPlus'))&
+                                                ~(Demanda_por_region['Combustible'].str.contains('HEXANO'))&
+                                                ~(Demanda_por_region['Combustible'].str.contains('Pet'))&
+                                                ~(Demanda_por_region['Combustible'].str.contains('Gas\n100LL'))&
+                                                ~(Demanda_por_region['Combustible'].str.contains('Diesel\nMGO'))&
+                                                ~(Demanda_por_region['Combustible'].str.contains('IFO'))&
+                                                ~(Demanda_por_region['Combustible'].str.contains('Gasolina\n97'))&
+                                                ~(Demanda_por_region['Combustible'].str.contains('JP 5'))&  
+                                                ~(Demanda_por_region['Combustible'].str.contains('Gasolina\n98'))&  
+                                                ~(Demanda_por_region['Combustible'].str.contains('Gasohol 97\nPlus'))& 
+                                                ~(Demanda_por_region['Combustible'].str.contains('Gasohol 98\nPlus'))
+                                                ]
+
+        #Arreglar fecha
+
+        Demanda_por_region['Fecha']=Demanda_por_region['Fecha'].str.replace('-',' ')
+
+        Demanda_por_region['Año']=Demanda_por_region['Fecha'].str.split().str[-1:].str[0].str.replace('pdf','').str.replace('.','')
+        Demanda_por_region['Mes']=Demanda_por_region['Fecha'].str.split().str[-2:-1].str[0].str.replace('-' ,'')
+
+
+        Demanda_por_region.drop('Fecha', axis=1, inplace=True)
+
+        Demanda_por_region['Volumenes']=Demanda_por_region['Volumenes'].str.replace(',','')
+
+        # guardar tabla
+
+        Demanda_por_region.to_csv("data/interim/combustibles_validos/df_volumenes_departamento.csv", encoding="utf-8", index=False)
+        print('guardo con exito')
+    def cv2_processCombustiblesValidos(self) -> DataFrame:
+        DF_val = "df_volumenes_departamento.csv"
+        DF_val2 = "df_validos_dpt.csv"
+        ruta8 = "data/interim/combustibles_validos/"
+        ruta4 = "data/processed/combustibles_validos/"
+        # Combustibles válidos
+        print("Combustibles válidos")
+        df = pd.read_csv(f'{ruta8}{DF_val}', encoding="utf-8")
+        valor_a_verificar = 'LIMA'
+        if valor_a_verificar in df['DEPARTAMENTO'].values:
+            nueva_fila = df[df['DEPARTAMENTO'] == valor_a_verificar].copy()
+            nueva_fila['DEPARTAMENTO'] = 'CALLAO'
+            df = pd.concat([df, nueva_fila], ignore_index=True)
+        df.columns = df.columns.str.upper()
+        cols = df["COMBUSTIBLE"].value_counts()
+        deps = df["DEPARTAMENTO"].unique()
+        aos = df["AÑO"].unique()
+        combinaciones = list(product(deps, aos))
+        df_gnv = pd.DataFrame(combinaciones, columns=['DEPARTAMENTO', 'AÑO'])
+        df_gnv["COD_PROD"] = 16
+        df_glpg = pd.DataFrame(combinaciones, columns=['DEPARTAMENTO', 'AÑO'])
+        df_glpg["COD_PROD"] = 30
+        df_glpe = pd.DataFrame(combinaciones, columns=['DEPARTAMENTO', 'AÑO'])
+        df_glpe["COD_PROD"] = 29
+
+        #df['VOLUMENES'] = pd.to_numeric(df['VOLUMENES'].str.replace(',', ''), errors='coerce')
+
+        df['NM'] = df['MES'].map({'Enero': 1, 'Febrero': 2, 'Marzo': 3, 'Abril': 4, 'Mayo': 5, 'Junio': 6, 'Julio': 7, 'Agosto': 8, 'Setiembre': 9, 'Octubre': 10, 'Noviembre': 11, 'Diciembre': 12})
+        df.loc[df['VOLUMENES'] == 0, 'VOLUMENES'] = pd.NA
+
+
+        df_gasohol_premium = df[(df['COMBUSTIBLE'] == 'GASOHOL PREMIUM') | (df['COMBUSTIBLE'] == 'Gasohol 95 Plus')]
+        df_gasohol_premium = processCv2File.combse(df_gasohol_premium,59)
+        df_gasolina_regular = df[(df['COMBUSTIBLE'] == 'GASOLINA REGULAR') | (df['COMBUSTIBLE'] == 'Gasolina 90')]
+        df_gasolina_regular = processCv2File.combse(df_gasolina_regular,62)
+        df_gasolina_premium = df[(df['COMBUSTIBLE'] == 'GASOLINA PREMIUM') | (df['COMBUSTIBLE'] == 'Gasolina 95')]
+        df_gasolina_premium = processCv2File.combse(df_gasolina_premium,61)
+        df_gasohol_regular = df[(df['COMBUSTIBLE'] == 'GASOHOL REGULAR') | (df['COMBUSTIBLE'] == 'Gasohol 90 Plus')]
+        df_gasohol_regular = processCv2File.combse(df_gasohol_regular,60)
+        df_diesel = df[(df['COMBUSTIBLE'] == 'DIESEL B5 UV') | (df['COMBUSTIBLE'] == 'DB5 S-50')]
+        df_diesel = processCv2File.combse(df_diesel,15)
+        df_diesel2 = df[(df['COMBUSTIBLE'] == 'DIESEL B5 S-50 UV') | (df['COMBUSTIBLE'] == 'Diesel B5')]
+        df_diesel2 = processCv2File.combse(df_diesel2,9)
+
+        combs = pd.concat([df_diesel,df_diesel2,df_gnv,df_glpe,df_glpg,df_gasohol_premium, df_gasolina_regular,df_gasolina_premium, df_gasohol_regular], ignore_index=True)
+        combs["ok"] = 1
+        combs.sort_values(by=["DEPARTAMENTO","AÑO"],inplace=True)
+        combs["ID"]=combs["DEPARTAMENTO"] + "-" + combs["COD_PROD"].astype(str)
+        fecha_minima = combs['AÑO'].min()
+        fecha_maxima = combs['AÑO'].max()
+        rango_fechas_completo = list(range(fecha_minima,fecha_maxima))
+        combinaciones = pd.DataFrame([(id, fecha) for id in combs['ID'].unique() for fecha in rango_fechas_completo], columns=['ID', 'AÑO'])
+        combs = pd.merge(combinaciones, combs, on=['ID', 'AÑO'], how='outer')
+        combs.to_csv(ruta4 + DF_val2,index=False)
+
+

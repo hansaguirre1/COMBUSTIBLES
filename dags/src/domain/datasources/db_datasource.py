@@ -37,3 +37,6 @@ class DbDatasource(ABC):
     @abstractmethod
     def saveRelapasa(self, df_combinado: DataFrame) -> DataFrame:
         pass
+    @abstractmethod
+    def saveCombustibleValido(self):
+        pass

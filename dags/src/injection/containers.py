@@ -1,3 +1,4 @@
+from src.infrastructure.repositories.combustibles_validos_repository_impl import CombustiblesValidosRepositoryImpl
 from src.infrastructure.repositories.referencia_repository_impl import ReferenciaRepositoryImpl
 from src.infrastructure.repositories.minorista_repository_impl import MinoristaRepositoryImpl
 from src.infrastructure.repositories.marcadores_repository_impl import MarcadoresRepositoryImpl
@@ -51,6 +52,12 @@ class Container(containers.DeclarativeContainer):
     
     minorista_repository = providers.Factory(
         MinoristaRepositoryImpl,
+        fileDatasource=file_datasource,
+        dbDatasource=db_datasource
+    )
+    
+    combustible_valido_repository = providers.Factory(
+        CombustiblesValidosRepositoryImpl,
         fileDatasource=file_datasource,
         dbDatasource=db_datasource
     )

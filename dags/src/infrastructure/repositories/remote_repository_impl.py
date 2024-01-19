@@ -27,3 +27,6 @@ class RemoteRepositoryImpl(RemoteRepository):
         
     def getDataMinorista(self, url: str):
         self.remoteDatasource.getDataSigneBlock(url=url)
+        
+    def cv0_getDataCombustiblesValidos(self, url: str):
+        self.remoteDatasource.getDataCombustiblesValidos(url=url)

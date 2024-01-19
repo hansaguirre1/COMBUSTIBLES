@@ -1,10 +1,10 @@
 from selenium import webdriver
 from src.config.get_env import hub_selenium
 
-def configure_selenium() -> webdriver:
+def configure_selenium(path: str = '') -> webdriver:
 
     __chrome_options = webdriver.ChromeOptions()
-    __new_dir_path = '/home/seluser/Downloads'
+    __new_dir_path = f'/home/seluser/Downloads{path}'        
     __prefs = {'download.default_directory' : __new_dir_path,  
             "download.prompt_for_download": False,
             "download.directory_upgrade": True,

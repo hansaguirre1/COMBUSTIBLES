@@ -22,3 +22,6 @@ class RemoteDatasource(ABC):
     @abstractmethod
     def getDataSigneBlock(self, url: str):
         ...
+    @abstractmethod
+    def getDataCombustiblesValidos(self, url: str):
+        ...

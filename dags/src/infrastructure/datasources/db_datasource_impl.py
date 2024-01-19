@@ -1,4 +1,7 @@
+import hashlib
+
 from pandas import DataFrame
+from src.infrastructure.models.combustible_valido_model import CombustibleValidoModel
 from src.infrastructure.models.relapasa_model import RelapasaModel
 from src.infrastructure.models.price_referencia_model import PriceReferenciaModel
 from src.infrastructure.models.planta_model import PlantaModel
@@ -22,6 +25,7 @@ import re
 from sqlalchemy.orm import Session
 from sqlalchemy import text, select, func
 pathMinorista = 'data/processed/minoristas'
+pathCombustibleValido = 'data/processed/combustibles_validos'
 
 class DbDatasourceImpl(DbDatasource):
     def __init__(self, session_factory: Callable[..., AbstractContextManager[Session]]) -> None:
@@ -470,7 +474,7 @@ class DbDatasourceImpl(DbDatasource):
         try:
             return int(value)
         except ValueError:
-            print('error transform string to int validate_and_convert_to_int()')
+            print(f'error transform string to int ({value}) validate_and_convert_to_int()')
             return 0
     def quitar_tildes(self, texto):
         return ''.join(
@@ -558,4 +562,50 @@ class DbDatasourceImpl(DbDatasource):
                     nom_prod = productNewValue
                 )
                 session.add(productModel)
+            session.commit()
+    def saveCombustibleValido(self):
+        cvDataframe = pd.read_csv(f"{pathCombustibleValido}/df_validos_dpt.csv")
+        with self.session_factory() as session:            
+            
+            for index, row in cvDataframe.iterrows():
+                id_cv = row.get("ID", '')
+                anio = row.get("AÑO", '')
+                departamento = row.get("DEPARTAMENTO", '')
+                producto_id = row.get("COD_PROD", '')
+                ok = row.get("ok", '')
+                
+                id_cv = str(id_cv) if not pd.isna(id_cv) else ''
+                anio = str(anio) if not pd.isna(anio) else ''
+                departamento = str(departamento) if not pd.isna(departamento) else ''
+                producto_id = producto_id if not pd.isna(producto_id) else 0
+                ok = str(ok) if not pd.isna(ok) else ''
+                
+                if (producto_id == 0):    
+                    continue
+                producto_id = str(producto_id).replace('.0', '')
+                campos = [
+                    id_cv,
+                    anio,
+                    departamento,
+                    producto_id,
+                    ok,
+                ]
+                    
+                cadena_unica = '|'.join(campos)
+
+                hash_id = hashlib.sha256(cadena_unica.encode()).hexdigest()
+                
+                results = session.query(CombustibleValidoModel).get(hash_id)
+                
+                producto_id = self.validate_and_convert_to_int(producto_id)
+                if not results:
+                    combustibleValidoModel = CombustibleValidoModel(
+                        id = hash_id,
+                        id_cv = id_cv,
+                        anio = anio,
+                        departamento = departamento,
+                        ok = ok,
+                        producto_id = producto_id,
+                    )
+                    session.add(combustibleValidoModel)
             session.commit()

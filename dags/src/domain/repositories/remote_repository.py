@@ -13,3 +13,6 @@ class RemoteRepository(ABC):
     @abstractmethod
     def getDataMinorista(self, url: str):
         ...
+    @abstractmethod
+    def cv0_getDataCombustiblesValidos(self, url: str):
+        ...

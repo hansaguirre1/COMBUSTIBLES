@@ -229,3 +229,39 @@ class RemoteDatasourceImpl(RemoteDatasource):
             
         finally:
             driver.quit()
+    
+    def getDataCombustiblesValidos(self, url: str):
+        try:
+            driver = configure_selenium(path='/raw/combustibles_validos') 
+            url_1 ='https://www.osinergmin.gob.pe/empresas/hidrocarburos/scop/documentos-scop'
+            
+            # # declarar correctamente los paths en selenium
+            # dir=os.getcwd()
+            # pre_dir=os.path.dirname(dir)
+            # pre_dir
+            # ner_dir=r"\data\raw\combustibles validos"
+            # new_dir_path=f"{pre_dir}{ner_dir}"
+            # new_dir_path
+
+
+            driver.get(url_1)
+            time.sleep(10)
+
+            #Encontrar elmentos de interés
+            driver.find_element(By.XPATH, '//*[@id="browser"]/li[1]/span').click()
+            container=driver.find_element(By.XPATH, '//*[@id="browser"]/li[1]/ul')
+            container_list=container.find_elements(By.TAG_NAME,'span')
+
+            len(container_list)
+
+            #Descargar elementos y rango de descarga
+
+            a=(datetime.now().year-2018-2)*13
+
+            for element in container_list[0:a]:
+                for i in range(0,1):
+                    element.click()
+                    time.sleep(5)
+            time.sleep(5)
+        finally:
+            driver.quit()

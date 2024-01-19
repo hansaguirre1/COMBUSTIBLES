@@ -25,6 +25,14 @@ class FileDatasource(ABC):
     @abstractmethod
     def processFileMinoristasDiario(self) -> DataFrame:
         pass
+    
+    @abstractmethod
+    def cv1_processReadAndCleanNewValues(self) -> DataFrame:
+        pass
+    
+    @abstractmethod
+    def cv2_processCombustiblesValidos(self) -> DataFrame:
+        pass
 
     # @abstractmethod
     # def saveDataActivityCsv(self, data: DataFrame) -> DataFrame:

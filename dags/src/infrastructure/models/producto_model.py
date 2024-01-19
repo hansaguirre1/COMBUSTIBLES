@@ -21,3 +21,4 @@ class ProductoModel(Base):
     precio_mayoristas = relationship("PricesMayoristasModel", back_populates="producto")
     precios_referencia = relationship("PriceReferenciaModel", back_populates="producto")
     relapasas = relationship("RelapasaModel", back_populates="producto")
+    combustibles_validos = relationship("CombustibleValidoModel", back_populates="producto")
