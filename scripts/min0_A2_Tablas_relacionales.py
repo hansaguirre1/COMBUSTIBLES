@@ -12,7 +12,7 @@ from minfut1_utils import *
 # Cargando la base de datos general
 os.chdir(os.getcwd())
 
-def limpieza_masiva(data):
+def limpieza_masiva(data, ubi):
     # Tabla Ubicacion
     ubi = ubi[["DPD","ID_DPD"]]
     
@@ -149,11 +149,10 @@ if len(arch)==1:
     ex2=pd.read_excel(arch[0],sheet_name="LIQ_EVP_DMAY_CCA_CCE",skiprows=3)
     ex2=limpieza_mini(ex2)
     data = pd.concat([ex1, ex2], ignore_index=True)
-    data = limpieza_masiva(data)
-    os.remove(arch[0])
+    data = limpieza_masiva(data, ubi)
+    #os.remove(arch[0])
 
 # Exportando base final
-data_concat_f = pd.concat([datax, data], ignore_index=True)
 data_concat_f.to_csv(ruta4 + BASE_DLC, index=False, encoding="utf-8", sep=";")
 
 

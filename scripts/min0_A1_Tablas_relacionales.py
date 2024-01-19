@@ -31,7 +31,7 @@ try:
 except:
     pass
 
-def limpieza_masiva(data):    
+def limpieza_masiva(data, ubi):    
     # Tabla Ubicacion
     ubi = ubi[["DPD","ID_DPD"]]
     
@@ -174,7 +174,7 @@ try:
     data.drop(["fecha","fecha1"],axis=1,inplace=True)
 except:
     pass
-dm=limpieza_masiva(data)
+dm=limpieza_masiva(data, ubi)
 
 
 
