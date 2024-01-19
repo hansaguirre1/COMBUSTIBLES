@@ -153,6 +153,7 @@ if len(arch)==1:
     #os.remove(arch[0])
 
 # Exportando base final
+data_concat_f = pd.concat([datax, data], ignore_index=True)
 data_concat_f.to_csv(ruta4 + BASE_DLC, index=False, encoding="utf-8", sep=";")
 
 
