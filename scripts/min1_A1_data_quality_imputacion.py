@@ -8,6 +8,7 @@ import seaborn as sns
 from concurrent.futures import ProcessPoolExecutor
 from itertools import product
 from minfut0_nombres import *
+from minfut3_utils_clean import *
 
 # Desactivar todas las advertencias de pandas
 warnings.filterwarnings("ignore")

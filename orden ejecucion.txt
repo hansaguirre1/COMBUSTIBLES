@@ -1,0 +1,9 @@
+1. min0_A1
+2. min1_A1
+3. min3_comb_validos
+4. ma3_distancias
+5. min4_A1_merge
+
+bucle:
+1. min0_A2
+2. min1_A2

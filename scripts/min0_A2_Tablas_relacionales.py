@@ -142,6 +142,7 @@ arch = glob(ruta2 + "Diario(*.xlsx")
 # Cargando compilado y diario
 if len(arch)==1:
     print("Archivo diario")
+    print(arch[0])
     datax = pd.read_csv(ruta4 + BASE_DLC,encoding="utf-8",sep=";")
     ex1=pd.read_excel(arch[0],sheet_name="GLP_EVP_PEGL_LVGL_COM_PROD_IMP",skiprows=3)
     ex1=limpieza_mini(ex1)
