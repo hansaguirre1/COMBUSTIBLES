@@ -7,7 +7,7 @@ import pandas as pd
 import os
 from minfut0_nombres import *
 from minfut1_utils import *
-from minfut2_ubigeo_simple import ubigeos
+
 
 # Cargando la base de datos general
 os.chdir(os.getcwd())

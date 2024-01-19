@@ -12,3 +12,7 @@ python "cv1_ Lectura join y limpieza de nuevos valores.py"
 
 echo Ejecutando: "cv2_comb_validos.py"
 python "cv2_comb_validos.py"
+
+
+echo Proceso completado.
+pause

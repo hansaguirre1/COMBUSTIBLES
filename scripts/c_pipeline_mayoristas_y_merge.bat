@@ -17,3 +17,7 @@ python "ma2_ imputación de precios.py"
 
 echo Ejecutando: "min4_A1_merges.py"
 python "min4_A1_merge.py"
+
+
+echo Proceso completado.
+pause
