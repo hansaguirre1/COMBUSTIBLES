@@ -4,7 +4,12 @@ cd E:\GitHub\COMBUSTIBLES\scripts
 
 call C:\ProgramData\anaconda3\Scripts\activate.bat
 
+# UBIGEO SIMPLE
 
+echo Ejecutando: "ubi0_simple.py"
+python "ubi0_simple.py"
+
+# Minoristas historico
 echo Ejecutando: "min0_A1_Tablas_relacionales.py"
 python "min0_A1_Tablas_relacionales.py"
 

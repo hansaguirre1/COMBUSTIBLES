@@ -4,6 +4,7 @@ cd E:\GitHub\COMBUSTIBLES\scripts
 
 call C:\ProgramData\anaconda3\Scripts\activate.bat
 
+
 #Proceso minorista diario
 
 echo Ejecutando: "min0_A2_descarga de precios diarios.py"
