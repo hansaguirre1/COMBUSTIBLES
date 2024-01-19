@@ -5,8 +5,8 @@ from minfut0_nombres import *
 from itertools import product
 
 def combse(df,cod):
-    df_mean = df.groupby(['DEPARTAMENTO', 'YEAR'])['PRECIOS'].mean().reset_index()
-    df_mean = df_mean[df_mean['YEAR'] > 2017]
+    df_mean = df.groupby(['DEPARTAMENTO', 'AÑO'])['PRECIOS'].mean().reset_index()
+    df_mean = df_mean[df_mean['AÑO'] > 2017]
     df_mean = df_mean.dropna(subset=['PRECIOS'])
     df_mean["COD_PROD"] = cod
     df_mean = df_mean[df_mean["PRECIOS"]>1000]
@@ -26,11 +26,11 @@ cols = df["COMBUSTIBLE"].value_counts()
 deps = df["DEPARTAMENTO"].unique()
 aos = df["YEAR"].unique()
 combinaciones = list(product(deps, aos))
-df_gnv = pd.DataFrame(combinaciones, columns=['DEPARTAMENTO', 'YEAR'])
+df_gnv = pd.DataFrame(combinaciones, columns=['DEPARTAMENTO', 'AÑO'])
 df_gnv["COD_PROD"] = 16
-df_glpg = pd.DataFrame(combinaciones, columns=['DEPARTAMENTO', 'YEAR'])
+df_glpg = pd.DataFrame(combinaciones, columns=['DEPARTAMENTO', 'AÑO'])
 df_glpg["COD_PROD"] = 30
-df_glpe = pd.DataFrame(combinaciones, columns=['DEPARTAMENTO', 'YEAR'])
+df_glpe = pd.DataFrame(combinaciones, columns=['DEPARTAMENTO', 'AÑO'])
 df_glpe["COD_PROD"] = 29
 df['PRECIOS'] = pd.to_numeric(df['PRECIOS'].str.replace(',', ''), errors='coerce')
 df['NM'] = df['MONTH'].map({'Enero': 1, 'Febrero': 2, 'Marzo': 3, 'Abril': 4, 'Mayo': 5, 'Junio': 6, 'Julio': 7, 'Agosto': 8, 'Setiembre': 9, 'Octubre': 10, 'Noviembre': 11, 'Diciembre': 12})
@@ -49,11 +49,13 @@ df_diesel2 = df[(df['COMBUSTIBLE'] == 'Diesel B5(***)') | (df['COMBUSTIBLE'] == 
 df_diesel2 = combse(df_diesel2,9)
 combs = pd.concat([df_diesel,df_diesel2,df_gnv,df_glpe,df_glpg,df_gasohol_premium, df_gasolina_regular,df_gasolina_premium, df_gasohol_regular], ignore_index=True)
 combs["ok"] = 1
-combs.sort_values(by=["DEPARTAMENTO","YEAR"],inplace=True)
+combs.sort_values(by=["DEPARTAMENTO","AÑO"],inplace=True)
 combs["ID"]=combs["DEPARTAMENTO"] + "-" + combs["COD_PROD"].astype(str)
-fecha_minima = combs['YEAR'].min()
-fecha_maxima = combs['YEAR'].max()
+fecha_minima = combs['AÑO'].min()
+fecha_maxima = combs['AÑO'].max()
 rango_fechas_completo = list(range(fecha_minima,fecha_maxima))
-combinaciones = pd.DataFrame([(id, fecha) for id in combs['ID'].unique() for fecha in rango_fechas_completo], columns=['ID', 'YEAR'])
-combs = pd.merge(combinaciones, combs, on=['ID', 'YEAR'], how='outer')
+combinaciones = pd.DataFrame([(id, fecha) for id in combs['ID'].unique() for fecha in rango_fechas_completo], columns=['ID', 'AÑO'])
+combs = pd.merge(combinaciones, combs, on=['ID', 'AÑO'], how='outer')
 combs.to_csv(ruta4 + DF_val2,index=False)
+
+
