@@ -32,6 +32,7 @@ ruta4 = r"..\data\processed\\"
 ruta5 = r"..\data\raw\combustibles validos\\"
 ruta6 = r"..\data\interim\\"
 ruta7 = r"..\data\interim\precios mayoristas\\"
+ruta8 = r"..\data\interim\combustibles validos\\"
 
 # Bases para merge
 try:

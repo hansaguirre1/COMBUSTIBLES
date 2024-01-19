@@ -5,26 +5,26 @@ from minfut0_nombres import *
 from itertools import product
 
 def combse(df,cod):
-    df_mean = df.groupby(['DEPARTAMENTO', 'AÑO'])['PRECIOS'].mean().reset_index()
+    df_mean = df.groupby(['DEPARTAMENTO', 'AÑO'])['Volumenes'].mean().reset_index()
     df_mean = df_mean[df_mean['AÑO'] > 2017]
-    df_mean = df_mean.dropna(subset=['PRECIOS'])
+    df_mean = df_mean.dropna(subset=['Volumenes'])
     df_mean["COD_PROD"] = cod
-    df_mean = df_mean[df_mean["PRECIOS"]>1000]
-    df_mean.drop(columns=["PRECIOS"],inplace=True)
+    df_mean = df_mean[df_mean["Volumenes"]>1000]
+    df_mean.drop(columns=["Volumenes"],inplace=True)
     return df_mean
     
 # Combustibles válidos
 print("Combustibles válidos")
-df = pd.read_csv(ruta5 + DF_val, encoding="utf-8")
+df = pd.read_csv(ruta8 + DF_val, encoding="utf-8")
 valor_a_verificar = 'LIMA'
 if valor_a_verificar in df['DEPARTAMENTO'].values:
     nueva_fila = df[df['DEPARTAMENTO'] == valor_a_verificar].copy()
     nueva_fila['DEPARTAMENTO'] = 'CALLAO'
     df = pd.concat([df, nueva_fila], ignore_index=True)
 df.columns = df.columns.str.upper()
-cols = df["COMBUSTIBLE"].value_counts()
+cols = df["Combustible"].value_counts()
 deps = df["DEPARTAMENTO"].unique()
-aos = df["YEAR"].unique()
+aos = df["AÑO"].unique()
 combinaciones = list(product(deps, aos))
 df_gnv = pd.DataFrame(combinaciones, columns=['DEPARTAMENTO', 'AÑO'])
 df_gnv["COD_PROD"] = 16
@@ -32,21 +32,26 @@ df_glpg = pd.DataFrame(combinaciones, columns=['DEPARTAMENTO', 'AÑO'])
 df_glpg["COD_PROD"] = 30
 df_glpe = pd.DataFrame(combinaciones, columns=['DEPARTAMENTO', 'AÑO'])
 df_glpe["COD_PROD"] = 29
-df['PRECIOS'] = pd.to_numeric(df['PRECIOS'].str.replace(',', ''), errors='coerce')
-df['NM'] = df['MONTH'].map({'Enero': 1, 'Febrero': 2, 'Marzo': 3, 'Abril': 4, 'Mayo': 5, 'Junio': 6, 'Julio': 7, 'Agosto': 8, 'Setiembre': 9, 'Octubre': 10, 'Noviembre': 11, 'Diciembre': 12})
-df.loc[df['PRECIOS'] == 0, 'PRECIOS'] = pd.NA
-df_gasohol_premium = df[(df['COMBUSTIBLE'] == 'GASOHOL PREMIUM') | (df['COMBUSTIBLE'] == 'Gasohol 95 Plus')]
+
+df['Volumenes'] = pd.to_numeric(df['Volumenes'].str.replace(',', ''), errors='coerce')
+
+df['NM'] = df['Mes'].map({'Enero': 1, 'Febrero': 2, 'Marzo': 3, 'Abril': 4, 'Mayo': 5, 'Junio': 6, 'Julio': 7, 'Agosto': 8, 'Setiembre': 9, 'Octubre': 10, 'Noviembre': 11, 'Diciembre': 12})
+df.loc[df['Volumenes'] == 0, 'Volumenes'] = pd.NA
+
+
+df_gasohol_premium = df[(df['Combustible'] == 'GASOHOL PREMIUM') | (df['Combustible'] == 'Gasohol 95 Plus')]
 df_gasohol_premium = combse(df_gasohol_premium,59)
-df_gasolina_regular = df[(df['COMBUSTIBLE'] == 'GASOLINA REGULAR') | (df['COMBUSTIBLE'] == 'Gasolina 90')]
+df_gasolina_regular = df[(df['Combustible'] == 'GASOLINA REGULAR') | (df['Combustible'] == 'Gasolina 90')]
 df_gasolina_regular = combse(df_gasolina_regular,62)
-df_gasolina_premium = df[(df['COMBUSTIBLE'] == 'GASOLINA PREMIUM') | (df['COMBUSTIBLE'] == 'Gasolina 95')]
+df_gasolina_premium = df[(df['Combustible'] == 'GASOLINA PREMIUM') | (df['Combustible'] == 'Gasolina 95')]
 df_gasolina_premium = combse(df_gasolina_premium,61)
-df_gasohol_regular = df[(df['COMBUSTIBLE'] == 'GASOHOL REGULAR') | (df['COMBUSTIBLE'] == 'Gasohol 90 Plus')]
+df_gasohol_regular = df[(df['Combustible'] == 'GASOHOL REGULAR') | (df['Combustible'] == 'Gasohol 90 Plus')]
 df_gasohol_regular = combse(df_gasohol_regular,60)
-df_diesel = df[(df['COMBUSTIBLE'] == 'DB5 S-50(***)') | (df['COMBUSTIBLE'] == 'DB5 S-50')]
+df_diesel = df[(df['Combustible'] == 'DIESEL B5 UV') | (df['Combustible'] == 'DB5 S-50')]
 df_diesel = combse(df_diesel,15)
-df_diesel2 = df[(df['COMBUSTIBLE'] == 'Diesel B5(***)') | (df['COMBUSTIBLE'] == 'Diesel B5')]
+df_diesel2 = df[(df['Combustible'] == 'DIESEL B5 S-50 UV') | (df['Combustible'] == 'Diesel B5')]
 df_diesel2 = combse(df_diesel2,9)
+
 combs = pd.concat([df_diesel,df_diesel2,df_gnv,df_glpe,df_glpg,df_gasohol_premium, df_gasolina_regular,df_gasolina_premium, df_gasohol_regular], ignore_index=True)
 combs["ok"] = 1
 combs.sort_values(by=["DEPARTAMENTO","AÑO"],inplace=True)
