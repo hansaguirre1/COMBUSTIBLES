@@ -80,6 +80,6 @@ time.sleep(15)
 # descargar data
 data_download_button = driver.find_element(By.XPATH, '/html/body/div[3]/div/div/form/div[5]/div[2]/div[1]/table/tbody/tr[3]/td[4]/input')
 driver.execute_script("arguments[0].click();", data_download_button)
-
+time.sleep(60)
 
 driver.close()
