@@ -1,5 +1,5 @@
 import pandas as pd
-pathMinorista = 'data/minoristas'
+pathMinorista = 'data/interim/minoristas'
 
 # Cargando compilado y diario
 def limpiezaMinorista(df):

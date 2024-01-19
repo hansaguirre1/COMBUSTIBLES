@@ -13,16 +13,16 @@ class MinoristaRepositoryImpl(MinoristaRepository):
     
     def saveDataBase(self):
         data = self.fileDatasource.processFileMinoristasDiario()
-        relapasa = self.dbDatasource.saveRelapasa(data)
-        self.fileDatasource.saveDataRelapasaToCsv(relapasa)
+        # relapasa = self.dbDatasource.saveRelapasa(data)
+        # self.fileDatasource.saveDataRelapasaToCsv(relapasa)
         
-        # self.dbDatasource.saveRazonSocial()
-        # self.dbDatasource.saveCodigoOsinerg()
-        # self.dbDatasource.saveUbication()
-        # self.dbDatasource.saveActivity()
-        # self.dbDatasource.saveProduct()
-        # self.dbDatasource.saveDirection()
-        # self.dbDatasource.savePrice(data=data)
+        self.dbDatasource.saveRazonSocial()
+        self.dbDatasource.saveCodigoOsinerg()
+        self.dbDatasource.saveUbication()
+        self.dbDatasource.saveActivity()
+        self.dbDatasource.saveProduct()
+        self.dbDatasource.saveDirection()
+        self.dbDatasource.savePrice(data=data)
     
     def saveDataToDta(self):
         self.fileDatasource.exportFinalDta()

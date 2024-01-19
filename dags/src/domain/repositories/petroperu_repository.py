@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-class PetroperuRepository(ABC):
+class MayoristaPetroperuRepository(ABC):
     
     @abstractmethod
     def saveData(self):

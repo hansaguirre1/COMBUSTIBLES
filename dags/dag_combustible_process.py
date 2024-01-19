@@ -23,18 +23,18 @@ with DAG(
         catchup=False,
 ) as dag:
     
-    def processDataPetroperu():
+    def processDataPreciosMayoristaPetroperu():
         from src.injection.containers import Container
         from src.domain.repositories.remote_repository import RemoteRepository
-        from src.domain.repositories.petroperu_repository import PetroperuRepository
+        from src.domain.repositories.petroperu_repository import MayoristaPetroperuRepository
         from src.config.get_env import url_petroperu
 
         container = Container()
         remoteRepository: RemoteRepository = container.remote_repository()
-        petroperuRepository: PetroperuRepository = container.petroperu_repository()
+        mayoristaPetroperuRepository: MayoristaPetroperuRepository = container.petroperu_repository()
         
-        remoteRepository.getDataPetroperu(url=url_petroperu)
-        petroperuRepository.saveData()
+        # remoteRepository.getDataPetroperu(url=url_petroperu)
+        mayoristaPetroperuRepository.saveData()
     
     def processDataMarcadores():
         from src.config.get_env import url_bcrp, url_eia
@@ -50,7 +50,7 @@ with DAG(
         marcadorRepository.saveData(df=dfMarcadores)
     
     
-    def getDataOsinergmin():
+    def processDataPreciosReferencialesOsinergmin():
         from src.domain.repositories.remote_repository import RemoteRepository
         from src.domain.repositories.referencia_repository import ReferenciaRepository
 
@@ -60,7 +60,7 @@ with DAG(
         container = Container()
         remoteRepository: RemoteRepository = container.remote_repository()
         referenciaRepository: ReferenciaRepository = container.referencia_repository()
-        remoteRepository.getDataOsinergmin(url=url_osinergmin)
+        # remoteRepository.getDataOsinergmin(url=url_osinergmin)
         referenciaRepository.saveDataReferencia()
     
     def processDataMinoristas():
@@ -98,9 +98,9 @@ with DAG(
         dag=dag,
         )
     
-    process_data_petroperu = PythonOperator(
+    process_data_precios_mayorista_petroperu = PythonOperator(
         task_id='process-data-petroperu',
-        python_callable=processDataPetroperu,
+        python_callable=processDataPreciosMayoristaPetroperu,
         dag=dag,
         )
     
@@ -110,25 +110,25 @@ with DAG(
         dag=dag,
         )
     
-    process_data_osinergmin_referencia = PythonOperator(
+    process_data_osinergmin_precios_referencia = PythonOperator(
         task_id='process-data-osinergmin-referencia',
-        python_callable=getDataOsinergmin,
+        python_callable=processDataPreciosReferencialesOsinergmin,
         dag=dag,
         )
     
-    process_data_signeblock = PythonOperator(
+    process_data_minoristas = PythonOperator(
         task_id='process-data-minoristas',
         python_callable=processDataMinoristas,
         dag=dag,
         )
     
-    process_final_dta = PythonOperator(
-        task_id='save-final-dta-minoritas',
-        python_callable=processDataMinoristas,
-        dag=dag,
-        )
+    # process_final_dta = PythonOperator(
+    #     task_id='save-final-dta-minoritas',
+    #     python_callable=processDataMinoristas,
+    #     dag=dag,
+    #     )
 
     end_process = EmptyOperator(task_id='end-process-data')
     
     # start_process >> remote_data_petroperu >> remote_data_marcadores >> remote_data_osinergmin >> remote_data_signeblock >> end_process
-    start_process >> process_data_marcadores >> process_data_signeblock >> process_final_dta >> process_data_petroperu >> process_data_osinergmin_referencia >> end_process
+    start_process >>process_data_minoristas >> process_data_marcadores >> process_data_precios_mayorista_petroperu >> process_data_osinergmin_precios_referencia >> end_process

@@ -24,7 +24,7 @@ class RemoteDatasourceImpl(RemoteDatasource):
 
             archivos = os.listdir(f'{new_dir_path}')
             ruta_original = f'{new_dir_path}/{archivos[0]}'
-            ruta_nueva = 'data/raw/petroperu_info.pdf'
+            ruta_nueva = 'data/raw/precios_mayoristas_petroperu/petroperu_info.pdf'
             shutil.copyfile(ruta_original, ruta_nueva)
             os.remove(ruta_original)
             print('archivo copiado y eliminado con éxito!')
@@ -221,7 +221,7 @@ class RemoteDatasourceImpl(RemoteDatasource):
             for archivo in archivos:
                 if archivo.endswith(".xlsx"):
                     ruta_original = os.path.join(f'{new_dir_path}', archivo)
-                    ruta_nueva = os.path.join('data/raw', f'precios_combustibles_minorista_{fecha_actual.strftime("%d-%m-%Y")}.xlsx')
+                    ruta_nueva = os.path.join('data/raw/precios_minoristas', f'precios_combustibles_minorista_{fecha_actual.strftime("%d-%m-%Y")}.xlsx')
                     shutil.copy2(ruta_original, ruta_nueva)
                     os.remove(ruta_original)
                     

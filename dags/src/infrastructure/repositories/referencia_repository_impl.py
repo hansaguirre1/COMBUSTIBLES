@@ -1,7 +1,7 @@
 from src.domain.repositories.referencia_repository import ReferenciaRepository
 from src.domain.datasources.db_datasource import DbDatasource
 from src.domain.datasources.file_datasource import FileDatasource
-from src.domain.repositories.petroperu_repository import PetroperuRepository
+from src.domain.repositories.petroperu_repository import MayoristaPetroperuRepository
 
 
 class ReferenciaRepositoryImpl(ReferenciaRepository):

@@ -1,9 +1,9 @@
 from src.domain.datasources.db_datasource import DbDatasource
 from src.domain.datasources.file_datasource import FileDatasource
-from src.domain.repositories.petroperu_repository import PetroperuRepository
+from src.domain.repositories.petroperu_repository import MayoristaPetroperuRepository
 
 
-class PetroperuRepositoryImpl(PetroperuRepository):
+class MayoristaPetroperuRepositoryImpl(MayoristaPetroperuRepository):
     def __init__(self, fileDatasource: FileDatasource, dbDatasource: DbDatasource):
         self.fileDatasource = fileDatasource
         self.dbDatasource = dbDatasource

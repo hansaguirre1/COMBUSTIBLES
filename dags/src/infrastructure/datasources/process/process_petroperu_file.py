@@ -5,7 +5,7 @@ import re
 import numpy as np
 
 
-pagina_pdf = "data/raw/petroperu_info.pdf"
+pagina_pdf = "data/raw/precios_mayoristas_petroperu/petroperu_info.pdf"
 Acumulado =[]
 
 def get_date(pagina_pdf):

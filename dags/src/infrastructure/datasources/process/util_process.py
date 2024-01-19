@@ -2,8 +2,8 @@ import pandas as pd
 
 def verifyNameProductsNotMatchesByReference():
     # Read the CSV files
-        referencia_excel = pd.read_excel('data/referencia/Precios_referencia.xls')
-        producto_df = pd.read_csv('data/minoristas/df_producto.csv')
+        referencia_excel = pd.read_excel('data/raw/referencia/Precios_referencia.xls')
+        producto_df = pd.read_csv('data/processed/minoristas/df_producto.csv')
 
         combustibles_excel = set(referencia_excel['Combustible'])
         nombres_prod_csv = set(producto_df['NOM_PROD'])
@@ -16,8 +16,8 @@ def verifyNameProductsNotMatchesByReference():
 
 def verifyNameProductsNotMatchesByPetroperu():
     # Read the CSV files
-    petroperu_df = pd.read_csv('data/petroperu/Petroperu_Lista.csv', sep=';')
-    producto_df = pd.read_csv('data/minoristas/df_producto.csv')
+    petroperu_df = pd.read_csv('data/raw/petroperu/Petroperu_Lista.csv', sep=';')
+    producto_df = pd.read_csv('data/processed/minoristas/df_producto.csv')
 
     # Compare the 'Combustible' column of petroperu_df with the 'NOM_PROD' column of producto_df
     # non_matches = petroperu_df[petroperu_df['Combustible'].isin(producto_df['NOM_PROD'])]

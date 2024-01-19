@@ -5,6 +5,7 @@ from datetime import datetime
 from src.config.db_config import Base
 from sqlalchemy.orm import relationship
 from src.infrastructure.models.price_referencia_model import PriceReferenciaModel
+import re
 
 
 class ProductoModel(Base):

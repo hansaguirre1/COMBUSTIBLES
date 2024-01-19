@@ -21,7 +21,7 @@ import re
 
 from sqlalchemy.orm import Session
 from sqlalchemy import text, select, func
-pathMinorista = 'data/minoristas'
+pathMinorista = 'data/processed/minoristas'
 
 class DbDatasourceImpl(DbDatasource):
     def __init__(self, session_factory: Callable[..., AbstractContextManager[Session]]) -> None:
@@ -63,52 +63,51 @@ class DbDatasourceImpl(DbDatasource):
         newPetroperuList: List[PricesMayoristasModel] = []
         with self.session_factory() as session:
             allPetroperu = session.query(PricesMayoristasModel).all()
-        for index, row in petroperuDataframe.iterrows():
-            precio_con_impuesto = row.get('Precios', '')
-            combustible = row.get('Combustible', '')
-            planta = row.get('PLANTAS', '')
-            fecha = row.get('Fecha', '')
-            
-            combustibleOnlyLetterNumber = re.sub(r'[^a-zA-Z0-9]', '', combustible).lower()
-            plantaDb= session.query(PlantaModel).filter(PlantaModel.planta == planta).first()
-            combustibleDb= session.query(ProductoModel).filter(ProductoModel.nom_prod == combustibleOnlyLetterNumber).first()
-            combustibleId = combustibleDb.id if combustibleDb else 0
-            if(combustibleId == 0):
-                datos_homogeneizado = self.homogenizar_datos(combustible)
-                if(datos_homogeneizado == None) :
-                    newProductsList.append(combustible)
-                    datos_homogeneizado = combustible
-                combustibleOnlyLetterNumber = re.sub(r'[^a-zA-Z0-9]', '', datos_homogeneizado).lower()
-                combustibleDb= session.query(ProductoModel).filter(ProductoModel.nom_prod == datos_homogeneizado).first()
+            for index, row in petroperuDataframe.iterrows():
+                precio_con_impuesto = row.get('Precios', '')
+                combustible = row.get('Combustible', '')
+                planta = row.get('PLANTAS', '')
+                fecha = row.get('Fecha', '')
                 
-            combustibleId = combustibleDb.id if combustibleDb else 0
-            plantaId = plantaDb.id if plantaDb else 0
-            
-            precio_con_impuesto = str(precio_con_impuesto) if not pd.isna(precio_con_impuesto) else None
-            fecha = str(fecha) if not pd.isna(fecha) else None
-            
-            results = list(filter(
-                lambda petroperu: (
-                    petroperu.precio_con_impuesto == precio_con_impuesto and
-                    petroperu.producto_id == combustibleId and
-                    petroperu.planta_id == plantaId
-                ),
-                allPetroperu
-            ))
-            if not results:
-                petroperuEntity = PricesMayoristasModel(
-                    precio_con_impuesto = precio_con_impuesto,
-                    fecha = fecha,
-                    producto_id = combustibleId,
-                    planta_id = plantaId
-                )
-                if(combustibleId > 0 and plantaId > 0):
-                    newPetroperuList.append(petroperuEntity)
+                combustibleOnlyLetterNumber = self.convertOnlyLettersAndNumbers(combustible)
+                plantaDb= session.query(PlantaModel).filter(PlantaModel.planta == planta).first()
+                combustibleDb= session.query(ProductoModel).filter(self.convertSqlOnlyLettersAndNumbers(ProductoModel.nom_prod) == combustibleOnlyLetterNumber).first()
+                combustibleId = combustibleDb.id if combustibleDb else 0
+                print(f'combustibleId -> {combustibleId}')
+                if(combustibleId == 0):
+                    datos_homogeneizado = self.homogenizar_datos(combustible)
+                    if(datos_homogeneizado == None) :
+                        newProductsList.append(combustible)
+                    combustibleOnlyLetterNumber = self.convertOnlyLettersAndNumbers( datos_homogeneizado)
+                    combustibleDb= session.query(ProductoModel).filter(self.convertSqlOnlyLettersAndNumbers(ProductoModel.nom_prod) == combustibleOnlyLetterNumber).first()
+                    
+                combustibleId = combustibleDb.id if combustibleDb else 0
+                plantaId = plantaDb.id if plantaDb else 0
                 
-        with self.session_factory() as session:
-            session.add_all(newPetroperuList)
+                precio_con_impuesto = str(precio_con_impuesto) if not pd.isna(precio_con_impuesto) else None
+                fecha = str(fecha) if not pd.isna(fecha) else None
+                
+                results = list(filter(
+                    lambda petroperu: (
+                        petroperu.precio_con_impuesto == precio_con_impuesto and
+                        petroperu.producto_id == combustibleId and
+                        petroperu.planta_id == plantaId
+                    ),
+                    allPetroperu
+                ))
+                if not results:
+                    petroperuEntity = PricesMayoristasModel(
+                        precio_con_impuesto = precio_con_impuesto,
+                        fecha = fecha,
+                        producto_id = combustibleId,
+                        planta_id = plantaId
+                    )
+                    if(combustibleId > 0 and plantaId > 0):
+                        newPetroperuList.append(petroperuEntity)
+                    
+                session.add_all(newPetroperuList)
             session.commit()
-        self.addNewProduct(newProductsList=newProductsList)
+        # self.addNewProduct(newProductsList=newProductsList)
     
     def saveReferenciaOsinergmin(self, df: DataFrame):
         newReferenciaList: List[PriceReferenciaModel] = []
@@ -118,28 +117,25 @@ class DbDatasourceImpl(DbDatasource):
             allReferencia = session.query(PriceReferenciaModel).all()
             allProducts = session.query(ProductoModel).all()
             
-        def mi_filtro(producto, valor_a_comparar):
-            valor_a_comparar = re.sub(r'[^a-zA-Z0-9]', '', valor_a_comparar)
+        products_dict = {self.convertOnlyLettersAndNumbers(producto.nom_prod):producto.id for producto in allProducts}
 
-            findProduct =  producto.nom_prod == valor_a_comparar.replace(' ','').strip().lower()
-            if(findProduct) : return producto
-            else: return None
-            
         for index, row in df.iterrows():
             precio = row.get('Precio', '')
             productoRef = row.get('Producto', '')
             fecha = row.get('Fecha', '')
             
-            productoDb = next((producto for producto in allProducts if mi_filtro(producto, productoRef)), None)
+            productoRefOnlyLettersAndNumber = self.convertOnlyLettersAndNumbers(productoRef)
+            productoDb = products_dict.get(productoRefOnlyLettersAndNumber, None)
 
+            productoId = productoDb if productoDb else 0
             if not productoDb:
                 responseProductoRef = self.homogenizar_datos(productoRef)
                 if(responseProductoRef == None) :
                     newProductsList.append(productoRef)
-                    responseProductoRef = productoRef
-                productoDb = next((producto for producto in allProducts if mi_filtro(producto, responseProductoRef)), None)
+                productoRefOnlyLettersAndNumber = self.convertOnlyLettersAndNumbers(responseProductoRef)
+                productoDb = products_dict.get(productoRefOnlyLettersAndNumber, None)
 
-            productoId = productoDb.id if productoDb else 0
+            productoId = productoDb if productoDb else 0
             
             precio = str(precio) if not pd.isna(precio) else None
             fecha = str(fecha) if not pd.isna(fecha) else None
@@ -163,7 +159,7 @@ class DbDatasourceImpl(DbDatasource):
         with self.session_factory() as session:
             session.add_all(newReferenciaList)
             session.commit()
-        self.addNewProduct(newProductsList=newProductsList)
+        # self.addNewProduct(newProductsList=newProductsList)
     
     def saveRelapasa(self, df_combinado: DataFrame) -> DataFrame:
         relapasaDataframe = df_combinado
@@ -416,8 +412,8 @@ class DbDatasourceImpl(DbDatasource):
                 unidad = unidad if not pd.isna(unidad) else None
                 
                 id = self.validate_and_convert_to_int(id)
-                nom_prod = self.quitar_tildes(nom_prod).strip().lower()
-                nom_prod = re.sub(r'[^a-zA-Z0-9]', '', nom_prod)
+                # nom_prod = self.quitar_tildes(nom_prod).strip().lower()
+                # nom_prod = re.sub(r'[^a-zA-Z0-9]', '', nom_prod)
                 
                 productModel = ProductoModel(
                     id = id,
@@ -482,6 +478,33 @@ class DbDatasourceImpl(DbDatasource):
             if unicodedata.category(c) != 'Mn'
         )
     
+    def convertOnlyLettersAndNumbers(self, value: str) -> str: 
+        
+        if not isinstance(value, str):
+            return ''
+        if(value == ''):
+            return ''
+        newValue = self.quitar_tildes(value).strip().lower()
+        newValue = re.sub(r'[^a-zA-Z0-9]', '', newValue)
+        
+        return newValue
+        
+    def convertSqlOnlyLettersAndNumbers(self, column):
+        # Implementa la lógica de convertOnlyLettersAndNumbers aquí
+        
+        # Eliminar espacios en blanco
+        column = func.replace(column, ' ', '')
+        # Quiter tildes
+        column = func.translate(column, "áéíóúüñÁÉÍÓÚÜÑ", "aeiouunAEIOUUN")
+
+        # Eliminar caracteres no alfanuméricos
+        column = func.translate(column, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+
+        # Convertir a minúsculas
+        column = func.lower(column)
+
+        return column
+    
     def homogenizar_datos(self, dato):
         conversiones = {
             "GLP-E SOLES/KG": "GLP - E",
@@ -520,15 +543,16 @@ class DbDatasourceImpl(DbDatasource):
 
         return conversiones.get(dato, None)
     
+
     def addNewProduct(self, newProductsList: List[str]):
+        print(f'new products {newProductsList}')
         with self.session_factory() as session:
             consulta = select([func.max(ProductoModel.id)])
             max_id = session.execute(consulta).scalar()
             newProductsList = list(set(newProductsList))
             for newProduct in newProductsList:
                 max_id += 1
-                value = newProduct.strip().lower()
-                productNewValue = re.sub(r'[^a-zA-Z0-9]', '', value)
+                productNewValue = self.convertOnlyLettersAndNumbers(newProduct)
                 productModel = ProductoModel(
                     id = max_id,
                     nom_prod = productNewValue

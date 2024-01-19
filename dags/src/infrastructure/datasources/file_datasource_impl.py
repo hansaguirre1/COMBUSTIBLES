@@ -13,7 +13,7 @@ import zipfile
 import PyPDF2
 import re
 
-pathMinorista = 'data/minoristas'
+pathMinorista = 'data/interim/minoristas'
 
 class FileDatasourceImpl(FileDatasource):
     
@@ -112,11 +112,11 @@ class FileDatasourceImpl(FileDatasource):
         return data
         
     def saveDataPetroperuToCSV(self, df_combinado: pd.DataFrame):
-        data_existente = pd.read_csv("data/petroperu/Petroperu_Lista.csv", sep=';')
+        data_existente = pd.read_csv("data/raw/petroperu/Petroperu_Lista.csv", sep=';')
  
         petroperu = pd.concat([data_existente, df_combinado], ignore_index=True)
 
-        petroperu.to_csv("data/petroperu/Petroperu_Lista.csv", index=False, sep=';')
+        petroperu.to_csv("data/raw/petroperu/Petroperu_Lista.csv", index=False, sep=';')
     
     def saveDataPetroperuToExcel(self, df_combinado: pd.DataFrame):
         df_combinado = df_combinado.rename(columns={df_combinado.columns[1]: "GLP-E" ,
@@ -127,29 +127,29 @@ class FileDatasourceImpl(FileDatasource):
                                             df_combinado.columns[6]: "Gasohol Premium" ,
                                             df_combinado.columns[7]: "Gasohol Regular" ,
                                             df_combinado.columns[8]: "Gasohol 84"}) 
-        datos_excel = pd.read_excel("data/petroperu/petroperu.xlsx", sheet_name='Petroperu')
+        datos_excel = pd.read_excel("data/raw/petroperu/petroperu.xlsx", sheet_name='Petroperu')
 
         nuevos_datos = pd.concat([datos_excel, df_combinado], ignore_index=True)
         nuevos_datos['Fecha']=nuevos_datos['Fecha'].dt.date
 
-        with pd.ExcelWriter("data/petroperu/petroperu.xlsx", mode='a', engine='openpyxl', if_sheet_exists ='replace') as writer:
+        with pd.ExcelWriter("data/raw/petroperu/petroperu.xlsx", mode='a', engine='openpyxl', if_sheet_exists ='replace') as writer:
             nuevos_datos.to_excel(writer, sheet_name='Petroperu', index=False)
 
     def saveDataMarcadoresToCsv(self, df_combinado: pd.DataFrame):
-        data = pd.read_csv("data/marcadores/marcadores.csv")
+        data = pd.read_csv("data/raw/marcadores/marcadores.csv")
         data ["Fecha"] = pd.to_datetime(data["Fecha"], format="%Y-%m-%d")
 
         data_final = pd.concat([data, df_combinado], ignore_index=True)
         data_final["Fecha"] = pd.to_datetime(data_final["Fecha"], format="%Y-%m-%d")
         data_final["Fecha"] = data_final["Fecha"].dt.date
 
-        data_final.to_csv("data/marcadores/marcadores.csv", index=False)
+        data_final.to_csv("data/raw/marcadores/marcadores.csv", index=False)
         
     def processFileMinoristasDiario(self) -> pd.DataFrame:
         t = datetime.now()
         dateStr = t.strftime('%d-%m-%Y')
         print("Archivo diario")
-        pathExcel = f'data/raw/precios_combustibles_minorista_{dateStr}.xlsx'
+        pathExcel = f'data/raw/precios_minoristas/precios_combustibles_minorista_{dateStr}.xlsx'
         ex1=pd.read_excel(pathExcel,sheet_name="GLP_EVP_PEGL_LVGL_COM_PROD_IMP",skiprows=3)
         ex1=limpiezaMinorista(ex1)
         ex2=pd.read_excel(pathExcel,sheet_name="LIQ_EVP_DMAY_CCA_CCE",skiprows=3)
@@ -161,9 +161,9 @@ class FileDatasourceImpl(FileDatasource):
     
     def saveDataRelapasaToCsv(self, df_combinado: DataFrame):
         # Relapasa
-        relapasa = pd.read_excel("data/relapasa/relapasa.xlsx")
+        relapasa = pd.read_excel("data/raw/relapasa/relapasa.xlsx")
         relapasaMerge = pd.concat([relapasa, df_combinado])
-        relapasaMerge.to_excel("data/relapasa/relapasa.xlsx", index=False)
+        relapasaMerge.to_excel("data/raw/relapasa/relapasa.xlsx", index=False)
         # Fin - Relapasa
     
     def exportFinalDta(self):
