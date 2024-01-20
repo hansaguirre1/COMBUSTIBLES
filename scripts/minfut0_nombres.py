@@ -36,8 +36,8 @@ ruta8 = r"..\data\interim\combustibles validos\\"
 
 # Bases para merge
 try:
-    cod = pd.read_csv(ruta4 + DF_cod, encoding='utf-8', sep=";")
     ubi = pd.read_csv(ruta4 + DF_ubi, encoding='utf-8', sep=";")
+    cod = pd.read_csv(ruta4 + DF_cod, encoding='utf-8', sep=";")
     rs = pd.read_csv(ruta4 + DF_rs, encoding='utf-8', sep=";")
     prod = pd.read_csv(ruta4 + DF_prod, encoding='utf-8', sep=";")
     dir = pd.read_csv(ruta4 + DF_dir, encoding='utf-8', sep=";")
