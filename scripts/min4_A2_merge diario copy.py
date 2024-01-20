@@ -15,6 +15,7 @@ os.chdir(os.getcwd())
 
 # Finally
 d1 = pd.read_csv(ruta4 + DF_fin, encoding="utf-8", sep=";")
+d1=d1.drop(columns={"PRECIOVENTA_may"})
 df = pd.read_csv(ruta4 + DF_dir_may,encoding='utf-8',sep=";")
 #df = df.drop_duplicates(subset=["PROVINCIA","DEPARTAMENTO","RUC"])
 d2 = pd.read_csv(ruta7 + DF_may_fin,encoding='utf-8',sep=';')
