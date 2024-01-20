@@ -13,6 +13,11 @@ python "ma1_ join y limpieza de informacion.py"
 echo Ejecutando: "ma2_ imputación de precios.py"
 python "ma2_ imputación de precios.py"
 
+#Proceso georderenciación
+
+echo Ejecutando: "dis3_distancias.py"
+python "dis3_distancias.py"
+
 #merge mayorista minorista
 
 echo Ejecutando: "min4_A1_merges.py"
