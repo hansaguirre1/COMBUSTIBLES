@@ -150,7 +150,7 @@ if len(arch)==1:
     ex2=limpieza_mini(ex2)
     data = pd.concat([ex1, ex2], ignore_index=True)
     data = limpieza_masiva(data, ubi)
-    #os.remove(arch[0])
+    os.remove(arch[0])
 
 # Exportando base final
 data_concat_f = pd.concat([datax, data], ignore_index=True)

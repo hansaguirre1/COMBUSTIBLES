@@ -27,11 +27,14 @@ import os, zipfile
 # Configuración e inicio de navegación
 
 dir=os.getcwd()
-dir
+pre_dir=os.path.dirname(dir)
+pre_dir
+ner_dir=r"\data\raw\precios mayoristas"
+new_dir_path=f"{pre_dir}{ner_dir}"
+new_dir_path
 
-new_dir_path = f'{dir}\\data\\raw\\precios mayoristas'
 chrome_options = webdriver.ChromeOptions()
-service = Service(executable_path=r'E:/GitHub/COMBUSTIBLES/chromedriver.exe')
+service = Service(executable_path=r'../chromedriver.exe')
 home_dir = './scraper_combustibles'
 prefs = {'download.default_directory' : new_dir_path,  
          "download.prompt_for_download": False,
