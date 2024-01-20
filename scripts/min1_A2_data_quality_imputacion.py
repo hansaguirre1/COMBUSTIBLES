@@ -15,7 +15,7 @@ from minfut3_utils_clean import *
 
 # Directorio
 os.chdir(os.getcwd())
-fecha_manual = pd.to_datetime(datetime.now().date() - timedelta(days=3))
+fecha_manual = pd.to_datetime(datetime.now().date() - timedelta(days=1))
 #fecha_manual = pd.to_datetime('2024-01-16')  # Reemplaza con la fecha que desees
 nueva_fecha = fecha_manual - timedelta(days=15)
 

@@ -33,6 +33,15 @@ ner_dir=r"\data\raw\precios mayoristas"
 new_dir_path=f"{pre_dir}{ner_dir}"
 new_dir_path
 
+#Eliminar excel de la anterior corrida
+
+Precios_Mayoristas_list=[]
+for file in os.listdir(new_dir_path):
+    if file.endswith('.xlsx'):
+        os.remove(f'{new_dir_path}\\{file}')
+
+#Nuevos driver
+
 chrome_options = webdriver.ChromeOptions()
 service = Service(executable_path=r'../chromedriver.exe')
 home_dir = './scraper_combustibles'
