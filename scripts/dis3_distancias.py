@@ -21,6 +21,7 @@ data2["id"] = data2.index
 data2.to_csv(ruta3 + DF_georef_may, encoding="utf-8", sep=";")
 data2["RUC-prov"] = data2["RUC"].astype(str)+"-"+data2["PROVINCIA_VENDEDOR"]
 data2["RUC"]=data2["RUC"].astype(str)
+data2.to_csv(ruta3 + DF_georef_may, index=False, encoding="utf-8", sep=";")
 data2_ = pd.read_csv(ruta7 + DF_may_fin,encoding='utf-8',sep=';')
 
 # Verificamos el producto
