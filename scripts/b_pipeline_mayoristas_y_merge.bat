@@ -1,4 +1,4 @@
-cd E:\GitHub\COMBUSTIBLES\scripts
+
 
 call C:\ProgramData\anaconda3\Scripts\activate.bat
 
