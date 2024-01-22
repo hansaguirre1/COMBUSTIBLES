@@ -13,9 +13,9 @@ echo Ejecutando: "ma1_ join y limpieza de informacion.py"
 python ".\b_mayoristas y merge\ma1_ join y limpieza de informacion.py"
 
 echo Ejecutando: "ma2_ imputación de precios.py"
-python ".\b_mayoristas y merge\ma2_ imputación de precios.py"
+python ".\b_mayoristas y merge\ma2_ imputacion de precios.py"
 
-#Proceso georderenciación
+echo Proceso georderenciación
 
 echo Ejecutando: "dis3_distancias.py"
 python ".\b_mayoristas y merge\dis3_distancias.py"
