@@ -10,6 +10,15 @@ from concurrent.futures import ProcessPoolExecutor
 from itertools import product
 from datetime import timedelta
 from datetime import datetime
+
+import sys
+
+
+dir=os.getcwd()
+dir
+sys.path.append(dir)
+
+
 from minfut0_nombres import *
 from minfut3_utils_clean import *
 

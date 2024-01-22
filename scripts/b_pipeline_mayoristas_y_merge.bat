@@ -8,20 +8,20 @@ call C:\ProgramData\anaconda3\Scripts\activate.bat
 
 
 echo Ejecutando: "ma1_ join y limpieza de informacion.py"
-python "ma1_ join y limpieza de informacion.py"
+python ".\b_mayoristas y merge\ma1_ join y limpieza de informacion.py"
 
 echo Ejecutando: "ma2_ imputación de precios.py"
-python "ma2_ imputación de precios.py"
+python ".\b_mayoristas y merge\ma2_ imputación de precios.py"
 
 #Proceso georderenciación
 
 echo Ejecutando: "dis3_distancias.py"
-python "dis3_distancias.py"
+python ".\b_mayoristas y merge\dis3_distancias.py"
 
 #merge mayorista minorista
 
 echo Ejecutando: "min4_A1_merges.py"
-python "min4_A1_merge.py"
+python ".\b_mayoristas y merge\min4_A1_merge.py"
 
 
 echo Proceso completado.

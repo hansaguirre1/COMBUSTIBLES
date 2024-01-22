@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
 import pandas as pd
+import sys
+
+
+dir=os.getcwd()
+dir
+sys.path.append(dir)
+
 from minfut0_nombres import *
 from itertools import product
 

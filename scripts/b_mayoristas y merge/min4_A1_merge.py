@@ -8,6 +8,13 @@ import warnings
 import seaborn as sns
 from concurrent.futures import ProcessPoolExecutor
 from itertools import product
+
+import sys
+dir=os.getcwd()
+dir
+sys.path.append(dir)
+
+
 from minfut0_nombres import *
 
 # Directorio

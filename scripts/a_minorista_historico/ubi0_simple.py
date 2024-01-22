@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
+
+import sys
 import os
+
+dir=os.getcwd()
+dir
+sys.path.append(dir)
+
 import pandas as pd
 from minfut0_nombres import *
 
