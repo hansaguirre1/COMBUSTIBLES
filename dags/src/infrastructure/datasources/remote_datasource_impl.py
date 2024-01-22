@@ -1,5 +1,5 @@
 from pandas import DataFrame
-import os
+import os, zipfile
 import time 
 from selenium.webdriver.common.by import By
 import shutil
@@ -179,7 +179,7 @@ class RemoteDatasourceImpl(RemoteDatasource):
         finally:
             driver.quit()    
     
-    def getDataSigneBlock(self, url: str):
+    def min0_A2_descarga(self, url: str):
         try:
             fecha_actual = datetime.now()
             driver = configure_selenium()                        
@@ -205,7 +205,7 @@ class RemoteDatasourceImpl(RemoteDatasource):
             code = response['code']
             print ( code )
 
-                # Set the solved Captcha
+           # Set the solved Captcha
             recaptcha_response_element = driver.find_element(By.ID, 'g-recaptcha-response')
             driver.execute_script(f'arguments[0].value = "{code}";', recaptcha_response_element)
 
@@ -263,5 +263,45 @@ class RemoteDatasourceImpl(RemoteDatasource):
                     element.click()
                     time.sleep(5)
             time.sleep(5)
+        finally:
+            driver.quit()
+    
+    def m0_descarga_mayorista(self):
+        try:
+            driver = configure_selenium(path='/raw/precios_mayoristas') 
+            url_1 ='https://www.osinergmin.gob.pe/empresas/hidrocarburos/scop/documentos-scop'
+            driver.get(url_1)
+
+            # Encontrar elementos de interés
+            driver.find_element(By.XPATH, '//*[@id="browser"]/li[13]/div').click()
+            container=driver.find_element(By.XPATH, '//*[@id="browser"]/li[13]/ul')
+            container_list=container.find_elements(By.TAG_NAME,'li')
+
+
+            # Descarga de información
+
+            for element in container_list:
+                for i in range(0,1):
+                    element.click()
+                    time.sleep(5)
+
+            # Unzip files
+
+            new_dir_path_mayorista = 'data/raw/precios_mayoristas'
+            for file in os.listdir(new_dir_path_mayorista):   # get the list of files
+                if zipfile.is_zipfile(file): # if it is a zipfile, extract it
+                    with zipfile.ZipFile(file) as item: # treat the file as a zip
+                        item.extractall()
+
+
+            # Eliminar todo lo que no es excel
+                for file in os.listdir(new_dir_path_mayorista):
+                    if file.endswith('.zip') or file.endswith('.xml'):
+                        file_path = os.path.join(new_dir_path_mayorista, file)
+                        os.remove(file_path)
+                        print(f"Deleted: {file_path}")
+        except:
+            pass
+
         finally:
             driver.quit()

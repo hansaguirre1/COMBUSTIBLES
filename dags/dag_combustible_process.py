@@ -35,6 +35,19 @@ with DAG(
         
         # remoteRepository.getDataPetroperu(url=url_petroperu)
         # mayoristaPetroperuRepository.saveData()
+    
+    def processDataPreciosMayorista():
+        from src.injection.containers import Container
+        from src.domain.repositories.remote_repository import RemoteRepository
+        from src.domain.repositories.precios_mayoristas_repository import PreciosMayoristasRepository
+
+        container = Container()
+        remoteRepository: RemoteRepository = container.remote_repository()
+        preciosMayoristasRepository: PreciosMayoristasRepository = container.precios_mayoristas_repository()
+        
+        remoteRepository.m0_descarga_mayorista()
+        # preciosMayoristasRepository.saveDataMayoristas()
+        
     def processDataCombustiblesValidos():
         from src.injection.containers import Container
         from src.domain.repositories.remote_repository import RemoteRepository
@@ -61,6 +74,17 @@ with DAG(
         
         # dfMarcadores = remoteRepository.getDataMarcadores(urlBcrp=url_bcrp, urlEia=url_eia)
         # marcadorRepository.saveData(df=dfMarcadores)
+    
+    
+    def processDataUbigeo():
+        from src.config.get_env import url_bcrp, url_eia
+        from src.injection.containers import Container
+        from src.domain.repositories.ubigeo_repository import UbigeoRepository
+
+        container = Container()
+        ubigeoRepository: UbigeoRepository = container.ubigeo_repository()
+        
+        ubigeoRepository.saveDataUbigeo()
     
     
     def processDataPreciosReferencialesOsinergmin():
@@ -111,6 +135,12 @@ with DAG(
         dag=dag,
         )
     
+    process_data_ubigeo = PythonOperator(
+        task_id='process_data_ubigeo',
+        python_callable=processDataUbigeo,
+        dag=dag,
+        )
+    
     process_data_combustibles_validos = PythonOperator(
         task_id='process_data_combustibles_validos',
         python_callable=processDataCombustiblesValidos,
@@ -135,6 +165,12 @@ with DAG(
         dag=dag,
         )
     
+    process_precio_mayorista= PythonOperator(
+        task_id='process_precio_mayorista',
+        python_callable=processDataPreciosMayorista,
+        dag=dag,
+        )
+    
     process_data_minoristas = PythonOperator(
         task_id='process-data-minoristas',
         python_callable=processDataMinoristas,
@@ -150,4 +186,4 @@ with DAG(
     end_process = EmptyOperator(task_id='end-process-data')
     
     # start_process >> remote_data_petroperu >> remote_data_marcadores >> remote_data_osinergmin >> remote_data_signeblock >> end_process
-    start_process >>process_data_combustibles_validos >> process_data_minoristas >> process_data_marcadores >> process_data_precios_mayorista_petroperu >> process_data_osinergmin_precios_referencia >> end_process
+    start_process >> process_precio_mayorista >> process_data_ubigeo >> process_data_combustibles_validos >> process_data_minoristas >> process_data_marcadores >> process_data_precios_mayorista_petroperu >> process_data_osinergmin_precios_referencia >> end_process

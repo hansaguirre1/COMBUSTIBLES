@@ -1,3 +1,5 @@
+from src.infrastructure.repositories.precios_mayoristas_repository_impl import PreciosMayoristasRepositoryImpl
+from src.infrastructure.repositories.ubigeo_repository_impl import UbigeoRepositoryImpl
 from src.infrastructure.repositories.combustibles_validos_repository_impl import CombustiblesValidosRepositoryImpl
 from src.infrastructure.repositories.referencia_repository_impl import ReferenciaRepositoryImpl
 from src.infrastructure.repositories.minorista_repository_impl import MinoristaRepositoryImpl
@@ -58,6 +60,18 @@ class Container(containers.DeclarativeContainer):
     
     combustible_valido_repository = providers.Factory(
         CombustiblesValidosRepositoryImpl,
+        fileDatasource=file_datasource,
+        dbDatasource=db_datasource
+    )
+    
+    ubigeo_repository = providers.Factory(
+        UbigeoRepositoryImpl,
+        fileDatasource=file_datasource,
+        dbDatasource=db_datasource
+    )
+    
+    precios_mayoristas_repository = providers.Factory(
+        PreciosMayoristasRepositoryImpl,
         fileDatasource=file_datasource,
         dbDatasource=db_datasource
     )

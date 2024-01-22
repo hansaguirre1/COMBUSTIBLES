@@ -33,6 +33,10 @@ class FileDatasource(ABC):
     @abstractmethod
     def cv2_processCombustiblesValidos(self) -> DataFrame:
         pass
+    
+    @abstractmethod
+    def ubi0_processUbigeo(self) -> DataFrame:
+        pass
 
     # @abstractmethod
     # def saveDataActivityCsv(self, data: DataFrame) -> DataFrame:

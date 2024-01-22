@@ -25,6 +25,7 @@ import re
 from sqlalchemy.orm import Session
 from sqlalchemy import text, select, func
 pathMinorista = 'data/processed/minoristas'
+pathUbication = 'data/processed'
 pathCombustibleValido = 'data/processed/combustibles_validos'
 
 class DbDatasourceImpl(DbDatasource):
@@ -327,35 +328,47 @@ class DbDatasourceImpl(DbDatasource):
             session.commit()
                     
     def saveUbication(self):
-        ubigeoDataframe = pd.read_csv(f"{pathMinorista}/df_ubicacion.csv")
+        ubigeoDataframe = pd.read_csv(f"{pathUbication}/df_ubicacion.csv", sep=';')
         ubigeoDataframe = ubigeoDataframe.drop_duplicates(subset=['ID_DPD'], keep='first')
         with self.session_factory() as session:
             
             for index, row in ubigeoDataframe.iterrows():
                 id =row.get('ID_DPD', '')
+                ubigeo =row.get('UBIGEO', '')
                 departamento =row.get('departamento', '')
                 provincia =row.get('provincia', '')
                 distrito =row.get('distrito', '')
                 dpd =row.get('DPD', '')
-                ubigeo =row.get('UBIGEO', '')
+                ubi =row.get('UBI', '')
+                p_urban =row.get('pUrban', '')
+                rural =row.get('rural', '')
+                capital =row.get('Capital', '')
                 
                 id = id if not pd.isna(id) else 0
+                ubigeo = ubigeo if not pd.isna(ubigeo) else None
                 departamento = departamento if not pd.isna(departamento) else None
                 provincia = provincia if not pd.isna(provincia) else None
                 distrito = distrito if not pd.isna(distrito) else None
                 dpd = dpd if not pd.isna(dpd) else None
-                ubigeo = ubigeo if not pd.isna(ubigeo) else None
+                ubi = ubi if not pd.isna(ubi) else None
+                p_urban = p_urban if not pd.isna(p_urban) else None
+                rural = rural if not pd.isna(rural) else None
+                capital = capital if not pd.isna(capital) else None
                 
                 id = self.validate_and_convert_to_int(id)
                 
                 ubicationModel = UbicacionModel(
                     id = id,
+                    ubigeo = ubigeo,
                     departamento = departamento,
                     provincia = provincia,
                     distrito = distrito,
                     dpd = dpd,
-                    ubigeo = ubigeo,
-                    )
+                    ubi = ubi,
+                    p_urban = p_urban,
+                    rural = rural,
+                    capital = capital,
+                )
                 if (ubicationModel.id > 0) :
                     session.merge(ubicationModel)
             session.commit()

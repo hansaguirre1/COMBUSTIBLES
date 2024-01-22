@@ -5,6 +5,7 @@ from src.domain.datasources.file_datasource import FileDatasource
 import src.infrastructure.datasources.process.process_petroperu_file as processFile
 import src.infrastructure.datasources.process.process_cv1_file as processCv1File
 import src.infrastructure.datasources.process.process_cv2_file as processCv2File
+import src.infrastructure.datasources.process.process_ubi0_file as processUbi0File
 import pandas as pd
 from glob import glob
 import numpy as np
@@ -330,4 +331,12 @@ class FileDatasourceImpl(FileDatasource):
         combs = pd.merge(combinaciones, combs, on=['ID', 'AÑO'], how='outer')
         combs.to_csv(ruta4 + DF_val2,index=False)
 
+    def ubi0_processUbigeo(self) -> DataFrame:
+        print("ubigeos")
+        ubi = processUbi0File.ubigeos()
+        print("ubi")
+        print(ubi)
+        print("-ubi-")
+        
+        return ubi
 

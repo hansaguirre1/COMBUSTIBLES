@@ -15,6 +15,10 @@ class UbicacionModel(Base):
     distrito = Column(String, nullable=True)
     ubigeo = Column(String, nullable=True)
     dpd = Column(String, nullable=True)
+    ubi = Column(String, nullable=True)
+    p_urban = Column(String, nullable=True)
+    rural = Column(String, nullable=True)
+    capital = Column(String, nullable=True)
     created_at = Column(DateTime(), default=datetime.now())
     
     # Relación con Direcciones

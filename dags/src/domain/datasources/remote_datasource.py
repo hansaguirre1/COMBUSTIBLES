@@ -20,7 +20,10 @@ class RemoteDatasource(ABC):
     def getDataOsinergmin(self, url: str):
         ...
     @abstractmethod
-    def getDataSigneBlock(self, url: str):
+    def min0_A2_descarga(self, url: str):
+        ...
+    @abstractmethod
+    def m0_descarga_mayorista(self):
         ...
     @abstractmethod
     def getDataCombustiblesValidos(self, url: str):
