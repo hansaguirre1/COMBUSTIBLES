@@ -13,7 +13,7 @@ def process2(ii):
 
 
 # Costo otros
-df = pd.read_csv("..\\..\\data\\interim\\precios mayoristas\\mayoristas_pre_imp.csv",encoding='utf-8',sep=";")
+df = pd.read_csv("..\\data\\interim\\precios mayoristas\\mayoristas_pre_imp.csv",encoding='utf-8',sep=";")
 df.rename(columns={"PRECIO DE VENTA (SOLES)": "PRECIOVENTA"},inplace=True)
 df.rename(columns={"PROVINCIA_VENDEDOR": "PROVINCIA"},inplace=True)
 df['fecha_stata'] = pd.to_datetime(df['fecha_stata'], infer_datetime_format=True, errors='coerce')
@@ -58,7 +58,7 @@ for k in cod_prods:
     #df_2.rename(columns={'CODIGOOSINERG': 'COD'}, inplace=True)
     df_2.drop(columns=['PRECIOVENTAx', 'PRECIOVENTA_','dias_faltantes'], inplace=True)
     df_2["COD_PROD"] = k
-    df_2.to_csv(f"..\\..\\data\\interim\\precios mayoristas\\base_final_{k}.csv",  encoding="utf-8",  index=False)
+    df_2.to_csv(f"..\\data\\interim\\precios mayoristas\\base_final_{k}.csv",  encoding="utf-8",  index=False)
 
 
 # guardar todos los productos en una lista
@@ -68,7 +68,7 @@ for k in cod_prods:
     print(k)
     exec(f'base_{p} = pd.read_csv("../data/interim/precios mayoristas/base_final_{k}.csv", encoding="utf-8")')
     dfs.append(f"base_{p}")
-    exec(f'os.remove("../../data/interim/precios mayoristas/base_final_{k}.csv")')
+    exec(f'os.remove("../data/interim/precios mayoristas/base_final_{k}.csv")')
     p += 1
 
 dfs2 = [globals()[f"base_{i}"] for i in range(1, len(dfs) + 1) if f"base_{i}" in globals()]
@@ -80,7 +80,7 @@ df_concatenado = pd.concat(dfs2, ignore_index=True)
 del dfs2
 
 # guardar información previa a la imputación
-df_concatenado.to_csv("..\\..\\data\\interim\\precios mayoristas\\precios_mayoristas_imp.csv", encoding="utf-8", index=False,sep=";")
+df_concatenado.to_csv("..\\data\\interim\\precios mayoristas\\precios_mayoristas_imp.csv", encoding="utf-8", index=False,sep=";")
 
 del df_concatenado
 #del d

@@ -24,7 +24,6 @@ from openpyxl import load_workbook
 # declarar correctamente los paths en selenium
 dir=os.getcwd()
 pre_dir=os.path.dirname(dir)
-pre_dir=os.path.dirname(pre_dir)
 pre_dir
 ner_dir=r"\data\raw\combustibles validos"
 new_dir_path=f"{pre_dir}{ner_dir}"
@@ -33,7 +32,7 @@ new_dir_path
 # Configuración e inicio de navegación
 
 chrome_options = webdriver.ChromeOptions()
-service = Service(executable_path=r'../../chromedriver.exe')
+service = Service(executable_path=r'../chromedriver.exe')
 home_dir = './scraper_combustibles'
 prefs = {'download.default_directory' : new_dir_path,  
          "download.prompt_for_download": False,

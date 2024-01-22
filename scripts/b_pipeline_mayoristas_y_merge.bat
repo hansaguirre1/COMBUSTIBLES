@@ -2,9 +2,11 @@
 
 call C:\ProgramData\anaconda3\Scripts\activate.bat
 
-#Proceso Mayoristas
+echo  Proceso Mayoristas
 
 
+echo Ejecutando: "ma0_ descarga de informacion mayoristas"
+python ".\b_mayoristas y merge\ma0_ descarga de informacion mayoristas.py"
 
 
 echo Ejecutando: "ma1_ join y limpieza de informacion.py"

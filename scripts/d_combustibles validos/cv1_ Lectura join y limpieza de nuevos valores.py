@@ -45,7 +45,7 @@ def list_pdf_files(directory):
     return pdf_files
 
 #DECLARAR TODOS LOS PDFS
-directory_path = r"..\\..\\data\\raw\\combustibles validos"
+directory_path = r"..\\data\\raw\\combustibles validos"
 
 file_list = list_pdf_files(directory_path)
 file_list
@@ -129,4 +129,4 @@ Demanda_por_region['Volumenes']=Demanda_por_region['Volumenes'].str.replace(',',
 
 # guardar tabla
 
-Demanda_por_region.to_csv(r"../../data/processed/df_volumenes_departamento.csv", encoding="utf-8", index=False)
+Demanda_por_region.to_csv(r"../data/processed/df_volumenes_departamento.csv", encoding="utf-8", index=False)

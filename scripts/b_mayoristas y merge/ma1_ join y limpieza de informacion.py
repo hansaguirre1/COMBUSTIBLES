@@ -11,7 +11,7 @@ import os
 dir=os.getcwd()
 dir
 
-new_dir_path = f'..\\..\\data\\raw\\precios mayoristas'
+new_dir_path = f'..\\data\\raw\\precios mayoristas'
 
 # Guardar todo en lista
 
@@ -178,7 +178,7 @@ Precios_Mayoristas['PRECIO DE VENTA (SOLES)']=Precios_Mayoristas['PRECIO DE VENT
 
 # Guardar data de precios mayoristas sin imputar
 
-Precios_Mayoristas.to_csv(f"..//..//data//interim//precios mayoristas//mayoristas_pre_imp.csv", sep=";", encoding="utf-8")
+Precios_Mayoristas.to_csv(f"..//data//interim//precios mayoristas//mayoristas_pre_imp.csv", sep=";", encoding="utf-8")
 
 
 
