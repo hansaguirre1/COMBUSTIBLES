@@ -1,6 +1,13 @@
 import pandas as pd
 import numpy as np
 import os
+import sys
+
+
+dir=os.getcwd()
+dir
+sys.path.append(dir)
+
 import glob
 import matplotlib.pyplot as plt
 import warnings
@@ -77,9 +84,9 @@ for k in cod_prods:
     print("p1")
     #with ProcessPoolExecutor(max_workers=num_cpus) as executor:
     #    executor.map(process, ["PRECIOVENTA_","dias_faltantes"])
-    df_2=process("PRECIOVENTA",df_2)
-    df_2=process("dias_faltantes",df_2)
-    df_2['PRECIOVENTAx'] = df_2['PRECIOVENTA_']
+    #df_2=process("PRECIOVENTA",df_2)
+    #df_2=process("dias_faltantes",df_2)
+    #df_2['PRECIOVENTAx'] = df_2['PRECIOVENTA_']
     print("p2")
     q = 1
     for i in range(1, len(df_2)):

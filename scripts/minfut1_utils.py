@@ -43,30 +43,46 @@ def limpieza_ubi(data):
     
 def limpieza_dir(dxx):
     # Actualización específica de latitud y longitud en base a ID_DIR
-    dxx.loc[dxx["ID_DIR"]==2736,"lat"]=-13.551168
-    dxx.loc[dxx["ID_DIR"]==2736,"lon"]=-71.925882
-    dxx.loc[dxx["ID_DIR"]==2536,"lat"]=-3.554706
-    dxx.loc[dxx["ID_DIR"]==2536,"lon"]=-80.421228
-    dxx.loc[dxx["ID_DIR"]==7785,"lat"]=-11.855585
-    dxx.loc[dxx["ID_DIR"]==7785,"lon"]=-77.07346
-    dxx.loc[dxx["ID_DIR"]==2172,"lat"]=-11.855585
-    dxx.loc[dxx["ID_DIR"]==2172,"lon"]=-77.07346 
-    dxx.loc[dxx["ID_DIR"]==4986,"lat"]=-12.103093
-    dxx.loc[dxx["ID_DIR"]==4986,"lon"]=-76.884684
-    dxx.loc[dxx["ID_DIR"]==2180,"lat"]=-11.931979
-    dxx.loc[dxx["ID_DIR"]==2180,"lon"]=-76.691007
-    dxx.loc[dxx["ID_DIR"]==2180,"lat"]=-12.09994
-    dxx.loc[dxx["ID_DIR"]==2180,"lon"]=-77.019067
-    dxx.loc[dxx["ID_DIR"]==12888,"lat"]=-12.087754
-    dxx.loc[dxx["ID_DIR"]==12888,"lon"]=-77.043034
-    dxx.loc[dxx["ID_DIR"]==10144,"lat"]=-12.09994
-    dxx.loc[dxx["ID_DIR"]==10144,"lon"]=-77.019067
-    dxx.loc[dxx["ID_DIR"]==4489,"lat"]=-12.09994
-    dxx.loc[dxx["ID_DIR"]==4489,"lon"]=-77.019067
-    dxx.loc[dxx["ID_DIR"]==4466,"lat"]=-12.099903
-    dxx.loc[dxx["ID_DIR"]==4466,"lon"]=-77.0190445
-    dxx.loc[dxx["ID_DIR"]==4985,"lat"]=-12.085317
-    dxx.loc[dxx["ID_DIR"]==4985,"lon"]=-76.969399
+    dxx.loc[(dxx["DIRECCION"]=="AV. EL TUBO S/N CARRETERA SAN JACINTO KM. 20 SECTOR COCHARCAS") & (dxx["CODIGOOSINERG2"]=="18426-2"),"lat"]=-9.389195
+    dxx.loc[(dxx["DIRECCION"]=="AV. EL TUBO S/N CARRETERA SAN JACINTO KM. 20 SECTOR COCHARCAS") & (dxx["CODIGOOSINERG2"]=="18426-2"),"lon"]=-77.864671
+    dxx.loc[(dxx["DIRECCION"]=="CARRETERA MOLLENDO-MATARANI KM. 01") & (dxx["CODIGOOSINERG2"]=="18418"),"lat"]=-17.009828
+    dxx.loc[(dxx["DIRECCION"]=="CARRETERA MOLLENDO-MATARANI KM. 01") & (dxx["CODIGOOSINERG2"]=="18418"),"lon"]=-72.024352
+    dxx.loc[(dxx["DIRECCION"]=="PLANTA DE VENTAS CUSCO") & (dxx["CODIGOOSINERG2"]=="42298-3"),"lat"]=-13.522345
+    dxx.loc[(dxx["DIRECCION"]=="PLANTA DE VENTAS CUSCO") & (dxx["CODIGOOSINERG2"]=="42298-3"),"lon"]=-71.983272
+    dxx.loc[(dxx["DIRECCION"]=="CARRETERA MARGINAL KM. 74, C.P. LA FLORIDA, SECTOR KIMIRIKI - AGUA DULCE, PRIMERA ETAPA") & (dxx["CODIGOOSINERG2"]=="87590-2"),"lat"]=-10.925214
+    dxx.loc[(dxx["DIRECCION"]=="CARRETERA MARGINAL KM. 74, C.P. LA FLORIDA, SECTOR KIMIRIKI - AGUA DULCE, PRIMERA ETAPA") & (dxx["CODIGOOSINERG2"]=="87590-2"),"lon"]=-74.876822
+    dxx.loc[(dxx["DIRECCION"]=="AV. SALAVERRY Nº 930") & (dxx["CODIGOOSINERG2"]=="19928-2"),"lat"]=-6.770888
+    dxx.loc[(dxx["DIRECCION"]=="AV. SALAVERRY Nº 930") & (dxx["CODIGOOSINERG2"]=="19928-2"),"lon"]=-79.852857
+    dxx.loc[(dxx["DIRECCION"]=="U. C. N° 117130 DENOMINADA SANTA MAGDALENA, SECTOR ACHOTAL- VALLE LA LECHE") & (dxx["CODIGOOSINERG2"]=="149211"),"lat"]=-6.395264
+    dxx.loc[(dxx["DIRECCION"]=="U. C. N° 117130 DENOMINADA SANTA MAGDALENA, SECTOR ACHOTAL- VALLE LA LECHE") & (dxx["CODIGOOSINERG2"]=="149211"),"lon"]=-79.830308
+    dxx.loc[(dxx["DIRECCION"]=="AV. REPUBLICA DE PANAMA N° 3591 OF. 401") & (dxx["CODIGOOSINERG2"]=="105920-1"),"lat"]=-12.09994
+    dxx.loc[(dxx["DIRECCION"]=="AV. REPUBLICA DE PANAMA N° 3591 OF. 401") & (dxx["CODIGOOSINERG2"]=="105920-1"),"lon"]=-77.019067
+    dxx.loc[(dxx["DIRECCION"]=="AV REPUBLICA DE PANAMA 3591. INT 302") & (dxx["CODIGOOSINERG2"]=="105920-3"),"lat"]=-12.09994
+    dxx.loc[(dxx["DIRECCION"]=="AV REPUBLICA DE PANAMA 3591. INT 302") & (dxx["CODIGOOSINERG2"]=="105920-3"),"lon"]=-77.019067
+    dxx.loc[(dxx["DIRECCION"]=="AV. CESAR VALLERO NRO.1180-1186 URB.ARANJUEZ") & (dxx["CODIGOOSINERG2"]=="39424-3"),"lat"]=-12.087754
+    dxx.loc[(dxx["DIRECCION"]=="AV. CESAR VALLERO NRO.1180-1186 URB.ARANJUEZ") & (dxx["CODIGOOSINERG2"]=="39424-3"),"lon"]=-77.043034
+    dxx.loc[(dxx["DIRECCION"]=="AV. REPUBLICA DE PANAMÁ N° 3591. OFICINA 401") & (dxx["CODIGOOSINERG2"]=="105612-1"),"lat"]=-12.09994
+    dxx.loc[(dxx["DIRECCION"]=="AV. REPUBLICA DE PANAMÁ N° 3591. OFICINA 401") & (dxx["CODIGOOSINERG2"]=="105612-1"),"lon"]=-77.019067
+    dxx.loc[(dxx["DIRECCION"]=="AV. CIRCUNVALACION DEL CLUB GOLF LOS INCAS N° 134 TORRE 1 PISO 18") & (dxx["CODIGOOSINERG2"]=="112622-2"),"lat"]=-12.085317
+    dxx.loc[(dxx["DIRECCION"]=="AV. CIRCUNVALACION DEL CLUB GOLF LOS INCAS N° 134 TORRE 1 PISO 18") & (dxx["CODIGOOSINERG2"]=="112622-2"),"lon"]=-76.969399
+    dxx.loc[(dxx["DIRECCION"]=="AV. VICTOR ANDRES BELAUNDE Nº 147 INT. 301, EDIFICIO REAL 5") & (dxx["CODIGOOSINERG2"]=="33811-2"),"lat"]=-12.096715
+    dxx.loc[(dxx["DIRECCION"]=="AV. VICTOR ANDRES BELAUNDE Nº 147 INT. 301, EDIFICIO REAL 5") & (dxx["CODIGOOSINERG2"]=="33811-2"),"lon"]=-77.037022
+    dxx.loc[(dxx["DIRECCION"]=="AV. VÍCTOR ANDRÉS BELAUNDE 147, VÍA PRINCIPAL N° 110, TORRE REAL 5, PISO 8") & (dxx["CODIGOOSINERG2"]=="33800-1"),"lat"]=-12.096715
+    dxx.loc[(dxx["DIRECCION"]=="AV. VÍCTOR ANDRÉS BELAUNDE 147, VÍA PRINCIPAL N° 110, TORRE REAL 5, PISO 8") & (dxx["CODIGOOSINERG2"]=="33800-1"),"lon"]=-77.037022
+    dxx.loc[(dxx["DIRECCION"]=="AV. VÍCTOR ANDRES BELAÚNDE Nº 147, VÍA PRINCIPAL Nº 110, TORRE 5 PISO 7") & (dxx["CODIGOOSINERG2"]=="33800-2"),"lat"]=-12.096715
+    dxx.loc[(dxx["DIRECCION"]=="AV. VÍCTOR ANDRES BELAÚNDE Nº 147, VÍA PRINCIPAL Nº 110, TORRE 5 PISO 7") & (dxx["CODIGOOSINERG2"]=="33800-2"),"lon"]=-77.037022
+    dxx.loc[(dxx["DIRECCION"]=="AV. CIRCUNVALACION DEL CLUB GOLF LOS INCAS 134. TORRE 1 PISO 18") & (dxx["CODIGOOSINERG2"]=="112623"),"lat"]=-12.085317
+    dxx.loc[(dxx["DIRECCION"]=="AV. CIRCUNVALACION DEL CLUB GOLF LOS INCAS 134. TORRE 1 PISO 18") & (dxx["CODIGOOSINERG2"]=="112623"),"lon"]=-76.969399
+    dxx.loc[(dxx["DIRECCION"]=="ESQ. AV. URUBAMBA CON AV. LOS INGENIEROS") & (dxx["CODIGOOSINERG2"]=="ESQ. AV. URUBAMBA CON AV. LOS INGENIEROS"),"lat"]=-12.06061
+    dxx.loc[(dxx["DIRECCION"]=="ESQ. AV. URUBAMBA CON AV. LOS INGENIEROS") & (dxx["CODIGOOSINERG2"]=="ESQ. AV. URUBAMBA CON AV. LOS INGENIEROS"),"lon"]=-76.951819
+    dxx.loc[(dxx["DIRECCION"]=="AV. MARIANO LINO URQUIETA N° 1003") & (dxx["CODIGOOSINERG2"]=="33767-1"),"lat"]=-17.641764
+    dxx.loc[(dxx["DIRECCION"]=="AV. MARIANO LINO URQUIETA N° 1003") & (dxx["CODIGOOSINERG2"]=="33767-1"),"lon"]=-71.34069
+    dxx.loc[(dxx["DIRECCION"]=="CARRETERA PANAMERICANA NORTE KM. 4.38") & (dxx["CODIGOOSINERG2"]=="39507-1"),"lat"]=-5.200756
+    dxx.loc[(dxx["DIRECCION"]=="CARRETERA PANAMERICANA NORTE KM. 4.38") & (dxx["CODIGOOSINERG2"]=="39507-1"),"lon"]=-80.625589
+    dxx.loc[(dxx["DIRECCION"]=="AV. GARCILAZO N° 323") & (dxx["CODIGOOSINERG2"]=="87636"),"lat"]=-14.882013
+    dxx.loc[(dxx["DIRECCION"]=="AV. GARCILAZO N° 323") & (dxx["CODIGOOSINERG2"]=="87636"),"lon"]=-70.590184
+    dxx.loc[(dxx["DIRECCION"]=="FUNDO EL CHOCHE II PARCELA B - CASERIO NVO. JUANJUI") & (dxx["CODIGOOSINERG2"]=="169148"),"lat"]=-8.639441
+    dxx.loc[(dxx["DIRECCION"]=="FUNDO EL CHOCHE II PARCELA B - CASERIO NVO. JUANJUI") & (dxx["CODIGOOSINERG2"]=="169148"),"lon"]=-74.964887
     return dxx
 
 def limpieza_prod(data):

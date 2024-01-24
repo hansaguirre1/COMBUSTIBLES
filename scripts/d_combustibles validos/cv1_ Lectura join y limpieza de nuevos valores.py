@@ -6,7 +6,6 @@ import datetime
 from openpyxl import load_workbook
 import numpy as np
 
-a
 # Definir funcion para extraer tabla
 
 def extraer_tabla(file):

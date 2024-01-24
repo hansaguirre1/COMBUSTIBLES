@@ -14,17 +14,18 @@ from selenium.webdriver.support.ui import WebDriverWait
 from datetime import date, datetime, timedelta
 
 from selenium.webdriver import ActionChains
-from twocaptcha import TwoCaptcha
-
+import os
 
 import pandas as pd
 
 from openpyxl import load_workbook
 
+
+# declarar correctamente los paths en selenium
 dir=os.getcwd()
 pre_dir=os.path.dirname(dir)
 pre_dir
-ner_dir=r"\data\raw\precios minoristas"
+ner_dir=r"\data\raw\combustibles validos"
 new_dir_path=f"{pre_dir}{ner_dir}"
 new_dir_path
 
@@ -40,42 +41,24 @@ prefs = {'download.default_directory' : new_dir_path,
 chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36")
 chrome_options.add_experimental_option('prefs', prefs)
 
-# Abrir navegador
+
 
 driver = webdriver.Chrome(service=service, options=chrome_options)
-url_6 = "https://tools.signeblock.com/default.aspx?m=0"
-driver.get(url_6)
+url_1 ='https://www.osinergmin.gob.pe/empresas/hidrocarburos/scop/documentos-scop'
+driver.get(url_1)
 
-# Credenciales para entrar a la sesión:
+#Encontrar elmentos de interés
+driver.find_element(By.XPATH, '//*[@id="browser"]/li[1]/span').click()
+container=driver.find_element(By.XPATH, '//*[@id="browser"]/li[1]/ul')
+container_list=container.find_elements(By.TAG_NAME,'span')
 
-user = 'hpalacios' 
-key =  'Lima123%$'
+len(container_list)
 
-user_input = driver.find_element(By.XPATH, '/html/body/div[3]/div/div/div/form/div[3]/input[1]')
-user_input.send_keys(user)
-key_input = driver.find_element(By.XPATH, '/html/body/div[3]/div/div/div/form/div[3]/div[2]/div/input[3]')
-key_input.send_keys(key)
+#Descargar elementos y rango de descarga
 
+a=(datetime.now().year-2018-2)*13
 
-#resolver catpcha
-api_key = 'da495832199f64fb89456be02236ac1e'
-
-solver = TwoCaptcha(api_key)
-
-
-sitekey='6LddE3UUAAAAAJo3jCCqG7iSiThGXicFCBgRvg0S'
-response = solver.recaptcha(sitekey=sitekey, url=url_6)
-
-code = response['code']
-code
-
-# Set the solved Captcha
-recaptcha_response_element = driver.find_element(By.ID, 'g-recaptcha-response')
-driver.execute_script(f'arguments[0].value = "{code}";', recaptcha_response_element)
-
-submit_btn = driver.find_element(By.XPATH, '/html/body/div[3]/div/div/div/form/div[3]/input[2]')
-submit_btn.click()
-time.sleep(15)
-
-data_download_button = driver.find_element(By.XPATH, '/html/body/div[3]/div/div/form/div[5]/div[2]/div[1]/table/tbody/tr[3]/td[4]/input')
-driver.execute_script("arguments[0].click();", data_download_button)
+for element in container_list[0:a]:
+    for i in range(0,1):
+        element.click()
+        time.sleep(5)

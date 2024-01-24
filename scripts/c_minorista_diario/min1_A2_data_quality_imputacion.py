@@ -10,13 +10,22 @@ from concurrent.futures import ProcessPoolExecutor
 from itertools import product
 from datetime import timedelta
 from datetime import datetime
+
+import sys
+
+
+dir=os.getcwd()
+dir
+sys.path.append(dir)
+
+
 from minfut0_nombres import *
 from minfut3_utils_clean import *
 
 # Directorio
 os.chdir(os.getcwd())
 fecha_manual = pd.to_datetime(datetime.now().date() - timedelta(days=1))
-#fecha_manual = pd.to_datetime('2024-01-16')  # Reemplaza con la fecha que desees
+#fecha_manual = pd.to_datetime('2024-01-17')  # Reemplaza con la fecha que desees
 nueva_fecha = fecha_manual - timedelta(days=15)
 
 # Base t-1
@@ -54,11 +63,12 @@ for k in cod_prods:
     print(k)
     df_2 = df_.copy()
     df_2 = df_2[df_2['COD_PROD'] == k]
+    d11_ = d11.loc[d11["COD_PROD"]==k]
     #df_2 = pd.merge(df_2, dir, on='ID_DIR', how='inner')
     df_2['PRECIOVENTA_'] = df_2['PRECIOVENTA']
     df_2 = df_2.groupby(['fecha_stata', 'ID_DIR']).agg({'PRECIOVENTA': 'mean', 'PRECIOVENTA_': 'last'}).reset_index()
     df_2 = df_2.sort_values(['ID_DIR', 'fecha_stata'])
-    df_2 = pd.concat([d11,df_2],ignore_index=True) # aquí está el truco
+    df_2 = pd.concat([d11_,df_2],ignore_index=True) # aquí está el truco
     df_2 = df_2.sort_values(['ID_DIR', 'fecha_stata'])
     df_2['dias_faltantes'] = (df_2['fecha_stata'].diff()).dt.days - 1
     df_2.loc[df_2["dias_faltantes"] < 0, "dias_faltantes"] = np.nan
@@ -75,9 +85,9 @@ for k in cod_prods:
     print("p1")
     #with ProcessPoolExecutor(max_workers=num_cpus) as executor:
     #    executor.map(process, ["PRECIOVENTA_","dias_faltantes"])
-    df_2=process("PRECIOVENTA", df_2)
-    df_2=process("dias_faltantes", df_2)
-    df_2['PRECIOVENTAx'] = df_2['PRECIOVENTA_']
+    #df_2=process("PRECIOVENTA", df_2)
+    #df_2=process("dias_faltantes", df_2)
+    #df_2['PRECIOVENTAx'] = df_2['PRECIOVENTA_']
     print("p2")
     q = 1
     for i in range(1, len(df_2)):
@@ -134,6 +144,7 @@ d1.COD_PROD.value_counts()
 d1.to_csv(ruta4 + DF_fin, index=False, encoding="utf-8", sep=";")
 #d1.to_csv(ruta4 + DF_fin, index=False, encoding="utf-8", sep=";")
 #df_ewe = d1.loc[d1["ID_DIR"]<100]
+
 
 
 

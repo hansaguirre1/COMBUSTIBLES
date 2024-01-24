@@ -43,9 +43,9 @@ for k in cod_prods:
     num_cpus = os.cpu_count()
     #with ProcessPoolExecutor(max_workers=num_cpus) as executor:
     #    executor.map(process2, ["PRECIOVENTA_","dias_faltantes"])
-    process2("PRECIOVENTA_")
-    process2("dias_faltantes")
-    df_2['PRECIOVENTAx'] = df_2['PRECIOVENTA_']
+    #process2("PRECIOVENTA_")
+    #process2("dias_faltantes")
+    #df_2['PRECIOVENTAx'] = df_2['PRECIOVENTA_']
     q = 1
     for i in range(1, len(df_2)):
         if q < 100:
@@ -56,7 +56,7 @@ for k in cod_prods:
         if i < len(df_2) - 1 and not pd.isnull(df_2.at[i+1, 'PRECIOVENTA']):
             q = 1
     #df_2.rename(columns={'CODIGOOSINERG': 'COD'}, inplace=True)
-    df_2.drop(columns=['PRECIOVENTAx', 'PRECIOVENTA_','dias_faltantes'], inplace=True)
+    df_2.drop(columns=['PRECIOVENTA_','dias_faltantes'], inplace=True)
     df_2["COD_PROD"] = k
     df_2.to_csv(f"..\\data\\interim\\precios mayoristas\\base_final_{k}.csv",  encoding="utf-8",  index=False)
 

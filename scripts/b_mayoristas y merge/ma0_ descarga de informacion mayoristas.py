@@ -27,11 +27,23 @@ import os, zipfile
 # Configuración e inicio de navegación
 
 dir=os.getcwd()
-dir
+pre_dir=os.path.dirname(dir)
+pre_dir
+ner_dir=r"\data\raw\precios mayoristas"
+new_dir_path=f"{pre_dir}{ner_dir}"
+new_dir_path
 
-new_dir_path = f'{dir}\\data\\raw\\precios mayoristas'
+#Eliminar excel de la anterior corrida
+
+Precios_Mayoristas_list=[]
+for file in os.listdir(new_dir_path):
+    if file.endswith('.xlsx'):
+        os.remove(f'{new_dir_path}\\{file}')
+
+#Nuevos driver
+
 chrome_options = webdriver.ChromeOptions()
-service = Service(executable_path=r'E:/GitHub/COMBUSTIBLES/chromedriver.exe')
+service = Service(executable_path=r'../chromedriver.exe')
 home_dir = './scraper_combustibles'
 prefs = {'download.default_directory' : new_dir_path,  
          "download.prompt_for_download": False,
