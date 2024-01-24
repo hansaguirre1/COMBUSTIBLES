@@ -266,8 +266,21 @@ class RemoteDatasourceImpl(RemoteDatasource):
         finally:
             driver.quit()
     
-    def m0_descarga_mayorista(self):
+    def m0_descarga_mayorista(self):     
         try:
+            
+            new_dir_path_mayorista = 'data/raw/precios_mayoristas'
+
+            #Eliminar excel de la anterior corrida
+
+            for file in os.listdir(new_dir_path_mayorista):
+                if file.endswith('.xlsx'):
+                    os.remove(f'{new_dir_path_mayorista}/{file}')
+
+            #Nuevos driver
+
+            
+
             driver = configure_selenium(path='/raw/precios_mayoristas') 
             url_1 ='https://www.osinergmin.gob.pe/empresas/hidrocarburos/scop/documentos-scop'
             driver.get(url_1)
@@ -287,21 +300,30 @@ class RemoteDatasourceImpl(RemoteDatasource):
 
             # Unzip files
 
-            new_dir_path_mayorista = 'data/raw/precios_mayoristas'
-            for file in os.listdir(new_dir_path_mayorista):   # get the list of files
-                if zipfile.is_zipfile(file): # if it is a zipfile, extract it
-                    with zipfile.ZipFile(file) as item: # treat the file as a zip
-                        item.extractall()
 
+            for file in os.listdir(new_dir_path_mayorista):   # get the list of files
+                file_path = os.path.join(new_dir_path_mayorista, file)
+                print(f'file path {file} - {file_path}')
+                try:
+                    if zipfile.is_zipfile(file_path): # if it is a zipfile, extract it
+                        with zipfile.ZipFile(file_path) as item: # treat the file as a zip
+                            item.extractall(new_dir_path_mayorista)
+                            time.sleep(10)
+                except Exception as e:
+                    print(f"Error al descomprimir '{file_path}': {e}")
+
+            time.sleep(10)
 
             # Eliminar todo lo que no es excel
-                for file in os.listdir(new_dir_path_mayorista):
-                    if file.endswith('.zip') or file.endswith('.xml'):
-                        file_path = os.path.join(new_dir_path_mayorista, file)
-                        os.remove(file_path)
-                        print(f"Deleted: {file_path}")
-        except:
-            pass
+            for file in os.listdir(new_dir_path_mayorista):
+                if file.endswith('.zip') or file.endswith('.xml'):
+                    file_path = os.path.join(new_dir_path_mayorista, file)
+                    os.remove(file_path)
+                    print(f"Deleted: {file_path}")
+                
+        except Exception as e:
+            # Captura la excepción y la imprime
+            print(f"Se produjo una excepción: {e}")
 
         finally:
             driver.quit()

@@ -45,8 +45,8 @@ with DAG(
         remoteRepository: RemoteRepository = container.remote_repository()
         preciosMayoristasRepository: PreciosMayoristasRepository = container.precios_mayoristas_repository()
         
-        remoteRepository.m0_descarga_mayorista()
-        # preciosMayoristasRepository.saveDataMayoristas()
+        # remoteRepository.m0_descarga_mayorista()
+        preciosMayoristasRepository.saveDataMayoristas()
         
     def processDataCombustiblesValidos():
         from src.injection.containers import Container

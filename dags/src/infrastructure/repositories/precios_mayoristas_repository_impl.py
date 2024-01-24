@@ -9,6 +9,6 @@ class PreciosMayoristasRepositoryImpl(PreciosMayoristasRepository):
         self.dbDatasource = dbDatasource
         
     def saveDataMayoristas(self):
-        pass
-        
+        # self.fileDatasource.m1_processCleanAndJoin()
+        self.fileDatasource.m2_processRucAndDays()
     

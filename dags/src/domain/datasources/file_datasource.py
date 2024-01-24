@@ -37,6 +37,14 @@ class FileDatasource(ABC):
     @abstractmethod
     def ubi0_processUbigeo(self) -> DataFrame:
         pass
+    
+    @abstractmethod
+    def m1_processCleanAndJoin(self):
+        pass
+    
+    @abstractmethod
+    def m2_processRucAndDays(self):
+        pass
 
     # @abstractmethod
     # def saveDataActivityCsv(self, data: DataFrame) -> DataFrame:

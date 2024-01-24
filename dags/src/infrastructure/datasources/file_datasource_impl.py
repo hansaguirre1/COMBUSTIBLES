@@ -6,6 +6,7 @@ import src.infrastructure.datasources.process.process_petroperu_file as processF
 import src.infrastructure.datasources.process.process_cv1_file as processCv1File
 import src.infrastructure.datasources.process.process_cv2_file as processCv2File
 import src.infrastructure.datasources.process.process_ubi0_file as processUbi0File
+import src.infrastructure.datasources.process.process_m2_file as processM2File
 import pandas as pd
 from glob import glob
 import numpy as np
@@ -339,4 +340,256 @@ class FileDatasourceImpl(FileDatasource):
         print("-ubi-")
         
         return ubi
+
+    def m1_processCleanAndJoin(self):
+        new_dir_path = 'data/raw/precios_mayoristas'
+
+
+        # Guardar todo en lista
+
+        Precios_Mayoristas_list=[]
+        for file in os.listdir(new_dir_path):
+            if file.endswith('.xlsx'):
+                df=pd.read_excel(f'{new_dir_path}/{file}')
+                try:
+                    row_index = df.index[df['Unnamed: 1'] == 'ACTIVIDAD'].tolist()[0]
+                    df.columns = df.iloc[row_index]
+                except:
+                    pass
+                df["Tipo"]=file
+                Precios_Mayoristas_list.append(df)
+
+        # Filtar por actividades de interés
+        b=[]
+        for a in Precios_Mayoristas_list:
+            a=a.drop(columns="NaN", errors='ignore')
+            b.append(a.loc[ (a['ACTIVIDAD'].str.contains('DISTRIBUIDOR')) |
+                            (a['ACTIVIDAD'].str.contains('PRODUCTOR')) |
+                            (a['ACTIVIDAD'].str.contains('IMPORTADOR')) |
+                            (a['ACTIVIDAD'].str.contains('PLANTA'))|
+                            (a['ACTIVIDAD'].str.contains('MAYORISTAS'))|
+                            (a['ACTIVIDAD'].str.contains('ACTIVIDAD'))|
+                            (a['ACTIVIDAD'].str.contains('PROCESAMIENTO'))|
+                            (a['ACTIVIDAD'].str.contains('COMERCIALIZADOR DE GLP'))
+                            ])
+
+        # join todas las bases 
+
+        Total=pd.concat(b)
+
+        # Renombrar productos y codificar productos de interes
+
+        Precios_Mayoristas=Total
+
+        # Homogenizar producto
+        Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GASOHOL 95 PLUS","GASOHOL PREMIUM")
+        Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GASOHOL 90 PLUS","GASOHOL REGULAR")
+
+        Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GOH95","GASOHOL PREMIUM")
+        Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GOH90","GASOHOL REGULAR")
+
+        Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GASOLINA 90","GASOLINA REGULAR")
+        Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GASOLINA 95","GASOLINA PREMIUM")
+        Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("G90","GASOLINA REGULAR")
+        Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("G95","GASOLINA PREMIUM")
+
+        Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("'Cilindros de 10 Kg de GLP","GLP - E")
+
+
+
+        # Eliminar productos que no utilizamos
+
+        Precios_Mayoristas = Precios_Mayoristas[~(Precios_Mayoristas['PRODUCTO'].str.contains('Cilindros de 5 Kg de GL')) &
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('ASFALTO'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('PETRÓLEO'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('CEMENTO'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('OIL'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('HEXANO'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('Cilindros de 45 Kg de GLP'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('Cilindros de 15 Kg de GLP'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('Cilindros de 3 Kg de GLP'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('GLP - E'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('MARINO'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('TURBO'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('IFO - 380 EXPORT'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('PENTANO'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('BREA'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOLINA 84'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOHOL 84 PLUS'))&
+                                                ~(Precios_Mayoristas['PRODUCTO']=='DIESEL B5')&
+                                                ~(Precios_Mayoristas['PRODUCTO']=='DIESEL B5 GE')&
+                                                ~(Precios_Mayoristas['PRODUCTO']=="Diesel B5 S-50")&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOLINA 97'))&  
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOHOL 97 PLUS'))&  
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOLINA 98 BA'))& 
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOHOL 98 PLUS'))&  
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('Diesel B5 S-50 GE'))&                                                                                
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('SOLVENTE'))&  
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOLINA 100 LL'))&  
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOLINA 98'))&  
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('CGN SOLVENTE'))&  
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('DIESEL 2'))& 
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('PRODUCTO'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('Diesel 2'))
+                                                ]
+
+
+        #codificar producto
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOLINA REGULAR", 'COD_PROD'] = 46
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOLINA PREMIUM", 'COD_PROD'] = 45
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOHOL REGULAR", 'COD_PROD'] = 37
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOHOL PREMIUM", 'COD_PROD'] = 36
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Cilindros de 10 Kg de GLP", 'COD_PROD'] = 47
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GLP - G", 'COD_PROD'] = 48
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="DIESEL B5 S-50 UV", 'COD_PROD'] = 28
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="DIESEL B5 UV", 'COD_PROD'] = 19
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Diesel B5 S-50 UV", 'COD_PROD'] = 28
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Diesel B5 UV", 'COD_PROD'] = 19
+
+
+
+        # Declarar fecha
+
+        Precios_Mayoristas['FECHA DE REGISTRO'] = pd.to_datetime(Precios_Mayoristas['FECHA DE REGISTRO'], format='%Y-%m-%d')
+
+        Precios_Mayoristas['DIA'] =Precios_Mayoristas['FECHA DE REGISTRO'].dt.day.astype(str)
+        Precios_Mayoristas['MES'] =Precios_Mayoristas['FECHA DE REGISTRO'].dt.month.astype(str)
+        Precios_Mayoristas['AÑO'] =Precios_Mayoristas['FECHA DE REGISTRO'].dt.year.astype(str)
+
+
+        #mes
+
+        Precios_Mayoristas['MES']='0'+Precios_Mayoristas['MES']
+        Precios_Mayoristas['MES']=Precios_Mayoristas['MES'].str.replace('010','10')
+        Precios_Mayoristas['MES']=Precios_Mayoristas['MES'].str.replace('011','11')
+        Precios_Mayoristas['MES']=Precios_Mayoristas['MES'].str.replace('012','12')
+
+        #día
+
+
+        Precios_Mayoristas['fecha_stata']=Precios_Mayoristas['AÑO']+"-"+Precios_Mayoristas['MES']+"-"+Precios_Mayoristas['DIA']
+        Precios_Mayoristas['fecha_stata'] = pd.to_datetime(Precios_Mayoristas['fecha_stata'], format='%Y-%m-%d')
+
+
+        # Llenar valores nan de GLP-E principalmente
+
+        Precios_Mayoristas['PRECIO DE VENTA (SOLES)'] = Precios_Mayoristas['PRECIO DE VENTA (SOLES)'].fillna((Precios_Mayoristas['PRECIO_MIN (SOLES)'] + Precios_Mayoristas['PRECIO_MAX (SOLES)'])/2)
+
+        def replace_value(row):
+            if row['PRECIO DE VENTA (SOLES)'] > 100 and not np.isnan(row['PRECIO_MIN (SOLES)']) and not np.isnan(row['PRECIO_MAX (SOLES)']):
+                return (row['PRECIO_MIN (SOLES)'] + row['PRECIO_MAX (SOLES)'])/2
+            else:
+                return row['PRECIO DE VENTA (SOLES)']
+
+        # Apply the function to the DataFrame
+        Precios_Mayoristas['PRECIO DE VENTA (SOLES)'] = Precios_Mayoristas.apply(replace_value, axis=1)
+
+        Precios_Mayoristas = Precios_Mayoristas[Precios_Mayoristas['PRECIO DE VENTA (SOLES)'] <= 100]
+
+
+        #Conversión de litros a galones
+        Precios_Mayoristas.reset_index()
+
+
+        def replace_value_litros(row):
+            if row['PRECIO DE VENTA (SOLES)'] > 5 and row['COD_PROD'] == 30:
+                return (row['PRECIO DE VENTA (SOLES)'])/ 3.78533
+            else:
+                return row['PRECIO DE VENTA (SOLES)']
+
+
+        # Apply the function to the DataFrame
+        Precios_Mayoristas['PRECIO DE VENTA (SOLES)'] = Precios_Mayoristas.apply(replace_value_litros, axis=1)
+
+
+        Precios_Mayoristas.loc[Precios_Mayoristas['COD_PROD'] == 30, 'PRECIO DE VENTA (SOLES)'] = Precios_Mayoristas.loc[Precios_Mayoristas['COD_PROD'] == 30, 'PRECIO DE VENTA (SOLES)'] /  0.5324
+
+        # Redondear precios a dos decimales
+
+        Precios_Mayoristas['PRECIO DE VENTA (SOLES)']=Precios_Mayoristas['PRECIO DE VENTA (SOLES)'].round(2)
+
+        # Guardar data de precios mayoristas sin imputar
+
+        Precios_Mayoristas.to_csv(f"data/interim/precios_mayoristas/mayoristas_pre_imp.csv", sep=";", encoding="utf-8")
+
+    def m2_processRucAndDays(self):
+        # Costo otros
+        df = pd.read_csv("data/interim/precios_mayoristas/mayoristas_pre_imp.csv",encoding='utf-8',sep=";")
+        df.rename(columns={"PRECIO DE VENTA (SOLES)": "PRECIOVENTA"},inplace=True)
+        df.rename(columns={"PROVINCIA_VENDEDOR": "PROVINCIA"},inplace=True)
+        df['fecha_stata'] = pd.to_datetime(df['fecha_stata'], infer_datetime_format=True, errors='coerce')
+        df["RUC-prov"] = df["RUC"].astype(str)+"-"+df["PROVINCIA"]
+        df.COD_PROD.value_counts()
+        cod_prods = [ 46, 45, 37, 36, 47, 48, 28, 19]
+        
+        # test
+        codigos_unicos = df['COD_PROD'].unique()
+        print(codigos_unicos)
+        # fin - test
+        
+        for k in cod_prods:
+            print(k)
+            df_2 = df.copy()
+            df_2 = df_2[df_2['COD_PROD'].astype(int) == k]
+            df_2['PRECIOVENTA_'] = df_2['PRECIOVENTA']
+            df_2 = df_2.groupby(['fecha_stata', "RUC-prov"]).agg({'PRECIOVENTA': 'mean', 'PRECIOVENTA_': 'last'}).reset_index()
+            df_2 = df_2.sort_values(['RUC-prov', 'fecha_stata'])
+            df_2['dias_faltantes'] = (df_2['fecha_stata'].diff()).dt.days - 1
+            df_2.loc[df_2["dias_faltantes"] < 0, "dias_faltantes"] = np.nan
+            df_2['dias_faltantes'] = df_2['dias_faltantes'].fillna(0)
+            fecha_minima = df_2['fecha_stata'].min()
+            fecha_maxima = df_2['fecha_stata'].max()
+            rango_fechas_completo = pd.date_range(fecha_minima, fecha_maxima, freq='D')
+            combinaciones = pd.DataFrame([(id, fecha) for id in df_2['RUC-prov'].unique(
+            ) for fecha in rango_fechas_completo], columns=['RUC-prov', 'fecha_stata'])
+            df_2 = pd.merge(combinaciones, df_2, on=['RUC-prov', 'fecha_stata'], how='outer')
+            df_2 = df_2.sort_values(by=['RUC-prov', 'fecha_stata'])
+            df_2 = df_2.reset_index(drop=True)
+            num_cpus = os.cpu_count()
+            #with ProcessPoolExecutor(max_workers=num_cpus) as executor:
+            #    executor.map(process2, ["PRECIOVENTA_","dias_faltantes"])
+            #process2("PRECIOVENTA_")
+            #process2("dias_faltantes")
+            #df_2['PRECIOVENTAx'] = df_2['PRECIOVENTA_']
+            q = 1
+            for i in range(1, len(df_2)):
+                if q < 100:
+                    if (df_2.at[i, 'RUC-prov'] == df_2.at[i-1, 'RUC-prov']) and pd.isnull(df_2.at[i, 'PRECIOVENTA']):
+                        df_2.at[i, 'PRECIOVENTA'] = df_2.at[i-1, 'PRECIOVENTA']
+                    q += 1
+            
+                if i < len(df_2) - 1 and not pd.isnull(df_2.at[i+1, 'PRECIOVENTA']):
+                    q = 1
+            #df_2.rename(columns={'CODIGOOSINERG': 'COD'}, inplace=True)
+            df_2.drop(columns=['PRECIOVENTA_','dias_faltantes'], inplace=True)
+            df_2["COD_PROD"] = k
+            df_2.to_csv(f"data/interim/precios_mayoristas/base_final_{k}.csv",  encoding="utf-8",  index=False)
+
+
+        # guardar todos los productos en una lista
+        dfs = {}
+        p = 1
+        for k in cod_prods:
+            print(k)
+            dfk = pd.read_csv(f"data/interim/precios_mayoristas/base_final_{k}.csv", encoding="utf-8")
+            dfs[f"base_{p}"] = dfk
+            os.remove(f"data/interim/precios_mayoristas/base_final_{k}.csv")
+            p += 1
+
+        # dfs2 = [globals()[f"base_{i}"] for i in range(1, len(dfs) + 1) if f"base_{i}" in globals()]
+        # dfs2 = [dfs[f"base_{i}"] for i in range(1, len(dfs) + 1) if f"base_{i}" in dfs]
+        dfs2 = [dfs[key] for key in sorted(dfs.keys()) if key.startswith("base_")]
+
+        # del base_1,base_2,base_3,base_4,base_5,base_6,base_7,base_8
+
+
+        #unir todas las bases completas por día
+        df_concatenado = pd.concat(dfs2, ignore_index=True)
+        del dfs2
+
+        # guardar información previa a la imputación
+        df_concatenado.to_csv("data/interim/precios_mayoristas/precios_mayoristas_imp.csv", encoding="utf-8", index=False,sep=";")
+
+        del df_concatenado
+        
 
