@@ -24,8 +24,8 @@ from minfut3_utils_clean import *
 
 # Directorio
 os.chdir(os.getcwd())
-#fecha_manual = pd.to_datetime(datetime.now().date() - timedelta(days=3))
-fecha_manual = pd.to_datetime('2024-01-17')  # Reemplaza con la fecha que desees
+#fecha_manual = pd.to_datetime(datetime.now().date() - timedelta(days=1))
+fecha_manual = pd.to_datetime('2024-01-16')  # Reemplaza con la fecha que desees
 nueva_fecha = fecha_manual - timedelta(days=15)
 
 # Base t-1
@@ -63,11 +63,12 @@ for k in cod_prods:
     print(k)
     df_2 = df_.copy()
     df_2 = df_2[df_2['COD_PROD'] == k]
+    d11_ = d11.loc[d11["COD_PROD"]==k]
     #df_2 = pd.merge(df_2, dir, on='ID_DIR', how='inner')
     df_2['PRECIOVENTA_'] = df_2['PRECIOVENTA']
     df_2 = df_2.groupby(['fecha_stata', 'ID_DIR']).agg({'PRECIOVENTA': 'mean', 'PRECIOVENTA_': 'last'}).reset_index()
     df_2 = df_2.sort_values(['ID_DIR', 'fecha_stata'])
-    df_2 = pd.concat([d11,df_2],ignore_index=True) # aquí está el truco
+    df_2 = pd.concat([d11_,df_2],ignore_index=True) # aquí está el truco
     df_2 = df_2.sort_values(['ID_DIR', 'fecha_stata'])
     df_2['dias_faltantes'] = (df_2['fecha_stata'].diff()).dt.days - 1
     df_2.loc[df_2["dias_faltantes"] < 0, "dias_faltantes"] = np.nan
