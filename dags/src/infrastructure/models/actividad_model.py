@@ -14,4 +14,4 @@ class ActividadModel(Base):
     created_at = Column(DateTime(), default=datetime.now())
     
     # Relación con Direcciones
-    direcciones = relationship("DireccionModel", back_populates="actividad")
+    # direcciones = relationship("DireccionModel", back_populates="actividad")

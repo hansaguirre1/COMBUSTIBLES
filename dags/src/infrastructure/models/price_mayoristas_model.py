@@ -13,11 +13,12 @@ class PricesMayoristasModel(Base):
     precio_con_impuesto = Column(String, nullable=True)
     fecha = Column(String, nullable=True)
     created_at = Column(DateTime(), default=datetime.now())
-    producto_id = Column(Integer, ForeignKey('producto.id'))
-    planta_id = Column(Integer, ForeignKey('planta.id'))
+    
+    # producto_id = Column(Integer, ForeignKey('producto.id'))
+    # planta_id = Column(Integer, ForeignKey('planta.id'))
     
     
-    producto = relationship("ProductoModel", back_populates="precio_mayoristas")
-    planta = relationship("PlantaModel", back_populates="precio_mayoristas")
+    # producto = relationship("ProductoModel", back_populates="precio_mayoristas")
+    # planta = relationship("PlantaModel", back_populates="precio_mayoristas")
     
     

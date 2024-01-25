@@ -12,7 +12,8 @@ class RelapasaModel(Base):
     fecha_registro = Column(String, nullable=True)
     precio = Column(String, nullable=True)
     created_at = Column(DateTime(), default=datetime.now())
-    producto_id = Column(Integer, ForeignKey('producto.id'))
     
-    # Relaciones
-    producto = relationship('ProductoModel', back_populates="relapasas")
+    producto_id = Column(Integer, nullable=True)
+    
+    # # Relaciones
+    # producto = relationship('ProductoModel', back_populates="relapasas")

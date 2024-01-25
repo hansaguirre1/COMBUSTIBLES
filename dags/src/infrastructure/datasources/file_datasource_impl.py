@@ -17,6 +17,7 @@ import zipfile
 import PyPDF2
 import re
 from itertools import product
+from src.infrastructure.datasources.process.minfut0_nombres import *
 
 pathMinorista = 'data/interim/minoristas'
 
@@ -154,15 +155,24 @@ class FileDatasourceImpl(FileDatasource):
         t = datetime.now()
         dateStr = t.strftime('%d-%m-%Y')
         print("Archivo diario")
+        datax = pd.read_csv(ruta4 + BASE_DLC,encoding="utf-8",sep=";")
+        
         pathExcel = f'data/raw/precios_minoristas/precios_combustibles_minorista_{dateStr}.xlsx'
         ex1=pd.read_excel(pathExcel,sheet_name="GLP_EVP_PEGL_LVGL_COM_PROD_IMP",skiprows=3)
         ex1=limpiezaMinorista(ex1)
         ex2=pd.read_excel(pathExcel,sheet_name="LIQ_EVP_DMAY_CCA_CCE",skiprows=3)
         ex2=limpiezaMinorista(ex2)
-        data_concat = pd.concat([ex1, ex2], ignore_index=True)
+        data = pd.concat([ex1, ex2], ignore_index=True)
+        df_ubi = pd.read_csv(ruta4 + DF_ubi, encoding='utf-8', sep=";")
+        data = limpiezaMasivaMinorista(data, df_ubi)
+        os.remove(pathExcel)
         print("excel eliminado.")
-        data_concat=limpiezaMasivaMinorista(data_concat)
-        return data_concat
+        
+        data_concat_f = pd.concat([datax, data], ignore_index=True)
+        data_concat_f.to_csv(ruta4 + BASE_DLC, index=False, encoding="utf-8", sep=";")
+
+
+        return data_concat_f
     
     def saveDataRelapasaToCsv(self, df_combinado: DataFrame):
         # Relapasa

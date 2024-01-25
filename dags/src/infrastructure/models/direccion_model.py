@@ -17,15 +17,15 @@ class DireccionModel(Base):
     longitude = Column(String, nullable=True)
     created_at = Column(DateTime(), default=datetime.now())
     
-    razon_id = Column(Integer, ForeignKey('razon_social.id'))
-    actividad_id = Column(Integer, ForeignKey('actividad.id'))
-    ubicacion_id = Column(Integer, ForeignKey('ubicacion.id'))
-    codigoosinerg_id = Column(Integer, ForeignKey('codigoosinerg.id'))
+    razon_id = Column(Integer, nullable=True)
+    actividad_id = Column(Integer, nullable=True)
+    ubicacion_id = Column(Integer, nullable=True)
+    codigoosinerg_id = Column(Integer, nullable=True)
     
     # Relaciones
-    razon_social = relationship("RazonSocialModel", back_populates="direcciones")
-    actividad = relationship("ActividadModel", back_populates="direcciones")
-    ubicacion = relationship("UbicacionModel", back_populates="direcciones")
-    codigoosinerg = relationship('CodigoosinergModel', back_populates="direcciones")
-    precios = relationship("PriceModel", back_populates="direccion")
+    # razon_social = relationship("RazonSocialModel", back_populates="direcciones")
+    # actividad = relationship("ActividadModel", back_populates="direcciones")
+    # ubicacion = relationship("UbicacionModel", back_populates="direcciones")
+    # codigoosinerg = relationship('CodigoosinergModel', back_populates="direcciones")
+    # precios = relationship("PriceModel", back_populates="direccion")
     

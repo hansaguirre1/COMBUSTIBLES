@@ -22,7 +22,7 @@ class MinoristaRepositoryImpl(MinoristaRepository):
         self.dbDatasource.saveActivity()
         self.dbDatasource.saveProduct()
         self.dbDatasource.saveDirection()
-        self.dbDatasource.savePrice(data=data)
+        # self.dbDatasource.savePrice(data=data)
     
     def saveDataToDta(self):
         self.fileDatasource.exportFinalDta()

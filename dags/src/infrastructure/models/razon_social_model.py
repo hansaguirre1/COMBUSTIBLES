@@ -13,6 +13,6 @@ class RazonSocialModel(Base):
     razon_social = Column(String, nullable=True)
     created_at = Column(DateTime(), default=datetime.now())
     
-    direcciones = relationship("DireccionModel", back_populates="razon_social")
+    # direcciones = relationship("DireccionModel", back_populates="razon_social")
 
     

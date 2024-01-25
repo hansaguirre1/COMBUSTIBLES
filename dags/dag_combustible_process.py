@@ -111,8 +111,8 @@ with DAG(
         remoteRepository: RemoteRepository = container.remote_repository()
         minoristaRepository: MinoristaRepository = container.minorista_repository()
         
-        # remoteRepository.getDataMinorista(url=url_signeblock)
-        # minoristaRepository.saveDataBase()
+        remoteRepository.getDataMinorista(url=url_signeblock)
+        minoristaRepository.saveDataBase()
     
     def processDtaMinoristas():
         from src.injection.containers import Container
@@ -186,4 +186,4 @@ with DAG(
     end_process = EmptyOperator(task_id='end-process-data')
     
     # start_process >> remote_data_petroperu >> remote_data_marcadores >> remote_data_osinergmin >> remote_data_signeblock >> end_process
-    start_process >> process_precio_mayorista >> process_data_ubigeo >> process_data_combustibles_validos >> process_data_minoristas >> process_data_marcadores >> process_data_precios_mayorista_petroperu >> process_data_osinergmin_precios_referencia >> end_process
+    start_process >> process_data_minoristas >> process_precio_mayorista >> process_data_ubigeo >> process_data_combustibles_validos  >> process_data_marcadores >> process_data_precios_mayorista_petroperu >> process_data_osinergmin_precios_referencia >> end_process

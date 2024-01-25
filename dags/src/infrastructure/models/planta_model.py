@@ -13,4 +13,4 @@ class PlantaModel(Base):
     planta = Column(String, nullable=True)
     created_at = Column(DateTime(), default=datetime.now())
     
-    precio_mayoristas = relationship("PricesMayoristasModel", back_populates="planta")
+    # precio_mayoristas = relationship("PricesMayoristasModel", back_populates="planta")

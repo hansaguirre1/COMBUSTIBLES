@@ -17,8 +17,8 @@ class ProductoModel(Base):
     created_at = Column(DateTime(), default=datetime.now())
     
     # Relación con Precio
-    precios = relationship("PriceModel", back_populates="producto")
-    precio_mayoristas = relationship("PricesMayoristasModel", back_populates="producto")
-    precios_referencia = relationship("PriceReferenciaModel", back_populates="producto")
-    relapasas = relationship("RelapasaModel", back_populates="producto")
-    combustibles_validos = relationship("CombustibleValidoModel", back_populates="producto")
+    # precios = relationship("PriceModel", back_populates="producto")
+    # precio_mayoristas = relationship("PricesMayoristasModel", back_populates="producto")
+    # precios_referencia = relationship("PriceReferenciaModel", back_populates="producto")
+    # relapasas = relationship("RelapasaModel", back_populates="producto")
+    # combustibles_validos = relationship("CombustibleValidoModel", back_populates="producto")
