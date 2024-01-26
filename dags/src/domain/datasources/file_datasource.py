@@ -45,25 +45,15 @@ class FileDatasource(ABC):
     @abstractmethod
     def m2_processRucAndDays(self):
         pass
-
-    # @abstractmethod
-    # def saveDataActivityCsv(self, data: DataFrame) -> DataFrame:
-    #     pass
-    # @abstractmethod
-    # def saveDataDirectionCsv(self, data: DataFrame) -> DataFrame:
-    #     pass
-    # @abstractmethod
-    # def saveDataProductCsv(self, data: DataFrame) -> DataFrame:
-    #     pass
-    # @abstractmethod
-    # def saveDataCodigoOsinergCsv(self, data: DataFrame, df_actividad: DataFrame) -> DataFrame:
-    #     pass
-    # @abstractmethod
-    # def saveDataRazonSocialCsv(self, data: DataFrame, df_ubigeo: DataFrame) -> DataFrame:
-    #     pass
-    # @abstractmethod
-    # def saveDataUbicationCsv(self, data: DataFrame) -> DataFrame:
-    #     pass
+   
+    @abstractmethod
+    def dis3_processDistances(self):
+        pass
+    
+    @abstractmethod
+    def min4_a1_processMerge(self):
+        pass
+    
     @abstractmethod
     def exportFinalDta(self):
         pass

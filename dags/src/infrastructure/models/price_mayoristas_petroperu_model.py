@@ -6,17 +6,18 @@ from src.config.db_config import Base
 from sqlalchemy.orm import relationship, sessionmaker
 
 
-class PricesMayoristasModel(Base):
-    __tablename__ = "precio_mayoristas"
+class PricesMayoristasPetroperuModel(Base):
+    __tablename__ = "precio_mayoristas_petroperu"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(String, primary_key=True)
     precio_con_impuesto = Column(String, nullable=True)
     fecha = Column(String, nullable=True)
+    
+    producto_id = Column(String, nullable=True)
+    planta_id = Column(String, nullable=True)
+    
     created_at = Column(DateTime(), default=datetime.now())
-    
-    # producto_id = Column(Integer, ForeignKey('producto.id'))
-    # planta_id = Column(Integer, ForeignKey('planta.id'))
-    
+    updated_at = Column(DateTime(), default=datetime.now())
     
     # producto = relationship("ProductoModel", back_populates="precio_mayoristas")
     # planta = relationship("PlantaModel", back_populates="precio_mayoristas")

@@ -19,7 +19,8 @@ class UbicacionModel(Base):
     p_urban = Column(String, nullable=True)
     rural = Column(String, nullable=True)
     capital = Column(String, nullable=True)
-    created_at = Column(DateTime(), default=datetime.now())
     
+    created_at = Column(DateTime(), default=datetime.now())
+    updated_at = Column(DateTime(), default=datetime.now())
     # Relación con Direcciones
     # direcciones = relationship("DireccionModel", back_populates="ubicacion")

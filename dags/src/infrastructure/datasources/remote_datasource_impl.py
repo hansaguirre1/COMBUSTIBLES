@@ -232,6 +232,16 @@ class RemoteDatasourceImpl(RemoteDatasource):
     
     def getDataCombustiblesValidos(self, url: str):
         try:
+            new_dir_path = 'data/raw/combustibles_validos'
+
+            #Eliminar excel de la anterior corrida
+
+            for file in os.listdir(new_dir_path):
+                if file.endswith('.pdf'):
+                    os.remove(f'{new_dir_path}/{file}')
+
+            #Nuevos driver
+            
             driver = configure_selenium(path='/raw/combustibles_validos') 
             url_1 ='https://www.osinergmin.gob.pe/empresas/hidrocarburos/scop/documentos-scop'
             

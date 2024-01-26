@@ -15,12 +15,14 @@ class DireccionModel(Base):
     direccion_name = Column(String, nullable=True)
     latitude = Column(String, nullable=True)
     longitude = Column(String, nullable=True)
-    created_at = Column(DateTime(), default=datetime.now())
     
-    razon_id = Column(Integer, nullable=True)
-    actividad_id = Column(Integer, nullable=True)
-    ubicacion_id = Column(Integer, nullable=True)
-    codigoosinerg_id = Column(Integer, nullable=True)
+    razon_id = Column(String, nullable=True)
+    actividad_id = Column(String, nullable=True)
+    ubicacion_id = Column(String, nullable=True)
+    codigoosinerg_id = Column(String, nullable=True)
+    
+    created_at = Column(DateTime(), default=datetime.now())
+    updated_at = Column(DateTime(), default=datetime.now())
     
     # Relaciones
     # razon_social = relationship("RazonSocialModel", back_populates="direcciones")

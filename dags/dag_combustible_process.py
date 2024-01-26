@@ -4,6 +4,7 @@ from airflow.operators.empty import EmptyOperator
 from datetime import datetime, timedelta
 
 
+
 with DAG(
         'Procesar-data-combustibles',
         # These args will get passed on to each operator
@@ -33,8 +34,8 @@ with DAG(
         remoteRepository: RemoteRepository = container.remote_repository()
         mayoristaPetroperuRepository: MayoristaPetroperuRepository = container.petroperu_repository()
         
-        # remoteRepository.getDataPetroperu(url=url_petroperu)
-        # mayoristaPetroperuRepository.saveData()
+        remoteRepository.getDataPetroperu(url=url_petroperu)
+        mayoristaPetroperuRepository.saveData()
     
     def processDataPreciosMayorista():
         from src.injection.containers import Container
@@ -59,7 +60,7 @@ with DAG(
         remoteRepository: RemoteRepository = container.remote_repository()
         combustibleValidoRepository: CombustiblesValidosRepository = container.combustible_valido_repository()
         
-        # remoteRepository.cv0_getDataCombustiblesValidos(url = '')
+        remoteRepository.cv0_getDataCombustiblesValidos(url = '')
         combustibleValidoRepository.processDataCombustiblesValidos()
     
     def processDataMarcadores():
@@ -72,8 +73,8 @@ with DAG(
         remoteRepository: RemoteRepository = container.remote_repository()
         marcadorRepository: MarcadoresRepository = container.marcador_repository()
         
-        # dfMarcadores = remoteRepository.getDataMarcadores(urlBcrp=url_bcrp, urlEia=url_eia)
-        # marcadorRepository.saveData(df=dfMarcadores)
+        dfMarcadores = remoteRepository.getDataMarcadores(urlBcrp=url_bcrp, urlEia=url_eia)
+        marcadorRepository.saveData(df=dfMarcadores)
     
     
     def processDataUbigeo():
@@ -97,8 +98,8 @@ with DAG(
         container = Container()
         remoteRepository: RemoteRepository = container.remote_repository()
         referenciaRepository: ReferenciaRepository = container.referencia_repository()
-        # remoteRepository.getDataOsinergmin(url=url_osinergmin)
-        # referenciaRepository.saveDataReferencia()
+        remoteRepository.getDataOsinergmin(url=url_osinergmin)
+        referenciaRepository.saveDataReferencia()
     
     def processDataMinoristas():
         from src.injection.containers import Container
@@ -113,6 +114,22 @@ with DAG(
         
         remoteRepository.getDataMinorista(url=url_signeblock)
         minoristaRepository.saveDataBase()
+    
+    def processDataLatLngMayorista():
+        from src.injection.containers import Container
+        from src.domain.repositories.lat_lng_mayorista_repository import LatLngMayoristaRepository
+
+        container = Container()
+        latLngMinoristaRepository: LatLngMayoristaRepository = container.lat_lng_mayoristas_repository()
+        
+        latLngMinoristaRepository.saveDataLatLng()
+    
+    def processIndicadorMinorista():
+        from src.injection.containers import Container
+        from src.domain.repositories.indicador_repository import IndicadorRepository
+        container = Container()
+        indicadorRepository: IndicadorRepository = container.indicador_repository()
+        indicadorRepository.saveAndProcessData()
     
     def processDtaMinoristas():
         from src.injection.containers import Container
@@ -135,6 +152,12 @@ with DAG(
         dag=dag,
         )
     
+    process_lat_lng_mayorista_task = PythonOperator(
+        task_id='process_lat_lng_mayorista',
+        python_callable=processDataLatLngMayorista,
+        dag=dag,
+        )
+    
     process_data_ubigeo = PythonOperator(
         task_id='process_data_ubigeo',
         python_callable=processDataUbigeo,
@@ -150,6 +173,12 @@ with DAG(
     process_data_precios_mayorista_petroperu = PythonOperator(
         task_id='process_data_precios_mayorista_petroperu',
         python_callable=processDataPreciosMayoristaPetroperu,
+        dag=dag,
+        )
+    
+    process_indicadores_task = PythonOperator(
+        task_id='process_indicadores',
+        python_callable=processIndicadorMinorista,
         dag=dag,
         )
     
@@ -186,4 +215,4 @@ with DAG(
     end_process = EmptyOperator(task_id='end-process-data')
     
     # start_process >> remote_data_petroperu >> remote_data_marcadores >> remote_data_osinergmin >> remote_data_signeblock >> end_process
-    start_process >> process_data_minoristas >> process_precio_mayorista >> process_data_ubigeo >> process_data_combustibles_validos  >> process_data_marcadores >> process_data_precios_mayorista_petroperu >> process_data_osinergmin_precios_referencia >> end_process
+    start_process >> process_data_minoristas >> process_data_combustibles_validos >> process_data_precios_mayorista_petroperu >> process_data_marcadores >>  [ process_data_ubigeo, process_data_osinergmin_precios_referencia , process_precio_mayorista, process_lat_lng_mayorista_task] >> process_indicadores_task  >> end_process

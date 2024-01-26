@@ -12,6 +12,7 @@ class RazonSocialModel(Base):
     id = Column(Integer, primary_key=True)
     razon_social = Column(String, nullable=True)
     created_at = Column(DateTime(), default=datetime.now())
+    updated_at = Column(DateTime(), default=datetime.now())
     
     # direcciones = relationship("DireccionModel", back_populates="razon_social")
 

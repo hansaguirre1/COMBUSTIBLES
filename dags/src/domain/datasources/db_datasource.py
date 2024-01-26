@@ -32,11 +32,14 @@ class DbDatasource(ABC):
     def saveCodigoOsinerg(self):
         pass
     @abstractmethod
-    def savePrice(self, data: DataFrame):
+    def saveIndicadores(self):
         pass
     @abstractmethod
     def saveRelapasa(self, df_combinado: DataFrame) -> DataFrame:
         pass
     @abstractmethod
     def saveCombustibleValido(self):
+        pass
+    @abstractmethod
+    def saveMayMinGeo(self):
         pass

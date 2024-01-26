@@ -1,6 +1,7 @@
 from pandas import DataFrame
 from src.infrastructure.datasources.process.process_minorista_file import limpiezaMinorista, limpiezaMasivaMinorista
 from src.domain.datasources.file_datasource import FileDatasource
+from scipy.spatial.distance import cdist
 
 import src.infrastructure.datasources.process.process_petroperu_file as processFile
 import src.infrastructure.datasources.process.process_cv1_file as processCv1File
@@ -288,13 +289,9 @@ class FileDatasourceImpl(FileDatasource):
         Demanda_por_region.to_csv("data/interim/combustibles_validos/df_volumenes_departamento.csv", encoding="utf-8", index=False)
         print('guardo con exito')
     def cv2_processCombustiblesValidos(self) -> DataFrame:
-        DF_val = "df_volumenes_departamento.csv"
-        DF_val2 = "df_validos_dpt.csv"
-        ruta8 = "data/interim/combustibles_validos/"
-        ruta4 = "data/processed/combustibles_validos/"
         # Combustibles válidos
         print("Combustibles válidos")
-        df = pd.read_csv(f'{ruta8}{DF_val}', encoding="utf-8")
+        df = pd.read_csv(ruta8 + DF_val, encoding="utf-8")
         valor_a_verificar = 'LIMA'
         if valor_a_verificar in df['DEPARTAMENTO'].values:
             nueva_fila = df[df['DEPARTAMENTO'] == valor_a_verificar].copy()
@@ -306,11 +303,11 @@ class FileDatasourceImpl(FileDatasource):
         aos = df["AÑO"].unique()
         combinaciones = list(product(deps, aos))
         df_gnv = pd.DataFrame(combinaciones, columns=['DEPARTAMENTO', 'AÑO'])
-        df_gnv["COD_PROD"] = 16
+        df_gnv["COD_PROD"] = nom_prods[b]
         df_glpg = pd.DataFrame(combinaciones, columns=['DEPARTAMENTO', 'AÑO'])
-        df_glpg["COD_PROD"] = 30
+        df_glpg["COD_PROD"] = nom_prods[h]
         df_glpe = pd.DataFrame(combinaciones, columns=['DEPARTAMENTO', 'AÑO'])
-        df_glpe["COD_PROD"] = 29
+        df_glpe["COD_PROD"] = nom_prods[g]
 
         #df['VOLUMENES'] = pd.to_numeric(df['VOLUMENES'].str.replace(',', ''), errors='coerce')
 
@@ -319,17 +316,17 @@ class FileDatasourceImpl(FileDatasource):
 
 
         df_gasohol_premium = df[(df['COMBUSTIBLE'] == 'GASOHOL PREMIUM') | (df['COMBUSTIBLE'] == 'Gasohol 95 Plus')]
-        df_gasohol_premium = processCv2File.combse(df_gasohol_premium,59)
+        df_gasohol_premium = processCv2File.combse(df_gasohol_premium,nom_prods[c])
         df_gasolina_regular = df[(df['COMBUSTIBLE'] == 'GASOLINA REGULAR') | (df['COMBUSTIBLE'] == 'Gasolina 90')]
-        df_gasolina_regular = processCv2File.combse(df_gasolina_regular,62)
+        df_gasolina_regular = processCv2File.combse(df_gasolina_regular,nom_prods[f])
         df_gasolina_premium = df[(df['COMBUSTIBLE'] == 'GASOLINA PREMIUM') | (df['COMBUSTIBLE'] == 'Gasolina 95')]
-        df_gasolina_premium = processCv2File.combse(df_gasolina_premium,61)
+        df_gasolina_premium = processCv2File.combse(df_gasolina_premium,nom_prods[e])
         df_gasohol_regular = df[(df['COMBUSTIBLE'] == 'GASOHOL REGULAR') | (df['COMBUSTIBLE'] == 'Gasohol 90 Plus')]
-        df_gasohol_regular = processCv2File.combse(df_gasohol_regular,60)
+        df_gasohol_regular = processCv2File.combse(df_gasohol_regular,nom_prods[d])
         df_diesel = df[(df['COMBUSTIBLE'] == 'DIESEL B5 UV') | (df['COMBUSTIBLE'] == 'DB5 S-50')]
-        df_diesel = processCv2File.combse(df_diesel,15)
+        df_diesel = processCv2File.combse(df_diesel,nom_prods[a])
         df_diesel2 = df[(df['COMBUSTIBLE'] == 'DIESEL B5 S-50 UV') | (df['COMBUSTIBLE'] == 'Diesel B5')]
-        df_diesel2 = processCv2File.combse(df_diesel2,9)
+        df_diesel2 = processCv2File.combse(df_diesel2,nom_prods[m])
 
         combs = pd.concat([df_diesel,df_diesel2,df_gnv,df_glpe,df_glpg,df_gasohol_premium, df_gasolina_regular,df_gasolina_premium, df_gasohol_regular], ignore_index=True)
         combs["ok"] = 1
@@ -340,8 +337,9 @@ class FileDatasourceImpl(FileDatasource):
         rango_fechas_completo = list(range(fecha_minima,fecha_maxima))
         combinaciones = pd.DataFrame([(id, fecha) for id in combs['ID'].unique() for fecha in rango_fechas_completo], columns=['ID', 'AÑO'])
         combs = pd.merge(combinaciones, combs, on=['ID', 'AÑO'], how='outer')
+        combs[['DEPARTAMENTO', 'COD_PROD']] = combs['ID'].str.split('-', expand=True)
         combs.to_csv(ruta4 + DF_val2,index=False)
-
+       
     def ubi0_processUbigeo(self) -> DataFrame:
         print("ubigeos")
         ubi = processUbi0File.ubigeos()
@@ -602,4 +600,89 @@ class FileDatasourceImpl(FileDatasource):
 
         del df_concatenado
         
+    def dis3_processDistances(self):
+
+       
+
+        # Ejemplo de DataFrames df1 y df2 con características numéricas
+        data2 = pd.read_csv(ruta3 + DF_georef_may, encoding="utf-8", sep=";")
+        data2["id"] = data2.index
+        data2.to_csv(ruta3 + DF_georef_may, encoding="utf-8", sep=";")
+        data2["RUC-prov"] = data2["RUC"].astype(str)+"-"+data2["PROVINCIA_VENDEDOR"]
+        data2["RUC"]=data2["RUC"].astype(str)
+        data2.to_csv(ruta3 + DF_georef_may, index=False, encoding="utf-8", sep=";")
+        data2_ = pd.read_csv(ruta7 + DF_may_fin,encoding='utf-8',sep=';')
+
+        # Verificamos el producto
+        data1 = pd.read_csv(ruta4 + DF_dir, encoding="utf-8", sep=";")
+        data1 = data1.loc[data1["minorista"]==1]
+        data1["id"] = data1.index
+        data1_ = pd.read_csv(ruta4 + BASE_DLC, encoding="utf-8", sep=";")
+
+        # Bucles
+        dfs=[]
+        p = 1
+        for k in cod_prods:
+            try:
+                print(k)
+                data2__ = data2_.loc[data2_["COD_PROD"]==k]
+                #data2__[['RUC', 'PROVINCIA']] = data2__['RUC-prov'].str.split('-', expand=True)
+                #data2__ = data2__.groupby(['fecha_stata', "PROVINCIA","COD_PROD"]).agg({'PRECIOVENTA': 'mean'}).reset_index()
+                data2__.drop_duplicates(subset=["RUC-prov"],inplace=True)
+                data2__=data2.merge(data2__[["RUC-prov","PRECIOVENTA"]],how="inner")
+                data2__.drop(["PRECIOVENTA"],axis=1,inplace=True)
+                data1__ = data1_.loc[data1_["COD_PROD"]==k]
+                data1__.drop_duplicates(subset="ID_DIR",inplace=True)
+                data1__=data1.merge(data1__[["ID_DIR","PRECIOVENTA"]],how="inner")
+                data1__.drop(["PRECIOVENTA"],axis=1,inplace=True)
+                # DFS
+                d2 = pd.DataFrame(data2__[["latitude","longitude"]])
+                d1 = pd.DataFrame(data1__[["lat","lon"]])
+                # Calcular la matriz de distancias
+                d1d2 = cdist(d1, d2, 'cityblock')
+                d1d2_ = np.min(d1d2, axis=1)
+                d1d2 = pd.DataFrame(d1d2)
+                d1d2.index = data1__["id"]
+                d1d2.columns = data2__["id"]
+                d1d2__ = d1d2.idxmin(axis=1)
+                data1__["COD_PROD"] = k
+                data1__["id"] = d1d2__.values
+                data1__ = data1__.merge(data2__[["RUC-prov","id"]],on="id")
+                exec(f"base_{p}=data1__.copy()")
+                # dfs.append(f"base_{p}")
+                dfs.append(data1__.copy())
+                p+=1
+            except:
+                pass
+            
+        # dfs2 = [globals()[f"base_{i}"] for i in range(1, len(dfs) + 1) if f"base_{i}" in globals()]
+        #del base_1,base_2,base_3,base_4,base_5,base_6,base_7,base_8,base_9
+        df_concatenado = pd.concat(dfs, ignore_index=True)
+        df_concatenado.rename(columns={"RUC_x": "RUC", "RUC_y": "RUC_mayorista"},inplace=True)
+        del dfs
+        df_concatenado.to_csv(ruta4 + DF_dir_may, encoding="utf-8", sep=";")
+        
+    def min4_a1_processMerge(self):
+        # Finally
+        d1 = pd.read_csv(ruta + DF_imp, encoding="utf-8", sep=";")
+        df = pd.read_csv(ruta4 + DF_dir_may,encoding='utf-8',sep=";")
+        #df = df.drop_duplicates(subset=["PROVINCIA","DEPARTAMENTO","RUC"])
+        d2 = pd.read_csv(ruta7 + DF_may_fin,encoding='utf-8',sep=';')
+        d2.rename(columns={"PRECIOVENTA": "PRECIOVENTA_may"},inplace=True)
+        #d2[['RUC', 'PROVINCIA']] = d2['RUC-prov'].str.split('-', expand=True)
+        #d2=d2.drop_duplicates(subset=["COD_PROD","fecha_stata","RUC-prov"])
+        d1 = d1.merge(df[["COD_PROD","RUC-prov","ID_DIR"]], on=["COD_PROD","ID_DIR"],how="left",indicator=True)
+        d1._merge.value_counts()
+        d1.drop(["_merge"],axis=1,inplace=True)
+        #d1["RUC_mayorista"]=d1["RUC_mayorista"].astype(str).str.rstrip('.0')
+        #print(d1.head())
+        #d2.rename(columns={"RUC": "RUC_mayorista"},inplace=True)
+        #d1.head()
+        d1x = d1[["COD_PROD","fecha_stata","RUC-prov"]].merge(d2[["COD_PROD","fecha_stata","RUC-prov","PRECIOVENTA_may"]],on=["RUC-prov","fecha_stata","COD_PROD"],how="left")
+        d1[["COD_PROD","fecha_stata","RUC-prov"]].tail()
+        #d1x.tail(20)
+        d1["PRECIOVENTA_may"] = d1x["PRECIOVENTA_may"]
+        d1.PRECIOVENTA_may.isnull().sum()
+        d1.columns
+        d1.to_csv(ruta4 + DF_fin,index=False,encoding='utf-8',sep=";")
 

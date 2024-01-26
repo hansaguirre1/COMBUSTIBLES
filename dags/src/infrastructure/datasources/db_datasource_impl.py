@@ -1,19 +1,20 @@
 import hashlib
 
 from pandas import DataFrame
+from src.infrastructure.models.may_min_geo_model import MayMinGeoModel
 from src.infrastructure.models.combustible_valido_model import CombustibleValidoModel
 from src.infrastructure.models.relapasa_model import RelapasaModel
 from src.infrastructure.models.price_referencia_model import PriceReferenciaModel
 from src.infrastructure.models.planta_model import PlantaModel
 from src.infrastructure.models.codigoosinerg_model import CodigoosinergModel
-from src.infrastructure.models.price_model import PriceModel
+from src.infrastructure.models.indicadores_model import IndicadoresModel
 from src.infrastructure.models.actividad_model import ActividadModel
 from src.infrastructure.models.direccion_model import DireccionModel
 from src.infrastructure.models.producto_model import ProductoModel
 from src.infrastructure.models.ubicacion_model import UbicacionModel
 from src.infrastructure.models.razon_social_model import RazonSocialModel
 from src.infrastructure.models.marcador_model import MarcadorModel
-from src.infrastructure.models.price_mayoristas_model import PricesMayoristasModel
+from src.infrastructure.models.price_mayoristas_petroperu_model import PricesMayoristasPetroperuModel
 from src.domain.datasources.db_datasource import DbDatasource
 import pandas as pd
 from contextlib import AbstractContextManager
@@ -21,53 +22,49 @@ from typing import Callable, List
 import unicodedata
 import src.infrastructure.datasources.process.util_process as util_process
 import re
+from datetime import datetime
 
 from sqlalchemy.orm import Session
 from sqlalchemy import text, select, func
-pathMinorista = 'data/processed/minoristas'
-pathUbication = 'data/processed'
-pathCombustibleValido = 'data/processed/combustibles_validos'
+pathProcessed = 'data/processed'
 
 class DbDatasourceImpl(DbDatasource):
     def __init__(self, session_factory: Callable[..., AbstractContextManager[Session]]) -> None:
         self.session_factory = session_factory
          
     def savePlanta(self, petroperuDataframe: DataFrame):
-        newPlantasList: List[PlantaModel] = []
-        
-        with self.session_factory() as session:
-            allPlanta = session.query(PlantaModel).all()
             
         petroperuDataframe = petroperuDataframe.drop_duplicates(subset=['PLANTAS'], keep='first')
-
-        for index, row in petroperuDataframe.iterrows():
-            planta_name = row.get('PLANTAS', '')
-
-            
-            planta_name = planta_name if not pd.isna(planta_name) else None
-            
-            results = list(filter(
-                lambda planta: (
-                    planta.planta == planta_name 
-                ),
-                allPlanta
-            ))
-            if not results:
-                plantaModel = PlantaModel(
-                    planta = planta_name,
-                )
-                newPlantasList.append(plantaModel)
-                
         with self.session_factory() as session:
-            session.add_all(newPlantasList)
-            session.commit()
+
+            for index, row in petroperuDataframe.iterrows():
+                planta_name = row.get('PLANTAS', '')
+
+                hash_id = hashlib.sha256(planta_name.encode()).hexdigest()
+                
+                results = session.query(PlantaModel).get(hash_id)
+            
+                if not results:
+                    plantaModel = PlantaModel(
+                        id = hash_id,
+                        planta = planta_name,
+                    )
+                    session.add(plantaModel)
+                else:
+                    results.updated_at = datetime.now()
+                session.commit()
             
             
     def saveMayoristaPetroperu(self, petroperuDataframe: pd.DataFrame):
-        newProductsList: List[str] = []
-        newPetroperuList: List[PricesMayoristasModel] = []
+        newProductsList = []
+        product_dict = {}
+
         with self.session_factory() as session:
-            allPetroperu = session.query(PricesMayoristasModel).all()
+            product_data = session.query(ProductoModel).all()
+            for product in product_data:
+                nomProd = self.convertOnlyLettersAndNumbers(product.nom_prod)
+                product_dict[nomProd] = int(product.id)
+
             for index, row in petroperuDataframe.iterrows():
                 precio_con_impuesto = row.get('Precios', '')
                 combustible = row.get('Combustible', '')
@@ -76,95 +73,102 @@ class DbDatasourceImpl(DbDatasource):
                 
                 combustibleOnlyLetterNumber = self.convertOnlyLettersAndNumbers(combustible)
                 plantaDb= session.query(PlantaModel).filter(PlantaModel.planta == planta).first()
-                combustibleDb= session.query(ProductoModel).filter(self.convertSqlOnlyLettersAndNumbers(ProductoModel.nom_prod) == combustibleOnlyLetterNumber).first()
-                combustibleId = combustibleDb.id if combustibleDb else 0
-                print(f'combustibleId -> {combustibleId}')
+                combustibleId= product_dict.get(combustibleOnlyLetterNumber, 0)
                 if(combustibleId == 0):
                     datos_homogeneizado = self.homogenizar_datos(combustible)
-                    if(datos_homogeneizado == None) :
-                        newProductsList.append(combustible)
                     combustibleOnlyLetterNumber = self.convertOnlyLettersAndNumbers( datos_homogeneizado)
-                    combustibleDb= session.query(ProductoModel).filter(self.convertSqlOnlyLettersAndNumbers(ProductoModel.nom_prod) == combustibleOnlyLetterNumber).first()
+                    combustibleId= product_dict.get(combustibleOnlyLetterNumber, 0)
                     
-                combustibleId = combustibleDb.id if combustibleDb else 0
+                if(combustibleId == 0):
+                    newProductsList.append(combustible)
                 plantaId = plantaDb.id if plantaDb else 0
                 
                 precio_con_impuesto = str(precio_con_impuesto) if not pd.isna(precio_con_impuesto) else None
                 fecha = str(fecha) if not pd.isna(fecha) else None
                 
-                results = list(filter(
-                    lambda petroperu: (
-                        petroperu.precio_con_impuesto == precio_con_impuesto and
-                        petroperu.producto_id == combustibleId and
-                        petroperu.planta_id == plantaId
-                    ),
-                    allPetroperu
-                ))
+                campos = [
+                    str(precio_con_impuesto),
+                    str(combustible),
+                    str(planta),
+                    str(fecha),
+                ]
+                        
+                cadena_unica = '|'.join(campos)
+
+                hash_id = hashlib.sha256(cadena_unica.encode()).hexdigest()
+                
+                results = session.query(PricesMayoristasPetroperuModel).get(hash_id)
+                
                 if not results:
-                    petroperuEntity = PricesMayoristasModel(
+                    petroperuEntity = PricesMayoristasPetroperuModel(
+                        id = hash_id,
                         precio_con_impuesto = precio_con_impuesto,
                         fecha = fecha,
                         producto_id = combustibleId,
                         planta_id = plantaId
                     )
-                    if(combustibleId > 0 and plantaId > 0):
-                        newPetroperuList.append(petroperuEntity)
-                    
-                session.add_all(newPetroperuList)
-            session.commit()
+                    session.add(petroperuEntity)
+                else:
+                    results.updated_at = datetime.now()
+                session.commit()
+            print('Productos no encontrados')
+            print(newProductsList)
         # self.addNewProduct(newProductsList=newProductsList)
     
     def saveReferenciaOsinergmin(self, df: DataFrame):
-        newReferenciaList: List[PriceReferenciaModel] = []
-        newProductsList: List[str] = []
 
         with self.session_factory() as session:
-            allReferencia = session.query(PriceReferenciaModel).all()
             allProducts = session.query(ProductoModel).all()
-            
-        products_dict = {self.convertOnlyLettersAndNumbers(producto.nom_prod):producto.id for producto in allProducts}
+                
+            products_dict = {self.convertOnlyLettersAndNumbers(producto.nom_prod):producto.id for producto in allProducts}
 
-        for index, row in df.iterrows():
-            precio = row.get('Precio', '')
-            productoRef = row.get('Producto', '')
-            fecha = row.get('Fecha', '')
-            
-            productoRefOnlyLettersAndNumber = self.convertOnlyLettersAndNumbers(productoRef)
-            productoDb = products_dict.get(productoRefOnlyLettersAndNumber, None)
-
-            productoId = productoDb if productoDb else 0
-            if not productoDb:
-                responseProductoRef = self.homogenizar_datos(productoRef)
-                if(responseProductoRef == None) :
-                    newProductsList.append(productoRef)
-                productoRefOnlyLettersAndNumber = self.convertOnlyLettersAndNumbers(responseProductoRef)
+            for index, row in df.iterrows():
+                precio = row.get('Precio', '')
+                productoRef = row.get('Producto', '')
+                fecha = row.get('Fecha', '')
+                
+                productoRefOnlyLettersAndNumber = self.convertOnlyLettersAndNumbers(productoRef)
                 productoDb = products_dict.get(productoRefOnlyLettersAndNumber, None)
 
-            productoId = productoDb if productoDb else 0
-            
-            precio = str(precio) if not pd.isna(precio) else None
-            fecha = str(fecha) if not pd.isna(fecha) else None
-            results = list(filter(
-                lambda referencia: (
-                    referencia.precio == precio and
-                    referencia.producto_id == productoId and 
-                    referencia.fecha_registro == fecha
-                ),
-                allReferencia
-            ))
-            if not results:
-                priceEntity = PriceReferenciaModel(
-                    precio = precio,
-                    fecha_registro = fecha,
-                    producto_id = productoId,
-                )
-                if(productoId > 0):
-                    newReferenciaList.append(priceEntity)
+                productoId = productoDb if productoDb else 0
+                if not productoDb:
+                    responseProductoRef = self.homogenizar_datos(productoRef)
+                    # if(responseProductoRef == None) : TODO: por si no encuentra estos combustibles en la tabla producto y se quiere agregar luego.
+                    #     newProductsList.append(productoRef)
+                    productoRefOnlyLettersAndNumber = self.convertOnlyLettersAndNumbers(responseProductoRef)
+                    productoDb = products_dict.get(productoRefOnlyLettersAndNumber, None)
+
+                productoId = productoDb if productoDb else 0
                 
-        with self.session_factory() as session:
-            session.add_all(newReferenciaList)
-            session.commit()
-        # self.addNewProduct(newProductsList=newProductsList)
+                precio = str(precio) if not pd.isna(precio) else None
+                fecha = str(fecha) if not pd.isna(fecha) else None
+                
+                campos = [
+                    str(precio),
+                    str(productoRef),
+                    str(fecha),
+                ]
+                        
+                cadena_unica = '|'.join(campos)
+
+                hash_id = hashlib.sha256(cadena_unica.encode()).hexdigest()
+                
+                results = session.query(PriceReferenciaModel).get(hash_id)
+                
+                if not results:
+                    priceEntity = PriceReferenciaModel(
+                        id = hash_id,
+                        precio = precio,
+                        fecha_registro = fecha,
+                        producto_id = productoId,
+                    )
+                    session.add(priceEntity)
+                else:
+                    results.updated_at = datetime.now()
+                session.commit()
+                
+                
+            # self.addNewProduct(newProductsList=newProductsList)
     
     def saveRelapasa(self, df_combinado: DataFrame) -> DataFrame:
         relapasaDataframe = df_combinado
@@ -225,44 +229,47 @@ class DbDatasourceImpl(DbDatasource):
         return pd.DataFrame(relapasaListToSaveCsv)
     
     def saveMarcadores(self, marcadoresDataframe: pd.DataFrame):
-        newMarcadorList: List[MarcadorModel] = []
         with self.session_factory() as session:
-            allMarcadores = session.query(MarcadorModel).all()
-        for index, row in marcadoresDataframe.iterrows():
-            tipo_cambio = row.get('TC', '')
-            wti = row.get('WTI', '')
-            mont_belvieu = row.get('MontBelvieu', '')
-            fecha = row.get('Fecha', '')
-            
-            tipo_cambio = str(tipo_cambio) if not pd.isna(tipo_cambio) else None
-            wti = str(wti) if not pd.isna(wti) else None
-            mont_belvieu = str(mont_belvieu) if not pd.isna(mont_belvieu) else None
-            fecha = str(fecha) if not pd.isna(fecha) else None
-            
-            results = list(filter(
-                lambda marcador: (
-                    marcador.tipo_cambio == tipo_cambio and
-                    marcador.wti == wti and
-                    marcador.mont_belvieu == mont_belvieu and
-                    marcador.fecha == fecha
-                ),
-                allMarcadores
-            ))
-            if not results:
-                marcadorModel = MarcadorModel(
-                    tipo_cambio = tipo_cambio,
-                    wti = wti,
-                    mont_belvieu = mont_belvieu,
-                    fecha = fecha,
-                )
-                newMarcadorList.append(marcadorModel)
+            for index, row in marcadoresDataframe.iterrows():
+                tipo_cambio = row.get('TC', '')
+                wti = row.get('WTI', '')
+                mont_belvieu = row.get('MontBelvieu', '')
+                fecha = row.get('Fecha', '')
                 
-        with self.session_factory() as session:
-            session.add_all(newMarcadorList)
-            session.commit()
+                tipo_cambio = str(tipo_cambio) if not pd.isna(tipo_cambio) else None
+                wti = str(wti) if not pd.isna(wti) else None
+                mont_belvieu = str(mont_belvieu) if not pd.isna(mont_belvieu) else None
+                fecha = str(fecha) if not pd.isna(fecha) else None
+                
+                campos = [
+                    str(tipo_cambio),
+                    str(wti),
+                    str(mont_belvieu),
+                    str(fecha),
+                ]
+                        
+                cadena_unica = '|'.join(campos)
+
+                hash_id = hashlib.sha256(cadena_unica.encode()).hexdigest()
+                
+                results = session.query(MarcadorModel).get(hash_id)
+                
+                if not results:
+                    marcadorModel = MarcadorModel(
+                        id = hash_id,
+                        tipo_cambio = tipo_cambio,
+                        wti = wti,
+                        mont_belvieu = mont_belvieu,
+                        fecha = fecha,
+                    )
+                    session.add(marcadorModel)
+                else:
+                    results.updated_at = datetime.now()
+                session.commit()
+            
         
     def saveCodigoOsinerg(self):
-        coDataframe = pd.read_csv(f"{pathMinorista}/df_codigoosinerg.csv")
+        coDataframe = pd.read_csv(f"{pathProcessed}/df_codigoosinerg.csv", sep=';')
         coDataframe = coDataframe.drop_duplicates(subset=['ID_COD'], keep='first')
         with self.session_factory() as session:
             
@@ -275,19 +282,24 @@ class DbDatasourceImpl(DbDatasource):
                 
                 id = self.validate_and_convert_to_int(id)
                 
-                coModel = CodigoosinergModel(
-                    id = id,
-                    codigo_osinerg = codigo_osinerg,
-                )
-                if (coModel.id > 0):
-                    session.merge(coModel)
-            session.commit()
+                results = session.query(CodigoosinergModel).get(id)
+                if not results:
+                    coModel = CodigoosinergModel(
+                        id = id,
+                        codigo_osinerg = codigo_osinerg,
+                    )
+                    if (coModel.id > 0):
+                        session.add(coModel)
+                else:
+                    results.updated_at = datetime.now()
+                session.commit()
             
     def saveRazonSocial(self):
-        rsDataframe = pd.read_csv(f"{pathMinorista}/df_razon_social.csv")
+        rsDataframe = pd.read_csv(f"{pathProcessed}/df_razon_social.csv", sep=';')
         rsDataframe = rsDataframe.drop_duplicates(subset=['ID_RS'], keep='first')
         with self.session_factory() as session:
             for index, row in rsDataframe.iterrows():
+                
                 razon_social = row.get('RAZONSOCIAL', '')
                 id = row.get('ID_RS', '')
                 
@@ -296,17 +308,21 @@ class DbDatasourceImpl(DbDatasource):
                 
                 id = self.validate_and_convert_to_int(id)
                 
-                razonSocialModel = RazonSocialModel(
-                    razon_social = razon_social,
-                    id = id,
-                )
-                if (razonSocialModel.id > 0):
-                    session.merge(razonSocialModel)
-                    
-            session.commit()
+                results = session.query(RazonSocialModel).get(id)
+                if not results:
+                    razonSocialModel = RazonSocialModel(
+                        id = id,
+                        razon_social = razon_social,
+                    )
+                    if (razonSocialModel.id > 0):
+                        session.add(razonSocialModel)
+                else:
+                    results.updated_at = datetime.now()
+                session.commit()
+                
                     
     def saveActivity(self):
-        activityDataframe = pd.read_csv(f"{pathMinorista}/df_actividad.csv")
+        activityDataframe = pd.read_csv(f"{pathProcessed}/df_actividad.csv", sep=';')
         activityDataframe = activityDataframe.drop_duplicates(subset=['COD_ACT'], keep='first')
         with self.session_factory() as session:
             
@@ -319,16 +335,22 @@ class DbDatasourceImpl(DbDatasource):
                 
                 id = self.validate_and_convert_to_int(id)
                 
-                activityModel = ActividadModel(
+                results = session.query(ActividadModel).get(id)
+                
+                if not results:
+                    activityModel = ActividadModel(
                         actividad = actividad,
                         id = id,
                     )
-                if (activityModel.id > 0):        
-                    session.merge(activityModel)
-            session.commit()
+                    if (activityModel.id > 0):        
+                        session.add(activityModel)
+                else:
+                    results.updated_at = datetime.now()
+
+                session.commit()
                     
     def saveUbication(self):
-        ubigeoDataframe = pd.read_csv(f"{pathUbication}/df_ubicacion.csv", sep=';')
+        ubigeoDataframe = pd.read_csv(f"{pathProcessed}/df_ubicacion.csv", sep=';')
         ubigeoDataframe = ubigeoDataframe.drop_duplicates(subset=['ID_DPD'], keep='first')
         with self.session_factory() as session:
             
@@ -356,26 +378,32 @@ class DbDatasourceImpl(DbDatasource):
                 capital = capital if not pd.isna(capital) else None
                 
                 id = self.validate_and_convert_to_int(id)
+                results = session.query(UbicacionModel).get(id)
                 
-                ubicationModel = UbicacionModel(
-                    id = id,
-                    ubigeo = ubigeo,
-                    departamento = departamento,
-                    provincia = provincia,
-                    distrito = distrito,
-                    dpd = dpd,
-                    ubi = ubi,
-                    p_urban = p_urban,
-                    rural = rural,
-                    capital = capital,
-                )
-                if (ubicationModel.id > 0) :
-                    session.merge(ubicationModel)
-            session.commit()
+                if not results:
+                    ubicationModel = UbicacionModel(
+                        id = id,
+                        ubigeo = ubigeo,
+                        departamento = departamento,
+                        provincia = provincia,
+                        distrito = distrito,
+                        dpd = dpd,
+                        ubi = ubi,
+                        p_urban = p_urban,
+                        rural = rural,
+                        capital = capital,
+                    )
+                    if (ubicationModel.id > 0) :
+                        session.add(ubicationModel)     
+                else:
+                    results.updated_at = datetime.now()
+
+                session.commit()
+                
         
                 
     def saveDirection(self):
-        directionDataframe = pd.read_csv(f"{pathMinorista}/df_direccion.csv")
+        directionDataframe = pd.read_csv(f"{pathProcessed}/df_direccion.csv", sep=';')
         directionDataframe = directionDataframe.drop_duplicates(subset=['ID_DIR'], keep='first')
         with self.session_factory() as session:
             
@@ -400,22 +428,29 @@ class DbDatasourceImpl(DbDatasource):
                 
                 id = self.validate_and_convert_to_int(id)
                 
-                directionModel = DireccionModel(
-                    id = id,
-                    direccion_name = direccion_name,
-                    latitude = latitude,
-                    longitude = longitude,
-                    razon_id = razon_id,
-                    actividad_id = actividad_id,
-                    ubicacion_id = ubicacion_id,
-                    codigoosinerg_id = codigoosinerg_id,
-                )
-                if (directionModel.id > 0):    
-                    session.merge(directionModel)
-            session.commit()
+                id = self.validate_and_convert_to_int(id)
+                results = session.query(DireccionModel).get(id)
+                
+                if not results:
+                    directionModel = DireccionModel(
+                        id = id,
+                        direccion_name = direccion_name,
+                        latitude = latitude,
+                        longitude = longitude,
+                        razon_id = razon_id,
+                        actividad_id = actividad_id,
+                        ubicacion_id = ubicacion_id,
+                        codigoosinerg_id = codigoosinerg_id,
+                    )
+                    if (directionModel.id > 0):    
+                        session.add(directionModel)
+                else:
+                    results.updated_at = datetime.now()
+
+                session.commit()
         
     def saveProduct(self):
-        productDataframe = pd.read_csv(f"{pathMinorista}/df_producto.csv")
+        productDataframe = pd.read_csv(f"{pathProcessed}/df_producto.csv", sep=';')
         with self.session_factory() as session:            
             productDataframe = productDataframe.drop_duplicates(subset=['COD_PROD'], keep='first')
             
@@ -432,57 +467,90 @@ class DbDatasourceImpl(DbDatasource):
                 # nom_prod = self.quitar_tildes(nom_prod).strip().lower()
                 # nom_prod = re.sub(r'[^a-zA-Z0-9]', '', nom_prod)
                 
-                productModel = ProductoModel(
-                    id = id,
-                    nom_prod = nom_prod,
-                    unidad = unidad,
-                )
-                if (productModel.id > 0):    
-                    session.merge(productModel)
-            session.commit()
+                results = session.query(ProductoModel).get(id)
+                
+                if not results:
+                    productModel = ProductoModel(
+                        id = id,
+                        nom_prod = nom_prod,
+                        unidad = unidad,
+                    )
+                    if (productModel.id > 0):    
+                        session.add(productModel)
+                else:
+                    results.updated_at = datetime.now()
+
+                session.commit()
     
-    def savePrice(self, data: DataFrame):
+    def saveIndicadores(self):
+        chunksize = 10000
+        
+        dfIndicadores = pd.read_csv(f"{pathProcessed}/df_indicadores.csv", sep=';', chunksize=chunksize)
         
         with self.session_factory() as session:
+            for dfIndicadores_chunk in dfIndicadores:
+                print(f'dfIndicadores_chunk {len(dfIndicadores_chunk)} ')
 
-            for index, row in data.iterrows():
-                
-                producto_id = row.get('COD_PROD', '')
-                direccion_id = row.get('ID_DIR', '')
-                fecha_registro = row.get('FECHADEREGISTRO', '')
-                hora_registro = row.get('HORADEREGISTRO', '')
-                precio = row.get('PRECIOVENTA', '')
-                
-                producto_id = producto_id if not pd.isna(producto_id) else 0
-                direccion_id = direccion_id if not pd.isna(direccion_id) else 0
-                fecha_registro = str(fecha_registro) if not pd.isna(fecha_registro) else None
-                hora_registro = str(hora_registro) if not pd.isna(hora_registro) else None
-                precio = str(precio) if not pd.isna(precio) else None
-                
-                
-                producto_id = self.validate_and_convert_to_int(producto_id)
-                direccion_id = self.validate_and_convert_to_int(direccion_id)
-                
-                existe = session.query(PriceModel).filter(
-                    PriceModel.producto_id == producto_id,
-                    PriceModel.direccion_id == direccion_id,
-                    PriceModel.fecha_registro == fecha_registro,
-                    PriceModel.hora_registro == hora_registro,
-                    PriceModel.precio == precio
-                ).first()
-                
-                if not existe:
-                    priceModel = PriceModel(
-                        producto_id = producto_id,
-                        direccion_id = direccion_id,
-                        fecha_registro = fecha_registro,
-                        hora_registro = hora_registro,
-                        precio = precio,
-                    )
-                    if(priceModel.producto_id > 0 and priceModel.direccion_id > 0):
-                        session.add(priceModel)
-            session.commit()
-        
+                for index, row in dfIndicadores_chunk.iterrows():
+                    
+                    id_dir = row.get('ID_DIR', '')
+                    fecha_stata = row.get('fecha_stata', '')
+                    precioventa = row.get('PRECIOVENTA', '')
+                    precioventa_ = row.get('PRECIOVENTA_', '')
+                    dias_faltantes = row.get('dias_faltantes', '')
+                    cod_prod = row.get('COD_PROD', '')
+                    id_col = row.get('ID_COL', '')
+                    dprecioventa = row.get('dPRECIOVENTA', '')
+                    dvarprecioventa = row.get('dvarPRECIOVENTA', '')
+                    raro = row.get('raro', '')
+                    raro2 = row.get('raro2', '')
+                    ruc_prov = row.get('RUC-prov', '')
+                    precioventa_may = row.get('PRECIOVENTA_may', '')
+                    
+                    campos = [
+                        str(id_dir),
+                        str(fecha_stata),
+                        str(precioventa),
+                        str(precioventa_),
+                        str(dias_faltantes),
+                        str(cod_prod),
+                        str(id_col),
+                        str(dprecioventa),
+                        str(dvarprecioventa),
+                        str(raro),
+                        str(raro2),
+                        str(ruc_prov),
+                        str(precioventa_may),
+                    ]
+                            
+                    cadena_unica = '|'.join(campos)
+
+                    hash_id = hashlib.sha256(cadena_unica.encode()).hexdigest()
+                    
+                    results = session.query(IndicadoresModel).get(hash_id)
+                    
+                    if not results:
+                        indicadorModel = IndicadoresModel(
+                            id = hash_id,
+                            id_dir = id_dir,
+                            fecha_stata = fecha_stata,
+                            precioventa = precioventa,
+                            precioventa_ = precioventa_,
+                            dias_faltantes = dias_faltantes,
+                            cod_prod = cod_prod,
+                            id_col = id_col,
+                            dprecioventa = dprecioventa,
+                            dvarprecioventa = dvarprecioventa,
+                            raro = raro,
+                            raro2 = raro2,
+                            ruc_prov = ruc_prov,
+                            precioventa_may = precioventa_may,
+                        )
+                        session.add(indicadorModel)
+                    else:
+                        results.updated_at = datetime.now()
+                    session.commit()
+            
     def validate_and_convert_to_int(self,value):
         try:
             return int(value)
@@ -529,6 +597,7 @@ class DbDatasourceImpl(DbDatasource):
             "PETRÓLEO INDUSTRIAL 6 G. E.": "PETROLEO INDUSTRIAL Nº 6 GE",
             "PETROLEO INDUSTRIAL 500": "PETROLEO INDUSTRIAL Nº 500",
             "PETROPERU INDUSTRIAL 500": "PETROLEO INDUSTRIAL Nº 500",
+            "PETROLEO INDUSTRIAL Nº 6": "PETROLEO INDUSTRIAL Nº 6",
             "PETROPERU INDUSTRIAL Nº 6": "PETROLEO INDUSTRIAL Nº 6",
             "GASOHOL 84": "GASOHOL 84 PLUS",
             "GASOHOL 90": "GASOHOL 90 PLUS",
@@ -577,7 +646,7 @@ class DbDatasourceImpl(DbDatasource):
                 session.add(productModel)
             session.commit()
     def saveCombustibleValido(self):
-        cvDataframe = pd.read_csv(f"{pathCombustibleValido}/df_validos_dpt.csv")
+        cvDataframe = pd.read_csv(f"{pathProcessed}/df_validos_dpt.csv")
         with self.session_factory() as session:            
             
             for index, row in cvDataframe.iterrows():
@@ -597,11 +666,11 @@ class DbDatasourceImpl(DbDatasource):
                     continue
                 producto_id = str(producto_id).replace('.0', '')
                 campos = [
-                    id_cv,
-                    anio,
-                    departamento,
-                    producto_id,
-                    ok,
+                    str(id_cv),
+                    str(anio),
+                    str(departamento),
+                    str(producto_id),
+                    str(ok),
                 ]
                     
                 cadena_unica = '|'.join(campos)
@@ -621,4 +690,73 @@ class DbDatasourceImpl(DbDatasource):
                         producto_id = producto_id,
                     )
                     session.add(combustibleValidoModel)
+                else:
+                    results.updated_at = datetime.now()
+            session.commit()
+            
+    def saveMayMinGeo(self):
+        mmDataframe = pd.read_csv(f"{pathProcessed}/df_may_min_geo.csv", sep=';')
+        with self.session_factory() as session:            
+            
+            for index, row in mmDataframe.iterrows():
+                
+                id_cod = row.get('ID_COD', '')
+                id_rs = row.get('ID_RS', '')
+                cod_act = row.get('COD_ACT', '')
+                id_dpd = row.get('ID_DPD', '')
+                direccion = row.get('DIRECCION', '')
+                lat = row.get('lat', '')
+                lon = row.get('lon', '')
+                ruc = row.get('RUC', '')
+                razonsocial_geo = row.get('RAZONSOCIAL_geo', '')
+                minorista = row.get('minorista', '')
+                id_dir = row.get('ID_DIR', '')
+                codigoosinerg2 = row.get('CODIGOOSINERG2', '')
+                cod_prod = row.get('COD_PROD', '')
+                ruc_prov = row.get('RUC-prov', '')
+                
+                campos = [
+                    str(id_cod),
+                    str(id_rs),
+                    str(cod_act),
+                    str(id_dpd),
+                    str(direccion),
+                    str(lat),
+                    str(lon),
+                    str(ruc),
+                    str(razonsocial_geo),
+                    str(minorista),
+                    str(id_dir),
+                    str(codigoosinerg2),
+                    str(cod_prod),
+                    str(ruc_prov),
+                ]
+                    
+                cadena_unica = '|'.join(campos)
+
+                hash_id = hashlib.sha256(cadena_unica.encode()).hexdigest()
+                
+                results = session.query(MayMinGeoModel).get(hash_id)
+                
+                if not results:
+                    mayMinModel = MayMinGeoModel(
+                        id = hash_id,
+                        id_cod = id_cod,
+                        id_rs = id_rs,
+                        cod_act = cod_act,
+                        id_dpd = id_dpd,
+                        direccion = direccion,
+                        lat = lat,
+                        lon = lon,
+                        ruc = ruc,
+                        razonsocial_geo = razonsocial_geo,
+                        minorista = minorista,
+                        id_dir = id_dir,
+                        codigoosinerg2 = codigoosinerg2,
+                        cod_prod = cod_prod,
+                        ruc_prov = ruc_prov,
+                    )
+                    session.add(mayMinModel)
+                else:
+                    results.updated_at = datetime.now()
             session.commit()

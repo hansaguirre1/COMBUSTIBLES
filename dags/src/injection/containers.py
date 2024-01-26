@@ -1,3 +1,6 @@
+
+from src.infrastructure.repositories.indicador_repository_impl import IndicadorRepositoryImpl
+from src.infrastructure.repositories.lat_lng_mayorista_repository_impl import LatLngMayoristaRepositoryImpl
 from src.infrastructure.repositories.precios_mayoristas_repository_impl import PreciosMayoristasRepositoryImpl
 from src.infrastructure.repositories.ubigeo_repository_impl import UbigeoRepositoryImpl
 from src.infrastructure.repositories.combustibles_validos_repository_impl import CombustiblesValidosRepositoryImpl
@@ -75,3 +78,16 @@ class Container(containers.DeclarativeContainer):
         fileDatasource=file_datasource,
         dbDatasource=db_datasource
     )
+    
+    lat_lng_mayoristas_repository = providers.Factory(
+        LatLngMayoristaRepositoryImpl,
+        fileDatasource=file_datasource,
+        dbDatasource=db_datasource
+    )
+    
+    indicador_repository = providers.Factory(
+        IndicadorRepositoryImpl,
+        fileDatasource=file_datasource,
+        dbDatasource=db_datasource
+    )
+    

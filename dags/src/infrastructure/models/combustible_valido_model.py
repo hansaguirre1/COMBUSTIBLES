@@ -14,8 +14,8 @@ class CombustibleValidoModel(Base):
     anio = Column(String, nullable=True)
     departamento = Column(String, nullable=True)
     ok = Column(String, nullable=True)
+    producto_id = Column(String, nullable=True)
     created_at = Column(DateTime(), default=datetime.now())
-    producto_id = Column(Integer, nullable=True)
-    
+    updated_at = Column(DateTime(), default=datetime.now())
     # Relaciones
     # producto = relationship('ProductoModel', back_populates="combustibles_validos")

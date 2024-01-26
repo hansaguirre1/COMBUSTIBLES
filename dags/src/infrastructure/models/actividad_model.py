@@ -12,6 +12,7 @@ class ActividadModel(Base):
     id = Column(Integer, primary_key=True)
     actividad = Column(String, nullable=True)
     created_at = Column(DateTime(), default=datetime.now())
+    updated_at = Column(DateTime(), default=datetime.now())
     
     # Relación con Direcciones
     # direcciones = relationship("DireccionModel", back_populates="actividad")
