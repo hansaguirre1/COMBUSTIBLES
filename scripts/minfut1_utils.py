@@ -83,6 +83,8 @@ def limpieza_dir(dxx):
     dxx.loc[(dxx["DIRECCION"]=="AV. GARCILAZO N° 323") & (dxx["CODIGOOSINERG2"]=="87636"),"lon"]=-70.590184
     dxx.loc[(dxx["DIRECCION"]=="FUNDO EL CHOCHE II PARCELA B - CASERIO NVO. JUANJUI") & (dxx["CODIGOOSINERG2"]=="169148"),"lat"]=-8.639441
     dxx.loc[(dxx["DIRECCION"]=="FUNDO EL CHOCHE II PARCELA B - CASERIO NVO. JUANJUI") & (dxx["CODIGOOSINERG2"]=="169148"),"lon"]=-74.964887
+    dxx.loc[(dxx["DIRECCION"]=="CALLE CORONEL ANDRES REYES N° 360, PISO 2") & (dxx["CODIGOOSINERG2"]=="33767-2"),"lat"]=-12.094413
+    dxx.loc[(dxx["DIRECCION"]=="CALLE CORONEL ANDRES REYES N° 360, PISO 2") & (dxx["CODIGOOSINERG2"]=="33767-2"),"lon"]=-77.028337
     return dxx
 
 def limpieza_prod(data):
