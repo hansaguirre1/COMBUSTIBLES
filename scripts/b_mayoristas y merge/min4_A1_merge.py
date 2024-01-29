@@ -88,7 +88,7 @@ d1.drop(["_merge"],axis=1,inplace=True)
 #print(d1.head())
 #d2.rename(columns={"RUC": "RUC_mayorista"},inplace=True)
 #d1.head()
-d1.to_csv(ruta4 + DF_fin,index=False,encoding='utf-8',sep=";")
+d1.to_csv(ruta6 + DF_fin,index=False,encoding='utf-8',sep=";")
 
 
 
