@@ -51,9 +51,17 @@ class FileDatasource(ABC):
         pass
     
     @abstractmethod
+    def minfut4_processSeparacion(self):
+        pass
+    
+    @abstractmethod
     def min4_a1_processMerge(self):
         pass
     
     @abstractmethod
     def exportFinalDta(self):
+        pass
+    
+    @abstractmethod
+    def divideIndicadoresFile(self):
         pass

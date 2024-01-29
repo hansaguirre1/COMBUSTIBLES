@@ -19,6 +19,7 @@ import PyPDF2
 import re
 from itertools import product
 from src.infrastructure.datasources.process.minfut0_nombres import *
+import concurrent.futures
 
 pathMinorista = 'data/interim/minoristas'
 
@@ -602,10 +603,10 @@ class FileDatasourceImpl(FileDatasource):
         
     def dis3_processDistances(self):
 
-       
-
+            
         # Ejemplo de DataFrames df1 y df2 con características numéricas
         data2 = pd.read_csv(ruta3 + DF_georef_may, encoding="utf-8", sep=";")
+        data2.drop_duplicates(subset=["RUC-prov"],inplace=True)
         data2["id"] = data2.index
         data2.to_csv(ruta3 + DF_georef_may, encoding="utf-8", sep=";")
         data2["RUC-prov"] = data2["RUC"].astype(str)+"-"+data2["PROVINCIA_VENDEDOR"]
@@ -616,12 +617,13 @@ class FileDatasourceImpl(FileDatasource):
         # Verificamos el producto
         data1 = pd.read_csv(ruta4 + DF_dir, encoding="utf-8", sep=";")
         data1 = data1.loc[data1["minorista"]==1]
-        data1["id"] = data1.index
+        #data1["id"] = data1.index
         data1_ = pd.read_csv(ruta4 + BASE_DLC, encoding="utf-8", sep=";")
 
         # Bucles
         dfs=[]
         p = 1
+        #k=19
         for k in cod_prods:
             try:
                 print(k)
@@ -640,49 +642,222 @@ class FileDatasourceImpl(FileDatasource):
                 d1 = pd.DataFrame(data1__[["lat","lon"]])
                 # Calcular la matriz de distancias
                 d1d2 = cdist(d1, d2, 'cityblock')
-                d1d2_ = np.min(d1d2, axis=1)
+                #d1d2_ = np.min(d1d2, axis=1)
                 d1d2 = pd.DataFrame(d1d2)
-                d1d2.index = data1__["id"]
+                d1d2.index = data1__["ID_DIR"]
                 d1d2.columns = data2__["id"]
-                d1d2__ = d1d2.idxmin(axis=1)
+                arr=d1d2.values.argsort(1)[:,:3]
+                c1=[]
+                c2=[]
+                c3=[]
+                for i in range(len(arr)):
+                    c1.append(d1d2.columns.tolist()[arr[i,0]])
+                    c2.append(d1d2.columns.tolist()[arr[i,1]])
+                    c3.append(d1d2.columns.tolist()[arr[i,2]])
                 data1__["COD_PROD"] = k
-                data1__["id"] = d1d2__.values
-                data1__ = data1__.merge(data2__[["RUC-prov","id"]],on="id")
-                exec(f"base_{p}=data1__.copy()")
+                data1__["id1"] = c1
+                data1__["id2"] = c2
+                data1__["id3"] = c3
+                #data1__ = data1__.merge(data2__[["RUC-prov","id"]],left_on="ID_DIR",right_on="id")
+                # exec(f"base_{p}=data1__.copy()")
                 # dfs.append(f"base_{p}")
                 dfs.append(data1__.copy())
+                
                 p+=1
             except:
                 pass
             
         # dfs2 = [globals()[f"base_{i}"] for i in range(1, len(dfs) + 1) if f"base_{i}" in globals()]
+        # df_concatenado = pd.concat(dfs, ignore_index=True)
+        
         #del base_1,base_2,base_3,base_4,base_5,base_6,base_7,base_8,base_9
         df_concatenado = pd.concat(dfs, ignore_index=True)
         df_concatenado.rename(columns={"RUC_x": "RUC", "RUC_y": "RUC_mayorista"},inplace=True)
-        del dfs
-        df_concatenado.to_csv(ruta4 + DF_dir_may, encoding="utf-8", sep=";")
+        # del dfs2
+        df_concatenado2 = df_concatenado[["COD_PROD","ID_DIR","id1","id2","id3"]]
+        df_concatenado2 = pd.melt(df_concatenado2, id_vars=['COD_PROD', 'ID_DIR'], value_vars=['id1', 'id2', 'id3'], var_name='variable', value_name='id')
+        df_concatenado2 = df_concatenado2.drop(columns=['variable'])
+        df_concatenado2 = df_concatenado2.merge(data2[["RUC-prov","id","latitude","longitude"]],on="id")
+        df_concatenado2.to_csv(ruta4 + DF_dir_may, encoding="utf-8", sep=";")
+        df_concatenado.to_csv(ruta4 + DF_dir_may2, encoding="utf-8", sep=";")
+
+        # Ejemplo de DataFrames df1 y df2 con características numéricas
+        # Ejemplo de DataFrames df1 y df2 con características numéricas
+        # Ejemplo de DataFrames df1 y df2 con características numéricas
+        # Ejemplo de DataFrames df1 y df2 con características numéricas
+        # Ejemplo de DataFrames df1 y df2 con características numéricas
+        # data2 = pd.read_csv(ruta3 + DF_georef_may, encoding="utf-8", sep=";")
+        # data2["id"] = data2.index
+        # data2.to_csv(ruta3 + DF_georef_may, encoding="utf-8", sep=";")
+        # data2["RUC-prov"] = data2["RUC"].astype(str)+"-"+data2["PROVINCIA_VENDEDOR"]
+        # data2["RUC"]=data2["RUC"].astype(str)
+        # data2.to_csv(ruta3 + DF_georef_may, index=False, encoding="utf-8", sep=";")
+        # data2_ = pd.read_csv(ruta7 + DF_may_fin,encoding='utf-8',sep=';')
+
+        # # Verificamos el producto
+        # data1 = pd.read_csv(ruta4 + DF_dir, encoding="utf-8", sep=";")
+        # data1 = data1.loc[data1["minorista"]==1]
+        # data1["id"] = data1.index
+        # data1_ = pd.read_csv(ruta4 + BASE_DLC, encoding="utf-8", sep=";")
+
+        # # Bucles
+        # dfs=[]
+        # p = 1
+        # for k in cod_prods:
+        #     try:
+        #         print(k)
+        #         data2__ = data2_.loc[data2_["COD_PROD"]==k]
+        #         #data2__[['RUC', 'PROVINCIA']] = data2__['RUC-prov'].str.split('-', expand=True)
+        #         #data2__ = data2__.groupby(['fecha_stata', "PROVINCIA","COD_PROD"]).agg({'PRECIOVENTA': 'mean'}).reset_index()
+        #         data2__.drop_duplicates(subset=["RUC-prov"],inplace=True)
+        #         data2__=data2.merge(data2__[["RUC-prov","PRECIOVENTA"]],how="inner")
+        #         data2__.drop(["PRECIOVENTA"],axis=1,inplace=True)
+        #         data1__ = data1_.loc[data1_["COD_PROD"]==k]
+        #         data1__.drop_duplicates(subset="ID_DIR",inplace=True)
+        #         data1__=data1.merge(data1__[["ID_DIR","PRECIOVENTA"]],how="inner")
+        #         data1__.drop(["PRECIOVENTA"],axis=1,inplace=True)
+        #         # DFS
+        #         d2 = pd.DataFrame(data2__[["latitude","longitude"]])
+        #         d1 = pd.DataFrame(data1__[["lat","lon"]])
+        #         # Calcular la matriz de distancias
+        #         d1d2 = cdist(d1, d2, 'cityblock')
+        #         d1d2_ = np.min(d1d2, axis=1)
+        #         d1d2 = pd.DataFrame(d1d2)
+        #         d1d2.index = data1__["id"]
+        #         d1d2.columns = data2__["id"]
+        #         d1d2__ = d1d2.idxmin(axis=1)
+        #         data1__["COD_PROD"] = k
+        #         data1__["id"] = d1d2__.values
+        #         data1__ = data1__.merge(data2__[["RUC-prov","id"]],on="id")
+        #         exec(f"base_{p}=data1__.copy()")
+        #         # dfs.append(f"base_{p}")
+        #         dfs.append(data1__.copy())
+        #         p+=1
+        #     except:
+        #         pass
+            
+        # # dfs2 = [globals()[f"base_{i}"] for i in range(1, len(dfs) + 1) if f"base_{i}" in globals()]
+        # #del base_1,base_2,base_3,base_4,base_5,base_6,base_7,base_8,base_9
+        # df_concatenado = pd.concat(dfs, ignore_index=True)
+        # df_concatenado.rename(columns={"RUC_x": "RUC", "RUC_y": "RUC_mayorista"},inplace=True)
+        # del dfs
+        # df_concatenado.to_csv(ruta4 + DF_dir_may, encoding="utf-8", sep=";")
         
     def min4_a1_processMerge(self):
         # Finally
-        d1 = pd.read_csv(ruta + DF_imp, encoding="utf-8", sep=";")
-        df = pd.read_csv(ruta4 + DF_dir_may,encoding='utf-8',sep=";")
+        print("Ultimo")
+        d1 = pd.read_csv(ruta6 + DF_fin, encoding="utf-8", sep=";")
+        #d1=d1.drop(columns={"PRECIOVENTA_may"})
+        df = pd.read_csv(ruta4 + DF_dir_may2,encoding='utf-8',sep=";")
+        df = df[["COD_PROD","ID_DIR","id1","id2","id3"]]
+        d22 = pd.read_csv(ruta3 + DF_georef_may, encoding="utf-8", sep=";")
+        d22 = d22[["RUC-prov","id"]]
+
+        df = df.merge(d22,left_on="id1",right_on="id")
+        df.drop(["id"],axis=1,inplace=True)
+        df.rename(columns={"RUC-prov": "RUC-prov1"},inplace=True)
+        df = df.merge(d22,left_on="id2",right_on="id")
+        df.drop(["id"],axis=1,inplace=True)
+        df.rename(columns={"RUC-prov": "RUC-prov2"},inplace=True)
+        df = df.merge(d22,left_on="id3",right_on="id")
+        df.drop(["id"],axis=1,inplace=True)
+        df.rename(columns={"RUC-prov": "RUC-prov3"},inplace=True)
+
         #df = df.drop_duplicates(subset=["PROVINCIA","DEPARTAMENTO","RUC"])
         d2 = pd.read_csv(ruta7 + DF_may_fin,encoding='utf-8',sep=';')
-        d2.rename(columns={"PRECIOVENTA": "PRECIOVENTA_may"},inplace=True)
-        #d2[['RUC', 'PROVINCIA']] = d2['RUC-prov'].str.split('-', expand=True)
-        #d2=d2.drop_duplicates(subset=["COD_PROD","fecha_stata","RUC-prov"])
-        d1 = d1.merge(df[["COD_PROD","RUC-prov","ID_DIR"]], on=["COD_PROD","ID_DIR"],how="left",indicator=True)
+        d2.rename(columns={"PRECIOVENTA": "PRECIOVENTA_may2"},inplace=True)
+        fecha_manual = '2024-01-26'
+        d2 = d2[d2['fecha_stata'] == fecha_manual]
+        dataframes_list = []
+
+        # def process_k(k):
+        #     print(k)
+        #     df_ = df.loc[df["COD_PROD"] == k]
+        #     df_ = df_["ID_DIR"].unique()
+        #     print(len(df_))
+        #     result_list = []
+        #     for j in range(len(df_)):
+        #         df__ = df.loc[(df["COD_PROD"] == k) & (df["ID_DIR"] == df_[j])]
+        #         ver1 = df__.loc[:, "RUC-prov1"].values[0]
+        #         ver2 = df__.loc[:, "RUC-prov2"].values[0]
+        #         ver3 = df__.loc[:, "RUC-prov3"].values[0]
+        #         d2_ = d2.loc[((d2["RUC-prov"] == ver1) | (d2["RUC-prov"] == ver2) | (d2["RUC-prov"] == ver3)) & (d2["COD_PROD"] == k)]
+        #         d2_ = d2_.groupby(['fecha_stata'])["PRECIOVENTA_may2"].mean().reset_index()
+        #         d2_["ID_DIR"] = df_[j]
+        #         d2_["COD_PROD"] = k
+        #         result_list.append(d2_)
+        #     return result_list
+
+        def process_k(k):
+            try:
+                print(k)
+                df_ = df.loc[df["COD_PROD"] == k]
+                df_ = df_["ID_DIR"].unique()
+                print(len(df_))
+                result_list = []
+                for j in range(len(df_)):
+                    df__ = df.loc[(df["COD_PROD"] == k) & (df["ID_DIR"] == df_[j])]
+                    ver1 = df__.loc[:, "RUC-prov1"].values[0]
+                    ver2 = df__.loc[:, "RUC-prov2"].values[0]
+                    ver3 = df__.loc[:, "RUC-prov3"].values[0]
+                    d2_ = d2.loc[((d2["RUC-prov"] == ver1) | (d2["RUC-prov"] == ver2) | (d2["RUC-prov"] == ver3)) & (d2["COD_PROD"] == k)]
+                    d2_ = d2_.groupby(['fecha_stata'])["PRECIOVENTA_may2"].mean().reset_index()
+                    d2_["ID_DIR"] = df_[j]
+                    d2_["COD_PROD"] = k
+                return d2_
+            except:
+                pass
+
+        # Lista para almacenar los resultados
+        dataframes_list = []
+
+        # Número de hilos (ajústalo según sea necesario)
+        num_threads = 9
+
+        # Paralelizar el bucle principal
+        # with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
+        #     futures = {executor.submit(process_k, k): k for k in cod_prods}
+        #     for future in concurrent.futures.as_completed(futures):
+        #         try:
+        #             dataframes_list.extend(future.result())
+        #         except Exception as e:
+        #             print(f"Error: {e}")
+
+        for k in cod_prods:
+            jj=process_k(k)
+            dataframes_list.append(jj)
+
+        dfs = pd.concat(dataframes_list, ignore_index=True)
+        dfs = dfs.dropna()
+        dfs.head()
+
+        del dataframes_list
+        d1 = d1.merge(dfs, on=["COD_PROD","ID_DIR","fecha_stata"],how="left",indicator=True)
         d1._merge.value_counts()
         d1.drop(["_merge"],axis=1,inplace=True)
+        d1.loc[d1["fecha_stata"]==fecha_manual,"PRECIOVENTA_may"]=d1["PRECIOVENTA_may2"]
+        d1.drop(["PRECIOVENTA_may2"],axis=1,inplace=True)
         #d1["RUC_mayorista"]=d1["RUC_mayorista"].astype(str).str.rstrip('.0')
         #print(d1.head())
         #d2.rename(columns={"RUC": "RUC_mayorista"},inplace=True)
         #d1.head()
-        d1x = d1[["COD_PROD","fecha_stata","RUC-prov"]].merge(d2[["COD_PROD","fecha_stata","RUC-prov","PRECIOVENTA_may"]],on=["RUC-prov","fecha_stata","COD_PROD"],how="left")
-        d1[["COD_PROD","fecha_stata","RUC-prov"]].tail()
-        #d1x.tail(20)
-        d1["PRECIOVENTA_may"] = d1x["PRECIOVENTA_may"]
-        d1.PRECIOVENTA_may.isnull().sum()
-        d1.columns
-        d1.to_csv(ruta4 + DF_fin,index=False,encoding='utf-8',sep=";")
+        d1.to_csv(ruta6 + DF_fin,index=False,encoding='utf-8',sep=";")
+    def minfut4_processSeparacion(self):
+        # Data
+        print("separando")
+        d1 = pd.read_csv(ruta6+DF_fin,encoding='utf-8',sep=";")
+        d1["ID_fin"] = d1["ID_DIR"].astype(str) + "-" + d1["COD_PROD"].astype(str) + "-" + d1["fecha_stata"]
+        d1[["ID_fin","ID_DIR","COD_PROD","fecha_stata","PRECIOVENTA"]].to_csv(ruta4 + DF_min_bi, index=False, encoding="utf-8", sep=";")
+        d1[["ID_fin","PRECIOVENTA_may"]].to_csv(ruta4 + DF_may_bi, index=False, encoding="utf-8", sep=";")
+        d1[["ID_fin","dPRECIOVENTA","dvarPRECIOVENTA"]].to_csv(ruta4 + DF_fin, index=False, encoding="utf-8", sep=";")
 
+    def divideIndicadoresFile(self):
+        total_rows = sum(1 for row in open(ruta4 + DF_fin, 'r', encoding='utf-8')) - 1
+        rows_per_part = total_rows // 3
+        iterator = pd.read_csv(ruta4 + DF_fin, chunksize=rows_per_part, sep=';')
+
+        for i, chunk in enumerate(iterator):
+            new_filename = f"data/processed/indicadores_part_{i}.csv"
+            chunk.to_csv(new_filename, index=False, sep=';')
+            if i == 2:
+                break

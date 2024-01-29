@@ -1,6 +1,8 @@
 import hashlib
 
 from pandas import DataFrame
+from src.infrastructure.models.mayorista_model import MayoristaModel
+from src.infrastructure.models.minorista_model import MinoristaModel
 from src.infrastructure.models.may_min_geo_model import MayMinGeoModel
 from src.infrastructure.models.combustible_valido_model import CombustibleValidoModel
 from src.infrastructure.models.relapasa_model import RelapasaModel
@@ -760,3 +762,61 @@ class DbDatasourceImpl(DbDatasource):
                 else:
                     results.updated_at = datetime.now()
             session.commit()
+            
+    def saveMinorista(self):
+        chunksize = 10000
+        
+        dfMinorista = pd.read_csv(f"{pathProcessed}/df_minorista.csv", sep=';', chunksize=chunksize)
+        
+        with self.session_factory() as session:
+            for dfMinorista_chunk in dfMinorista:
+                print(f'dfMinorista_chunk_chunk {len(dfMinorista_chunk)} ')
+
+                for index, row in dfMinorista_chunk.iterrows():
+
+                    id = row.get('ID_fin', '')
+                    id_dir = row.get('ID_DIR', '')
+                    cod_prod = row.get('COD_PROD', '')
+                    fecha_stata = row.get('fecha_stata', '')
+                    precio_venta = row.get('PRECIOVENTA', '')
+                    
+                    results = session.query(MinoristaModel).get(id)
+                    
+                    if not results:
+                        minoristaModel = MinoristaModel(
+                            id = id,
+                            id_dir = id_dir,
+                            cod_prod = cod_prod,
+                            fecha_stata = fecha_stata,
+                            precio_venta = precio_venta,
+                        )
+                        session.add(minoristaModel)
+                    else:
+                        results.updated_at = datetime.now()
+                    session.commit()
+        
+    def saveMayorista(self):
+        chunksize = 10000
+        
+        dfMayorista = pd.read_csv(f"{pathProcessed}/df_mayorista.csv", sep=';', chunksize=chunksize)
+        
+        with self.session_factory() as session:
+            for dfMayorista_chunk in dfMayorista:
+                print(f'dfMayorista_chunk_chunk {len(dfMayorista_chunk)} ')
+
+                for index, row in dfMayorista_chunk.iterrows():
+
+                    id = row.get('ID_fin', '')
+                    precio_venta_may = row.get('PRECIOVENTA_may', '')
+                    
+                    results = session.query(MayoristaModel).get(id)
+                    
+                    if not results:
+                        minoristaModel = MayoristaModel(
+                            id = id,
+                            precio_venta_may = precio_venta_may,
+                        )
+                        session.add(minoristaModel)
+                    else:
+                        results.updated_at = datetime.now()
+                    session.commit()

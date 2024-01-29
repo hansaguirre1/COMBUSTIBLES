@@ -4,7 +4,6 @@ import os
 # Directorio
 os.chdir(os.getcwd())
 
-# Nombres
 BASE_DLCC = "BASETOTAL_DLC.dta"
 BASE_DLC = "Base_apilada.csv"
 DF_rs = "df_razon_social.csv"
@@ -25,6 +24,9 @@ DF_may_fin = "precios_mayoristas_imp.csv"
 DF_fin = "df_indicadores.csv"
 DF_base_comb2 = "BASETOTAL_COMBUSTIBLES2.csv"
 DF_dir_may = "df_may_min_geo.csv"
+DF_dir_may2 = "df_may_min_geo2.csv"
+DF_min_bi = "df_minorista.csv"
+DF_may_bi = "df_mayorista.csv"
 ruta = "data/interim/precios_minoristas/"
 ruta2 = "data/raw/precios_minoristas/"
 ruta3 = "data/external/"
@@ -36,8 +38,8 @@ ruta8 = "data/interim/combustibles_validos/"
 
 # Bases para merge
 try:
-    cod = pd.read_csv(ruta4 + DF_cod, encoding='utf-8', sep=";")
     ubi = pd.read_csv(ruta4 + DF_ubi, encoding='utf-8', sep=";")
+    cod = pd.read_csv(ruta4 + DF_cod, encoding='utf-8', sep=";")
     rs = pd.read_csv(ruta4 + DF_rs, encoding='utf-8', sep=";")
     prod = pd.read_csv(ruta4 + DF_prod, encoding='utf-8', sep=";")
     dir = pd.read_csv(ruta4 + DF_dir, encoding='utf-8', sep=";")
@@ -68,7 +70,4 @@ try:
 
 except:
     pass
-
-
-
 

@@ -124,12 +124,12 @@ with DAG(
         
         latLngMinoristaRepository.saveDataLatLng()
     
-    def processIndicadorMinorista():
-        from src.injection.containers import Container
-        from src.domain.repositories.indicador_repository import IndicadorRepository
-        container = Container()
-        indicadorRepository: IndicadorRepository = container.indicador_repository()
-        indicadorRepository.saveAndProcessData()
+    # def processIndicadorMinorista():
+    #     from src.injection.containers import Container
+    #     from src.domain.repositories.indicador_repository import IndicadorRepository
+    #     container = Container()
+    #     indicadorRepository: IndicadorRepository = container.indicador_repository()
+    #     indicadorRepository.saveAndProcessData()
     
     def processDtaMinoristas():
         from src.injection.containers import Container
@@ -176,12 +176,6 @@ with DAG(
         dag=dag,
         )
     
-    process_indicadores_task = PythonOperator(
-        task_id='process_indicadores',
-        python_callable=processIndicadorMinorista,
-        dag=dag,
-        )
-    
     process_data_marcadores = PythonOperator(
         task_id='process-data-marcadores',
         python_callable=processDataMarcadores,
@@ -215,4 +209,4 @@ with DAG(
     end_process = EmptyOperator(task_id='end-process-data')
     
     # start_process >> remote_data_petroperu >> remote_data_marcadores >> remote_data_osinergmin >> remote_data_signeblock >> end_process
-    start_process >> process_data_minoristas >> process_data_combustibles_validos >> process_data_precios_mayorista_petroperu >> process_data_marcadores >>  [ process_data_ubigeo, process_data_osinergmin_precios_referencia , process_precio_mayorista, process_lat_lng_mayorista_task] >> process_indicadores_task  >> end_process
+    start_process >> process_data_minoristas >> process_data_combustibles_validos >> process_data_precios_mayorista_petroperu >> process_data_marcadores >>  [ process_data_ubigeo, process_data_osinergmin_precios_referencia , process_precio_mayorista] >> process_lat_lng_mayorista_task  >> end_process

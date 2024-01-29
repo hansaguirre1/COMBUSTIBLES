@@ -14,3 +14,9 @@ class LatLngMayoristaRepositoryImpl(LatLngMayoristaRepository):
         self.fileDatasource.dis3_processDistances()
         self.dbDatasource.saveMayMinGeo()
         
+        self.fileDatasource.min4_a1_processMerge()
+        self.fileDatasource.minfut4_processSeparacion()
+        self.dbDatasource.saveIndicadores()
+        self.dbDatasource.saveMayorista()
+        self.dbDatasource.saveMinorista()
+        

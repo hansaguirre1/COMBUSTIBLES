@@ -35,6 +35,12 @@ class DbDatasource(ABC):
     def saveIndicadores(self):
         pass
     @abstractmethod
+    def saveMinorista(self):
+        pass
+    @abstractmethod
+    def saveMayorista(self):
+        pass
+    @abstractmethod
     def saveRelapasa(self, df_combinado: DataFrame) -> DataFrame:
         pass
     @abstractmethod
