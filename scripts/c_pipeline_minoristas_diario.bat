@@ -15,11 +15,16 @@ python ".\c_minorista_diario\min0_A2_Tablas_relacionales.py"
 echo Ejecutando: "min1_A2_data_quality_imputacion.py"
 python ".\c_minorista_diario\min1_A2_data_quality_imputacion.py"
 
-#merge mayorista minorista
+echo #merge mayorista minorista
 
 echo Ejecutando: "min4_A2_merge diario copy.py"
 python ".\c_minorista_diario\min4_A2_merge diario copy.py"
 
+
+echo separación en tablñas independientes
+
+echo Ejecutando: "minfut4_separacion.py"
+python ".\c_minorista_diario\minfut4_separacion.py"
 
 echo Proceso completado.
 pause

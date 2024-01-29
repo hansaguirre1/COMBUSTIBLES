@@ -69,7 +69,7 @@ container_list=container.find_elements(By.TAG_NAME,'li')
 for element in container_list:
     for i in range(0,1):
         element.click()
-        time.sleep(5)
+        time.sleep(10)
 
 # Unzip files
 

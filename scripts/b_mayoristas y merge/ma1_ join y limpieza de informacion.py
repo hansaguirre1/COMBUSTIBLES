@@ -30,17 +30,19 @@ for file in os.listdir(new_dir_path):
 # Filtar por actividades de interés
 b=[]
 for a in Precios_Mayoristas_list:
-    a=a.drop(columns="NaN", errors='ignore')
-    b.append(a.loc[ (a['ACTIVIDAD'].str.contains('DISTRIBUIDOR')) |
-                    (a['ACTIVIDAD'].str.contains('PRODUCTOR')) |
-                    (a['ACTIVIDAD'].str.contains('IMPORTADOR')) |
-                    (a['ACTIVIDAD'].str.contains('PLANTA'))|
-                    (a['ACTIVIDAD'].str.contains('MAYORISTAS'))|
-                    (a['ACTIVIDAD'].str.contains('ACTIVIDAD'))|
-                    (a['ACTIVIDAD'].str.contains('PROCESAMIENTO'))|
-                    (a['ACTIVIDAD'].str.contains('COMERCIALIZADOR DE GLP'))
-                    ])
-
+    try:    
+        a=a.drop(columns="NaN", errors='ignore')
+        b.append(a.loc[ (a['ACTIVIDAD'].str.contains('DISTRIBUIDOR')) |
+                        (a['ACTIVIDAD'].str.contains('PRODUCTOR')) |
+                        (a['ACTIVIDAD'].str.contains('IMPORTADOR')) |
+                        (a['ACTIVIDAD'].str.contains('PLANTA'))|
+                        (a['ACTIVIDAD'].str.contains('MAYORISTAS'))|
+                        (a['ACTIVIDAD'].str.contains('ACTIVIDAD'))|
+                        (a['ACTIVIDAD'].str.contains('PROCESAMIENTO'))|
+                        (a['ACTIVIDAD'].str.contains('COMERCIALIZADOR DE GLP'))
+                        ])
+    except:
+        pass
 # join todas las bases 
 
 Total=pd.concat(b)
@@ -160,7 +162,7 @@ Precios_Mayoristas.reset_index()
 
 
 def replace_value_litros(row):
-    if row['PRECIO DE VENTA (SOLES)'] > 5 and row['COD_PROD'] == 30:
+    if row['PRECIO DE VENTA (SOLES)'] > 5 and row['COD_PROD'] == 48:
         return (row['PRECIO DE VENTA (SOLES)'])/ 3.78533
     else:
         return row['PRECIO DE VENTA (SOLES)']
@@ -170,7 +172,7 @@ def replace_value_litros(row):
 Precios_Mayoristas['PRECIO DE VENTA (SOLES)'] = Precios_Mayoristas.apply(replace_value_litros, axis=1)
 
 
-Precios_Mayoristas.loc[Precios_Mayoristas['COD_PROD'] == 30, 'PRECIO DE VENTA (SOLES)'] = Precios_Mayoristas.loc[Precios_Mayoristas['COD_PROD'] == 30, 'PRECIO DE VENTA (SOLES)'] /  0.5324
+Precios_Mayoristas.loc[Precios_Mayoristas['COD_PROD'] == 48, 'PRECIO DE VENTA (SOLES)'] = Precios_Mayoristas.loc[Precios_Mayoristas['COD_PROD'] == 30, 'PRECIO DE VENTA (SOLES)'] /  0.5324
 
 # Redondear precios a dos decimales
 
