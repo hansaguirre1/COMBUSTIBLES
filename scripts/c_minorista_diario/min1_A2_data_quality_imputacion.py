@@ -25,7 +25,7 @@ from minfut3_utils_clean import *
 # Directorio
 os.chdir(os.getcwd())
 fecha_manual = pd.to_datetime(datetime.now().date() - timedelta(days=1))
-#fecha_manual = pd.to_datetime('2024-01-17')  # Reemplaza con la fecha que desees
+#fecha_manual = pd.to_datetime('2024-01-25')  # Reemplaza con la fecha que desees
 nueva_fecha = fecha_manual - timedelta(days=15)
 
 # Base t-1
@@ -144,7 +144,6 @@ d1.COD_PROD.value_counts()
 d1.to_csv(ruta4 + DF_fin, index=False, encoding="utf-8", sep=";")
 #d1.to_csv(ruta4 + DF_fin, index=False, encoding="utf-8", sep=";")
 #df_ewe = d1.loc[d1["ID_DIR"]<100]
-
 
 
 
