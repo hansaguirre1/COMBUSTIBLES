@@ -148,7 +148,7 @@ def limpieza_masiva(data, ubi):
 arch = glob(ruta2 + "Diario(*.xlsx")
 
 # Cargando compilado y diario
-if len(arch)==1:
+if len(arch)>=1:
     print("Archivo diario")
     print(arch[0])
     datax = pd.read_csv(ruta4 + BASE_DLC,encoding="utf-8",sep=";")

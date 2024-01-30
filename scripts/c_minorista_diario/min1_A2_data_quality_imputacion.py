@@ -24,12 +24,13 @@ from minfut3_utils_clean import *
 
 # Directorio
 os.chdir(os.getcwd())
-fecha_manual = pd.to_datetime(datetime.now().date() - timedelta(days=1))
-#fecha_manual = pd.to_datetime('2024-01-25')  # Reemplaza con la fecha que desees
+#fecha_manual = pd.to_datetime(datetime.now().date() - timedelta(days=1))
+text = '2024-01-26'
+fecha_manual = pd.to_datetime(text)  # Reemplaza con la fecha que desees
 nueva_fecha = fecha_manual - timedelta(days=15)
 
 # Base t-1
-d1 = pd.read_csv(ruta4 + DF_fin, encoding="utf-8", sep=";")
+d1 = pd.read_csv(ruta6 + DF_fin, encoding="utf-8", sep=";")
 d1['fecha_stata'] = pd.to_datetime(d1['fecha_stata'], infer_datetime_format=True, errors='coerce')
 #d11 = d1.loc[d1["ID_DIR"]<100]
 d11 = d1[(d1['fecha_stata']<=fecha_manual) & (d1["fecha_stata"]>=nueva_fecha)] # aquí está el truco
@@ -141,7 +142,7 @@ d1 = pd.concat([d1,df_concatenado], ignore_index=True)
 d1 = d1.sort_values(by=["ID_DIR","COD_PROD","fecha_stata"])
 d1.COD_PROD.value_counts()
 
-d1.to_csv(ruta4 + DF_fin, index=False, encoding="utf-8", sep=";")
+d1.to_csv(ruta6 + DF_fin, index=False, encoding="utf-8", sep=";")
 #d1.to_csv(ruta4 + DF_fin, index=False, encoding="utf-8", sep=";")
 #df_ewe = d1.loc[d1["ID_DIR"]<100]
 
