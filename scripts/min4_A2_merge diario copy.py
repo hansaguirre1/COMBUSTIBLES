@@ -18,6 +18,9 @@ sys.path.append(dir)
 from minfut0_nombres import *
 
 # Directorio
+#fecha_manual = pd.to_datetime(datetime.now().date() - timedelta(days=1))
+fecha_manual = '2024-01-26'
+#fecha_manual = pd.to_datetime(text)  # Reemplaza con la fecha que desees
 os.chdir(os.getcwd())
 
 # Finally
