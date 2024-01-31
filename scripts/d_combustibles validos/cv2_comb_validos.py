@@ -69,6 +69,6 @@ rango_fechas_completo = list(range(fecha_minima,fecha_maxima))
 combinaciones = pd.DataFrame([(id, fecha) for id in combs['ID'].unique() for fecha in rango_fechas_completo], columns=['ID', 'AÑO'])
 combs = pd.merge(combinaciones, combs, on=['ID', 'AÑO'], how='outer')
 combs[['DEPARTAMENTO', 'COD_PROD']] = combs['ID'].str.split('-', expand=True)
-combs.to_csv(ruta4 + DF_val2,index=False)
+combs.to_csv(ruta4 + DF_val2,index=False,encoding="utf-8",sep=";")
 
 
