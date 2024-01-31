@@ -4,10 +4,6 @@ import os
 # Directorio
 os.chdir(os.getcwd())
 
-# Fechas
-#fecha_manual = pd.to_datetime(datetime.now().date() - timedelta(days=1))
-fecha_manual = pd.to_datetime('2024-01-26')  # Reemplaza con la fecha que desees
-
 # Nombres
 BASE_DLCC = "BASETOTAL_DLC.dta"
 BASE_DLC = "Base_apilada.csv"
@@ -41,6 +37,19 @@ ruta5 = r"..\data\raw\combustibles validos\\"
 ruta6 = r"..\data\interim\\"
 ruta7 = r"..\data\interim\precios mayoristas\\"
 ruta8 = r"..\data\interim\combustibles validos\\"
+
+# Fechas
+#fecha_manual = pd.to_datetime(datetime.now().date() - timedelta(days=1))
+#fecha_manual = pd.to_datetime('2024-01-26')  # Reemplaza con la fecha que desees
+try:
+    with open(ruta6 + "fechas.txt", 'r') as archivo:
+        lineas = archivo.readlines()    
+    f1 = lineas[0].strip()  # strip() elimina espacios en blanco y saltos de línea
+    f1 = pd.to_datetime(f1)
+    f2 = lineas[1].strip()
+    f2 = pd.to_datetime(f2)
+except:
+    pass
 
 # Bases para merge
 try:

@@ -82,7 +82,8 @@ def agg_pan(df,fecha_manual=""):
     df['fecha_stata'].fillna(filas_con_NaT['fecha1'], inplace=True)
     df.drop(["FECHADEREGISTRO"], axis=1, inplace=True)
     if fecha_manual!="":
-        df = df[df['fecha_stata'] == fecha_manual]
+        print("diario")
+        df = df[(df['fecha_stata']<=f2) & (df["fecha_stata"]>=f1)]
     df = df.drop_duplicates()
     df = pd.merge(df, prod, how='left', on='COD_PROD', indicator=True)
     df = df[df['_merge'] == 'both']

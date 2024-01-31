@@ -6,7 +6,7 @@ from ast import literal_eval
 import pandas as pd
 import os
 import sys
-
+import re
 
 dir=os.getcwd()
 dir
@@ -147,19 +147,39 @@ def limpieza_masiva(data, ubi):
 # Verificando si es archivo diario o mensual
 arch = glob(ruta2 + "Diario(*.xlsx")
 archivos = []
+patron_fecha = r'\((\d{4}-\d{2}-\d{2})\)'
 
 # Cargando compilado y diario
+datax = pd.read_csv(ruta4 + BASE_DLC,encoding="utf-8",sep=";")
+d = datax.FECHADEREGISTRO.unique()[-1]
+d=d.replace("/","-")
+d = datetime.strptime(d, "%d-%m-%Y")
+d = d.strftime("%Y-%m-%d")
+
 if len(arch)>=1:
     print("Archivo diario")
-    print(arch[0])
-    datax = pd.read_csv(ruta4 + BASE_DLC,encoding="utf-8",sep=";")
-    ex1=pd.read_excel(arch[0],sheet_name="GLP_EVP_PEGL_LVGL_COM_PROD_IMP",skiprows=3)
-    ex1=limpieza_mini(ex1)
-    ex2=pd.read_excel(arch[0],sheet_name="LIQ_EVP_DMAY_CCA_CCE",skiprows=3)
-    ex2=limpieza_mini(ex2)
-    data = pd.concat([ex1, ex2], ignore_index=True)
-    data = limpieza_masiva(data, ubi)
-    os.remove(arch[0])
+    for i in range(len(arch)):
+        if i==0:
+            match = re.search(patron_fecha, arch[i])
+            f1 = match.group(1)
+        if i==len(arch)-1:
+            match = re.search(patron_fecha, arch[i])
+            f2 = match.group(1)
+        print(arch[i])
+        ex1=pd.read_excel(arch[i],sheet_name="GLP_EVP_PEGL_LVGL_COM_PROD_IMP",skiprows=3)
+        ex1=limpieza_mini(ex1)
+        archivos.append(ex1)
+        ex2=pd.read_excel(arch[i],sheet_name="LIQ_EVP_DMAY_CCA_CCE",skiprows=3)
+        ex2=limpieza_mini(ex2)
+        archivos.append(ex2)
+        os.remove(arch[i])
+
+ruta_archivo = ruta6 + "fechas.txt"
+with open(ruta_archivo, 'w') as archivo:
+    archivo.write(f1 + '\n')
+    archivo.write(f2 + '\n')
+data = pd.concat(archivos, ignore_index=True)
+data = limpieza_masiva(data, ubi)
 
 # Exportando base final
 data_concat_f = pd.concat([datax, data], ignore_index=True)
