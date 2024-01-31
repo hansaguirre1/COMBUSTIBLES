@@ -46,7 +46,7 @@ with DAG(
         remoteRepository: RemoteRepository = container.remote_repository()
         preciosMayoristasRepository: PreciosMayoristasRepository = container.precios_mayoristas_repository()
         
-        # remoteRepository.m0_descarga_mayorista()
+        remoteRepository.m0_descarga_mayorista()
         preciosMayoristasRepository.saveDataMayoristas()
         
     def processDataCombustiblesValidos():
@@ -112,7 +112,7 @@ with DAG(
         remoteRepository: RemoteRepository = container.remote_repository()
         minoristaRepository: MinoristaRepository = container.minorista_repository()
         
-        remoteRepository.getDataMinorista(url=url_signeblock)
+        # remoteRepository.getDataMinorista(url=url_signeblock)
         minoristaRepository.saveDataBase()
     
     def processDataLatLngMayorista():

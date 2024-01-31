@@ -17,6 +17,6 @@ class LatLngMayoristaRepositoryImpl(LatLngMayoristaRepository):
         self.fileDatasource.min4_a1_processMerge()
         self.fileDatasource.minfut4_processSeparacion()
         self.dbDatasource.saveIndicadores()
-        self.dbDatasource.saveMayorista()
-        self.dbDatasource.saveMinorista()
+        # self.dbDatasource.saveMayorista()
+        # self.dbDatasource.saveMinorista()
         

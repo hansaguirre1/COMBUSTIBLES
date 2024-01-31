@@ -12,7 +12,8 @@ class MinoristaRepositoryImpl(MinoristaRepository):
     
     
     def saveDataBase(self):
-        data = self.fileDatasource.processFileMinoristasDiario()
+        # data = self.fileDatasource.processMin0_A2_descarga()
+        self.fileDatasource.processMin1_A2_data_quality()
         # relapasa = self.dbDatasource.saveRelapasa(data)
         # self.fileDatasource.saveDataRelapasaToCsv(relapasa)
         

@@ -14,4 +14,3 @@ class MinoristaModel(Base):
     precio_venta = Column(String, nullable=True)
     
     created_at = Column(DateTime(), default=datetime.now())
-    updated_at = Column(DateTime(), default=datetime.now())

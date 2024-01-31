@@ -487,14 +487,14 @@ class DbDatasourceImpl(DbDatasource):
     def saveIndicadores(self):
         chunksize = 10000
         
-        dfIndicadores = pd.read_csv(f"{pathProcessed}/df_indicadores.csv", sep=';', chunksize=chunksize)
+        dfIndicadores = pd.read_csv(f"{pathProcessed}/df_indicadores_sm.csv", sep=';', chunksize=chunksize)
         
         with self.session_factory() as session:
             for dfIndicadores_chunk in dfIndicadores:
                 print(f'dfIndicadores_chunk {len(dfIndicadores_chunk)} ')
 
                 for index, row in dfIndicadores_chunk.iterrows():
-                    
+                        
                     id_dir = row.get('ID_DIR', '')
                     fecha_stata = row.get('fecha_stata', '')
                     precioventa = row.get('PRECIOVENTA', '')
@@ -506,52 +506,55 @@ class DbDatasourceImpl(DbDatasource):
                     dvarprecioventa = row.get('dvarPRECIOVENTA', '')
                     raro = row.get('raro', '')
                     raro2 = row.get('raro2', '')
-                    ruc_prov = row.get('RUC-prov', '')
                     precioventa_may = row.get('PRECIOVENTA_may', '')
                     
-                    campos = [
-                        str(id_dir),
-                        str(fecha_stata),
-                        str(precioventa),
-                        str(precioventa_),
-                        str(dias_faltantes),
-                        str(cod_prod),
-                        str(id_col),
-                        str(dprecioventa),
-                        str(dvarprecioventa),
-                        str(raro),
-                        str(raro2),
-                        str(ruc_prov),
-                        str(precioventa_may),
-                    ]
+                    indicadorModel = IndicadoresModel(
+                        id_dir = id_dir,
+                        fecha_stata = fecha_stata,
+                        precioventa = precioventa,
+                        precioventa_ = precioventa_,
+                        dias_faltantes = dias_faltantes,
+                        cod_prod = cod_prod,
+                        id_col = id_col,
+                        dprecioventa = dprecioventa,
+                        dvarprecioventa = dvarprecioventa,
+                        raro = raro,
+                        raro2 = raro2,
+                        precioventa_may = precioventa_may,
+                    )
+                    session.add(indicadorModel)
+                session.commit()
+                    # campos = [
+                    #     str(id_dir),
+                    #     str(fecha_stata),
+                    #     str(cod_prod),
+                    #     str(dprecioventa),
+                    #     str(dvarprecioventa),
+                    #     str(raro),
+                    #     str(raro2),
+                    # ]
                             
-                    cadena_unica = '|'.join(campos)
+                    # cadena_unica = '|'.join(campos)
 
-                    hash_id = hashlib.sha256(cadena_unica.encode()).hexdigest()
+                    # hash_id = hashlib.sha256(cadena_unica.encode()).hexdigest()
                     
-                    results = session.query(IndicadoresModel).get(hash_id)
+                    # results = session.query(IndicadoresModel).get(hash_id)
                     
-                    if not results:
-                        indicadorModel = IndicadoresModel(
-                            id = hash_id,
-                            id_dir = id_dir,
-                            fecha_stata = fecha_stata,
-                            precioventa = precioventa,
-                            precioventa_ = precioventa_,
-                            dias_faltantes = dias_faltantes,
-                            cod_prod = cod_prod,
-                            id_col = id_col,
-                            dprecioventa = dprecioventa,
-                            dvarprecioventa = dvarprecioventa,
-                            raro = raro,
-                            raro2 = raro2,
-                            ruc_prov = ruc_prov,
-                            precioventa_may = precioventa_may,
-                        )
-                        session.add(indicadorModel)
-                    else:
-                        results.updated_at = datetime.now()
-                    session.commit()
+                    # if not results:
+                    #     indicadorModel = IndicadoresModel(
+                    #         id = hash_id,
+                    #         id_dir = id_dir,
+                    #         fecha_stata = fecha_stata,
+                    #         cod_prod = cod_prod,
+                    #         dprecioventa = dprecioventa,
+                    #         dvarprecioventa = dvarprecioventa,
+                    #         raro = raro,
+                    #         raro2 = raro2,
+                    #     )
+                    #     session.add(indicadorModel)
+                    # else:
+                    #     results.updated_at = datetime.now()
+                    # session.commit()
             
     def validate_and_convert_to_int(self,value):
         try:
@@ -780,20 +783,29 @@ class DbDatasourceImpl(DbDatasource):
                     fecha_stata = row.get('fecha_stata', '')
                     precio_venta = row.get('PRECIOVENTA', '')
                     
-                    results = session.query(MinoristaModel).get(id)
+                    minoristaModel = MinoristaModel(
+                        id = id,
+                        id_dir = id_dir,
+                        cod_prod = cod_prod,
+                        fecha_stata = fecha_stata,
+                        precio_venta = precio_venta,
+                    )
+                    session.merge(minoristaModel)
+                session.commit()
+                    # results = session.query(MinoristaModel).get(id)
                     
-                    if not results:
-                        minoristaModel = MinoristaModel(
-                            id = id,
-                            id_dir = id_dir,
-                            cod_prod = cod_prod,
-                            fecha_stata = fecha_stata,
-                            precio_venta = precio_venta,
-                        )
-                        session.add(minoristaModel)
-                    else:
-                        results.updated_at = datetime.now()
-                    session.commit()
+                    # if not results:
+                    #     minoristaModel = MinoristaModel(
+                    #         id = id,
+                    #         id_dir = id_dir,
+                    #         cod_prod = cod_prod,
+                    #         fecha_stata = fecha_stata,
+                    #         precio_venta = precio_venta,
+                    #     )
+                    #     session.add(minoristaModel)
+                    # else:
+                    #     results.updated_at = datetime.now()
+                    # session.commit()
         
     def saveMayorista(self):
         chunksize = 10000
@@ -807,16 +819,29 @@ class DbDatasourceImpl(DbDatasource):
                 for index, row in dfMayorista_chunk.iterrows():
 
                     id = row.get('ID_fin', '')
+                    
+                    id_dir = row.get('ID_DIR', '')
+                    cod_prod = row.get('COD_PROD', '')
+                    fecha_stata = row.get('fecha_stata', '')
                     precio_venta_may = row.get('PRECIOVENTA_may', '')
                     
-                    results = session.query(MayoristaModel).get(id)
+                    mayoristaModel = MayoristaModel(
+                        id = id,
+                        id_dir = id_dir,
+                        cod_prod = cod_prod,
+                        fecha_stata = fecha_stata,
+                        precio_venta_may = precio_venta_may,
+                    )
+                    session.merge(mayoristaModel)
+                session.commit()
+                    # results = session.query(MayoristaModel).get(id)
                     
-                    if not results:
-                        minoristaModel = MayoristaModel(
-                            id = id,
-                            precio_venta_may = precio_venta_may,
-                        )
-                        session.add(minoristaModel)
-                    else:
-                        results.updated_at = datetime.now()
-                    session.commit()
+                    # if not results:
+                    #     minoristaModel = MayoristaModel(
+                    #         id = id,
+                    #         precio_venta_may = precio_venta_may,
+                    #     )
+                    #     session.add(minoristaModel)
+                    # else:
+                    #     results.updated_at = datetime.now()
+                    # session.commit()
