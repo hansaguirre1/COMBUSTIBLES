@@ -95,7 +95,7 @@ def agg_pan(df,fecha_manual=""):
     df.loc[df['NOM_PROD'] == "GASOHOL 90 PLUS", 'COD_PROD'] = nom_prods[d]
     df.loc[df['NOM_PROD'] == "GASOHOL 95 PLUS", 'COD_PROD'] = nom_prods[c]
     df.loc[df['PRECIOVENTA'] < 0.51, 'PRECIOVENTA'] = pd.NA
-    df.to_csv(ruta6 + DF_base_comb2, index=False)
+    #df.to_csv(ruta6 + DF_base_comb2, index=False) # Descomentar si se desea Mercado relevante 
     valores_lista = dir.loc[dir["minorista"]==1]
     valores_lista = valores_lista["ID_DIR"]
     df = df[df['ID_DIR'].isin(valores_lista)]

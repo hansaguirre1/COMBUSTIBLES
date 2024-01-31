@@ -146,6 +146,7 @@ def limpieza_masiva(data, ubi):
 
 # Verificando si es archivo diario o mensual
 arch = glob(ruta2 + "Diario(*.xlsx")
+archivos = []
 
 # Cargando compilado y diario
 if len(arch)>=1:

@@ -172,7 +172,7 @@ def replace_value_litros(row):
 Precios_Mayoristas['PRECIO DE VENTA (SOLES)'] = Precios_Mayoristas.apply(replace_value_litros, axis=1)
 
 
-Precios_Mayoristas.loc[Precios_Mayoristas['COD_PROD'] == 48, 'PRECIO DE VENTA (SOLES)'] = Precios_Mayoristas.loc[Precios_Mayoristas['COD_PROD'] == 30, 'PRECIO DE VENTA (SOLES)'] /  0.5324
+Precios_Mayoristas.loc[Precios_Mayoristas['COD_PROD'] == 48, 'PRECIO DE VENTA (SOLES)'] = Precios_Mayoristas.loc[Precios_Mayoristas['COD_PROD'] == 48, 'PRECIO DE VENTA (SOLES)'] /  0.5324
 
 # Redondear precios a dos decimales
 
