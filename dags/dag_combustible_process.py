@@ -112,7 +112,7 @@ with DAG(
         remoteRepository: RemoteRepository = container.remote_repository()
         minoristaRepository: MinoristaRepository = container.minorista_repository()
         
-        # remoteRepository.getDataMinorista(url=url_signeblock)
+        remoteRepository.getDataMinorista(url=url_signeblock)
         minoristaRepository.saveDataBase()
     
     def processDataLatLngMayorista():
