@@ -154,10 +154,6 @@ match = re.search(patron_fecha, arch[len(arch)-1])
 f2 = match.group(1)
 f11 = datetime.strptime(f1, "%Y-%m-%d")
 f22 = datetime.strptime(f2, "%Y-%m-%d")
-diferencia_en_dias = (f22 - f11).days
-if len(arch)!=diferencia_en_dias+1:
-    print("ERROR: falta algún archivo diario")
-    error
 
 # Cargando compilado y diario
 datax = pd.read_csv(ruta4 + BASE_DLC,encoding="utf-8",sep=";")
@@ -165,6 +161,12 @@ d = datax.FECHADEREGISTRO.unique()[-1]
 d=d.replace("/","-")
 d = datetime.strptime(d, "%d-%m-%Y")
 d = d.strftime("%Y-%m-%d")
+d = pd.to_datetime(d)
+fecha_manual = pd.to_datetime(datetime.now().date() - timedelta(days=1))
+diferencia_en_dias = (fecha_manual - d).days
+if len(arch)!=diferencia_en_dias:
+    print("ERROR: falta algún archivo diario")
+    error
 
 if len(arch)>=1:
     print("Archivo diario")
