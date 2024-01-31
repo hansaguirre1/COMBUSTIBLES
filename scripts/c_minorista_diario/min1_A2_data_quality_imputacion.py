@@ -135,7 +135,7 @@ df_concatenado["raro2"] = df_concatenado["raro2"].fillna(0)
 
 # DF final
 df_concatenado['fecha_stata'] = pd.to_datetime(df_concatenado['fecha_stata'], infer_datetime_format=True, errors='coerce')
-df_concatenado = df_concatenado.loc[df_concatenado["fecha_stata"]==fecha_manual]
+df_concatenado = df_concatenado.loc[(df_concatenado["fecha_stata"]>=f1) & (df_concatenado["fecha_stata"]>=f2)]
 d1 = pd.concat([d1,df_concatenado], ignore_index=True)
 d1 = d1.sort_values(by=["ID_DIR","COD_PROD","fecha_stata"])
 d1.COD_PROD.value_counts()

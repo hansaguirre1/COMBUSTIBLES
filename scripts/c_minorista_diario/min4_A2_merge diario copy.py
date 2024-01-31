@@ -44,7 +44,7 @@ df.rename(columns={"RUC-prov": "RUC-prov3"},inplace=True)
 d2 = pd.read_csv(ruta7 + DF_may_fin,encoding='utf-8',sep=';')
 d2['fecha_stata'] = pd.to_datetime(d2['fecha_stata'], infer_datetime_format=True, errors='coerce')
 d2.rename(columns={"PRECIOVENTA": "PRECIOVENTA_may2"},inplace=True)
-d2 = d2[d2['fecha_stata'] == fecha_manual]
+d2 = d2[(d2['fecha_stata']>=f1) & (d2["fecha_stata"]<=f2)]
 dataframes_list = []
 
 # Si se desea paralelizar, ver el script histórico
@@ -82,7 +82,7 @@ del dataframes_list
 d1 = d1.merge(dfs, on=["COD_PROD","ID_DIR","fecha_stata"],how="left",indicator=True)
 d1._merge.value_counts()
 d1.drop(["_merge"],axis=1,inplace=True)
-d1.loc[d1["fecha_stata"]==fecha_manual,"PRECIOVENTA_may"]=d1["PRECIOVENTA_may2"]
+d1.loc[(d1["fecha_stata"]>=f1) & (d1['fecha_stata']<=f2),"PRECIOVENTA_may"]=d1["PRECIOVENTA_may2"]
 d1.drop(["PRECIOVENTA_may2"],axis=1,inplace=True)
 d1.to_csv(ruta6 + DF_fin,index=False,encoding='utf-8',sep=";")
 

@@ -148,6 +148,16 @@ def limpieza_masiva(data, ubi):
 arch = glob(ruta2 + "Diario(*.xlsx")
 archivos = []
 patron_fecha = r'\((\d{4}-\d{2}-\d{2})\)'
+match = re.search(patron_fecha, arch[0])
+f1 = match.group(1)
+match = re.search(patron_fecha, arch[len(arch)-1])
+f2 = match.group(1)
+f11 = datetime.strptime(f1, "%Y-%m-%d")
+f22 = datetime.strptime(f2, "%Y-%m-%d")
+diferencia_en_dias = (f22 - f11).days
+if len(arch)!=diferencia_en_dias+1:
+    print("ERROR: falta algún archivo diario")
+    error
 
 # Cargando compilado y diario
 datax = pd.read_csv(ruta4 + BASE_DLC,encoding="utf-8",sep=";")
@@ -159,12 +169,6 @@ d = d.strftime("%Y-%m-%d")
 if len(arch)>=1:
     print("Archivo diario")
     for i in range(len(arch)):
-        if i==0:
-            match = re.search(patron_fecha, arch[i])
-            f1 = match.group(1)
-        if i==len(arch)-1:
-            match = re.search(patron_fecha, arch[i])
-            f2 = match.group(1)
         print(arch[i])
         ex1=pd.read_excel(arch[i],sheet_name="GLP_EVP_PEGL_LVGL_COM_PROD_IMP",skiprows=3)
         ex1=limpieza_mini(ex1)
