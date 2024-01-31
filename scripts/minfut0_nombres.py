@@ -4,6 +4,10 @@ import os
 # Directorio
 os.chdir(os.getcwd())
 
+# Fechas
+#fecha_manual = pd.to_datetime(datetime.now().date() - timedelta(days=1))
+fecha_manual = pd.to_datetime('2024-01-26')  # Reemplaza con la fecha que desees
+
 # Nombres
 BASE_DLCC = "BASETOTAL_DLC.dta"
 BASE_DLC = "Base_apilada.csv"
