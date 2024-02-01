@@ -15,6 +15,11 @@ python ".\c_minorista_diario\min0_A2_Tablas_relacionales.py"
 echo Ejecutando: "min1_A2_data_quality_imputacion.py"
 python ".\c_minorista_diario\min1_A2_data_quality_imputacion.py"
 
+echo Proceso georderenciación
+
+echo Ejecutando: "dis3_distancias.py"
+python ".\b_mayoristas y merge\dis3_distancias.py"
+
 echo #merge mayorista minorista
 
 echo Ejecutando: "min4_A2_merge diario copy.py"

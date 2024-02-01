@@ -22,7 +22,8 @@ DF_imp = "df_ind_imp.csv"
 DF_may = "mayoristas_pre_imp.csv"
 DF_georef_may = "mayoristas_pre_imp_geo.csv"
 DF_may_fin = "precios_mayoristas_imp.csv"
-DF_fin = "df_indicadores.csv"
+DF_fin = "df_indicadores_cm.csv"
+DF_fin2 = "df_indicadores_sm.csv"
 DF_base_comb2 = "BASETOTAL_COMBUSTIBLES2.csv"
 DF_dir_may = "df_may_min_geo.csv"
 DF_dir_may2 = "df_may_min_geo2.csv"
@@ -36,6 +37,19 @@ ruta5 = r"..\data\raw\combustibles validos\\"
 ruta6 = r"..\data\interim\\"
 ruta7 = r"..\data\interim\precios mayoristas\\"
 ruta8 = r"..\data\interim\combustibles validos\\"
+
+# Fechas
+#fecha_manual = pd.to_datetime(datetime.now().date() - timedelta(days=1))
+#fecha_manual = pd.to_datetime('2024-01-26')  # Reemplaza con la fecha que desees
+try:
+    with open(ruta6 + "fechas.txt", 'r') as archivo:
+        lineas = archivo.readlines()    
+    f1 = lineas[0].strip()  # strip() elimina espacios en blanco y saltos de línea
+    f1 = pd.to_datetime(f1)
+    f2 = lineas[1].strip()
+    f2 = pd.to_datetime(f2)
+except:
+    pass
 
 # Bases para merge
 try:
