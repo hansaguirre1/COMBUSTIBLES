@@ -27,6 +27,11 @@ validos=validos.fillna(0)
 validos = validos.groupby(['DEPARTAMENTO', 'COD_PROD'])['ok'].mean().reset_index()
 validos.loc[validos.ok>0.9,"mirar"]=1
 d1 = d1.merge(validos[["DEPARTAMENTO","COD_PROD","mirar"]],how="left",on=["DEPARTAMENTO","COD_PROD"])
+d1['promedio'] = d1.groupby(['COD_PROD', 'fecha_stata'])['PRECIOVENTA'].transform('mean')
+d1['conteo'] = d1.groupby(['COD_PROD', 'fecha_stata'])['PRECIOVENTA'].transform('count')
+d1=d1.sort_values(by=["COD_PROD","fecha_stata","ID_DIR"])
+d1["markup_mm"]=d1["PRECIOVENTA"]-(d1["promedio"]*d1["conteo"]-d1["PRECIOVENTA"])/(d1["conteo"]-1)
+d1[["COD_PROD","fecha_stata","ID_DIR","PRECIOVENTA","promedio","conteo"]]
 #d1p = d1.loc[(d1["ID_DIR"]==188) | (d1["ID_DIR"]==189)]
 #d1p = d1p.sort_values(by=['ID_DIR', 'COD_PROD', 'fecha_stata'])
 #zzz
@@ -44,12 +49,11 @@ d1 = d1.merge(validos[["DEPARTAMENTO","COD_PROD","mirar"]],how="left",on=["DEPAR
 # resultado_final = resultado_final.sort_values(by=['ID_DIR', 'COD_PROD', 'fecha_stata'])
 # #resultado_final.COD_PROD.value_counts()
 # d1["markup_mm"] = resultado_final["Diferencia"]
-
+d1.drop(["promedio","conteo"],axis=1,inplace=True)
 #d1p = d1.iloc[:10000,:]
 d1.to_csv(ruta4 + DF_fin2, index=False, encoding="utf-8", sep=";")
 print("fin")
 
-resultados[0]
 
 
 
