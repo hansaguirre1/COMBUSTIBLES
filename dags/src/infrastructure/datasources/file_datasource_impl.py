@@ -233,7 +233,12 @@ class FileDatasourceImpl(FileDatasource):
     
     def processMin1_A2_data_quality(self) -> DataFrame:
         print("data_quality")
-        
+        with open(ruta6 + "fechas.txt", 'r') as archivo:
+            lineas = archivo.readlines()    
+        f1 = lineas[0].strip()  # strip() elimina espacios en blanco y saltos de línea
+        f1 = pd.to_datetime(f1)
+        f2 = lineas[1].strip()
+        f2 = pd.to_datetime(f2)
         nueva_fecha = f1 - timedelta(days=15)
 
         # Base t-1
