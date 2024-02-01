@@ -27,10 +27,29 @@ validos=validos.fillna(0)
 validos = validos.groupby(['DEPARTAMENTO', 'COD_PROD'])['ok'].mean().reset_index()
 validos.loc[validos.ok>0.9,"mirar"]=1
 d1 = d1.merge(validos[["DEPARTAMENTO","COD_PROD","mirar"]],how="left",on=["DEPARTAMENTO","COD_PROD"])
-zzz
+#d1p = d1.loc[(d1["ID_DIR"]==188) | (d1["ID_DIR"]==189)]
+#d1p = d1p.sort_values(by=['ID_DIR', 'COD_PROD', 'fecha_stata'])
+#zzz
+# resultados = []
+# for id_dir in d1['ID_DIR'].unique()[100:102]:
+#     print(id_dir)
+#     df_id_dir = d1[d1['ID_DIR'] != id_dir]
+#     df_si_id_dir = d1[d1['ID_DIR'] == id_dir]
+#     media_excluyendo_ID_DIR = df_id_dir.groupby(['COD_PROD', 'fecha_stata'])['PRECIOVENTA'].mean().reset_index()
+#     resultado_temporal = pd.merge(df_si_id_dir[["ID_DIR","COD_PROD","fecha_stata","PRECIOVENTA"]], media_excluyendo_ID_DIR, on=['COD_PROD', 'fecha_stata'], suffixes=('_ID_DIR', '_excluyendo_ID_DIR'), how="left")
+#     resultado_temporal['Diferencia'] = resultado_temporal['PRECIOVENTA_ID_DIR']-resultado_temporal['PRECIOVENTA_excluyendo_ID_DIR']
+#     resultados.append(resultado_temporal)
+
+# resultado_final = pd.concat(resultados, ignore_index=True)
+# resultado_final = resultado_final.sort_values(by=['ID_DIR', 'COD_PROD', 'fecha_stata'])
+# #resultado_final.COD_PROD.value_counts()
+# d1["markup_mm"] = resultado_final["Diferencia"]
+
+#d1p = d1.iloc[:10000,:]
 d1.to_csv(ruta4 + DF_fin2, index=False, encoding="utf-8", sep=";")
 print("fin")
 
+resultados[0]
 
 
 
