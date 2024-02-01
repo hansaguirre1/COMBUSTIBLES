@@ -185,9 +185,9 @@ class FileDatasourceImpl(FileDatasource):
 
         archivos = []
         patron_fecha = r'\((\d{4}-\d{2}-\d{2})\)'
-        match = re.search(patron_fecha, arch[0])
+        match = re.search(patron_fecha,arch[0])
         f1 = match.group(1)
-        match = re.search(patron_fecha, arch[len(arch)-1])
+        match = re.search(patron_fecha,arch[len(arch)-1])
         f2 = match.group(1)
         f11 = datetime.strptime(f1, "%Y-%m-%d")
         f22 = datetime.strptime(f2, "%Y-%m-%d")
@@ -199,8 +199,15 @@ class FileDatasourceImpl(FileDatasource):
         d = datetime.strptime(d, "%d-%m-%Y")
         d = d.strftime("%Y-%m-%d")
         d = pd.to_datetime(d)
+        
+        
         fecha_manual = pd.to_datetime(datetime.now().date() - timedelta(days=1))
+        
+        print(f'fecha_manual {fecha_manual}')
+        print(f'd value -- {d}')
         diferencia_en_dias = (fecha_manual - d).days
+        print(f'diferencia_en_dias {diferencia_en_dias}')
+        print(f'len(arch) {len(arch)}')
         if len(arch)!=diferencia_en_dias:
             print("ERROR: falta algún archivo diario")
             raise ValueError("ERROR: falta algún archivo diario")
