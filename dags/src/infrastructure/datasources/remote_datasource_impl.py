@@ -182,7 +182,7 @@ class RemoteDatasourceImpl(RemoteDatasource):
     def min0_A2_descarga(self, url: str):
         try:
             fecha_actual = datetime.now()
-            driver = configure_selenium()                        
+            driver = configure_selenium(path='/raw/precios_minoristas')                     
             urlSigneBlock = f"{url}?m=0"
             driver.get(urlSigneBlock)
             
@@ -203,9 +203,9 @@ class RemoteDatasourceImpl(RemoteDatasource):
             response = solver.recaptcha(sitekey=sitekey, url=urlSigneBlock)
 
             code = response['code']
-            print ( code )
+            code
 
-           # Set the solved Captcha
+            # Set the solved Captcha
             recaptcha_response_element = driver.find_element(By.ID, 'g-recaptcha-response')
             driver.execute_script(f'arguments[0].value = "{code}";', recaptcha_response_element)
 
@@ -213,19 +213,19 @@ class RemoteDatasourceImpl(RemoteDatasource):
             submit_btn.click()
             time.sleep(15)
 
-            data_download_button = driver.find_element(By.XPATH, '/html/body/div[3]/div/div/form/div[5]/div[2]/div[1]/table/tbody/tr[3]/td[4]/input')
+            # descargar data
+            data_download_button = driver.find_element(By.XPATH, '/html/body/div[3]/div/div/form/div[5]/div[2]/div[1]/table/tbody/tr[4]/td[4]/input')
             driver.execute_script("arguments[0].click();", data_download_button)
-
-            time.sleep(15)
-            archivos = os.listdir(f'{new_dir_path}')
-            for archivo in archivos:
-                if archivo.endswith(".xlsx"):
-                    ruta_original = os.path.join(f'{new_dir_path}', archivo)
-                    ruta_nueva = os.path.join('data/raw/precios_minoristas', f'precios_combustibles_minorista_{fecha_actual.strftime("%d-%m-%Y")}.xlsx')
-                    shutil.copy2(ruta_original, ruta_nueva)
-                    os.remove(ruta_original)
+            time.sleep(60)
+            
+            # archivos = os.listdir(f'{new_dir_path}')
+            # for archivo in archivos:
+            #     if archivo.endswith(".xlsx"):
+            #         ruta_original = os.path.join(f'{new_dir_path}', archivo)
+            #         ruta_nueva = os.path.join('data/raw/precios_minoristas', f'precios_combustibles_minorista_{fecha_actual.strftime("%d-%m-%Y")}.xlsx')
+            #         shutil.copy2(ruta_original, ruta_nueva)
+            #         os.remove(ruta_original)
                     
-            time.sleep(3)
             
         finally:
             driver.quit()

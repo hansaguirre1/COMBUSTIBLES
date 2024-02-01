@@ -23,7 +23,7 @@ class FileDatasource(ABC):
     def saveDataRelapasaToCsv(self, df_combinado: DataFrame):
         pass
     @abstractmethod
-    def processMin0_A2_descarga(self) -> DataFrame:
+    def processMin0_A2_tablas_relacionales(self) -> DataFrame:
         pass
     @abstractmethod
     def processMin1_A2_data_quality(self) -> DataFrame:

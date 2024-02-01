@@ -122,11 +122,11 @@ class FileDatasourceImpl(FileDatasource):
         return data
         
     def saveDataPetroperuToCSV(self, df_combinado: pd.DataFrame):
-        data_existente = pd.read_csv("data/raw/petroperu/Petroperu_Lista.csv", sep=';')
+        data_existente = pd.read_csv("data/processed/petroperu/Petroperu_Lista.csv", sep=';')
  
         petroperu = pd.concat([data_existente, df_combinado], ignore_index=True)
 
-        petroperu.to_csv("data/raw/petroperu/Petroperu_Lista.csv", index=False, sep=';')
+        petroperu.to_csv("data/processed/petroperu/Petroperu_Lista.csv", index=False, sep=';')
     
     def saveDataPetroperuToExcel(self, df_combinado: pd.DataFrame):
         df_combinado = df_combinado.rename(columns={df_combinado.columns[1]: "GLP-E" ,
@@ -137,69 +137,114 @@ class FileDatasourceImpl(FileDatasource):
                                             df_combinado.columns[6]: "Gasohol Premium" ,
                                             df_combinado.columns[7]: "Gasohol Regular" ,
                                             df_combinado.columns[8]: "Gasohol 84"}) 
-        datos_excel = pd.read_excel("data/raw/petroperu/petroperu.xlsx", sheet_name='Petroperu')
+        datos_excel = pd.read_excel("data/processed/petroperu/petroperu.xlsx", sheet_name='Petroperu')
 
         nuevos_datos = pd.concat([datos_excel, df_combinado], ignore_index=True)
         nuevos_datos['Fecha']=nuevos_datos['Fecha'].dt.date
 
-        with pd.ExcelWriter("data/raw/petroperu/petroperu.xlsx", mode='a', engine='openpyxl', if_sheet_exists ='replace') as writer:
+        with pd.ExcelWriter("data/processed/petroperu/petroperu.xlsx", mode='a', engine='openpyxl', if_sheet_exists ='replace') as writer:
             nuevos_datos.to_excel(writer, sheet_name='Petroperu', index=False)
 
     def saveDataMarcadoresToCsv(self, df_combinado: pd.DataFrame):
-        data = pd.read_csv("data/raw/marcadores/marcadores.csv")
+        data = pd.read_csv("data/processed/marcadores/marcadores.csv")
         data ["Fecha"] = pd.to_datetime(data["Fecha"], format="%Y-%m-%d")
 
         data_final = pd.concat([data, df_combinado], ignore_index=True)
         data_final["Fecha"] = pd.to_datetime(data_final["Fecha"], format="%Y-%m-%d")
         data_final["Fecha"] = data_final["Fecha"].dt.date
 
-        data_final.to_csv("data/raw/marcadores/marcadores.csv", index=False)
+        data_final.to_csv("data/processed/marcadores/marcadores.csv", index=False)
         
-    def processMin0_A2_descarga(self) -> pd.DataFrame:
-        t = datetime.now()
-        dateStr = t.strftime('%d-%m-%Y')
-        print("Archivo diario")
+    def processMin0_A2_tablas_relacionales(self) -> pd.DataFrame:
+        # t = datetime.now()
+        # dateStr = t.strftime('%d-%m-%Y')
+        # print("Archivo diario")
+        # datax = pd.read_csv(ruta4 + BASE_DLC,encoding="utf-8",sep=";")
+        
+        # pathExcel = f'data/raw/precios_minoristas/precios_combustibles_minorista_{dateStr}.xlsx'
+        # ex1=pd.read_excel(pathExcel,sheet_name="GLP_EVP_PEGL_LVGL_COM_PROD_IMP",skiprows=3)
+        # ex1=limpiezaMinorista(ex1)
+        # ex2=pd.read_excel(pathExcel,sheet_name="LIQ_EVP_DMAY_CCA_CCE",skiprows=3)
+        # ex2=limpiezaMinorista(ex2)
+        # data = pd.concat([ex1, ex2], ignore_index=True)
+        # df_ubi = pd.read_csv(ruta4 + DF_ubi, encoding='utf-8', sep=";")
+        # data = limpiezaMasivaMinorista(data, df_ubi)
+        # os.remove(pathExcel)
+        # print("excel eliminado.")
+        
+        # data_concat_f = pd.concat([datax, data], ignore_index=True)
+        # data_concat_f.to_csv(ruta4 + BASE_DLC, index=False, encoding="utf-8", sep=";")
+
+
+        # return data_concat_f
+    
+
+        # Verificando si es archivo diario o mensual
+        archivos2 = os.listdir(ruta2)
+        arch = [archivo for archivo in archivos2 if archivo.startswith("Diario") and archivo.endswith(".xlsx")]
+
+        archivos = []
+        patron_fecha = r'\((\d{4}-\d{2}-\d{2})\)'
+        match = re.search(patron_fecha, arch[0])
+        f1 = match.group(1)
+        match = re.search(patron_fecha, arch[len(arch)-1])
+        f2 = match.group(1)
+        f11 = datetime.strptime(f1, "%Y-%m-%d")
+        f22 = datetime.strptime(f2, "%Y-%m-%d")
+
+        # Cargando compilado y diario
         datax = pd.read_csv(ruta4 + BASE_DLC,encoding="utf-8",sep=";")
-        
-        pathExcel = f'data/raw/precios_minoristas/precios_combustibles_minorista_{dateStr}.xlsx'
-        ex1=pd.read_excel(pathExcel,sheet_name="GLP_EVP_PEGL_LVGL_COM_PROD_IMP",skiprows=3)
-        ex1=limpiezaMinorista(ex1)
-        ex2=pd.read_excel(pathExcel,sheet_name="LIQ_EVP_DMAY_CCA_CCE",skiprows=3)
-        ex2=limpiezaMinorista(ex2)
-        data = pd.concat([ex1, ex2], ignore_index=True)
+        d = datax.FECHADEREGISTRO.unique()[-1]
+        d=d.replace("/","-")
+        d = datetime.strptime(d, "%d-%m-%Y")
+        d = d.strftime("%Y-%m-%d")
+        d = pd.to_datetime(d)
+        fecha_manual = pd.to_datetime(datetime.now().date() - timedelta(days=1))
+        diferencia_en_dias = (fecha_manual - d).days
+        if len(arch)!=diferencia_en_dias:
+            print("ERROR: falta algún archivo diario")
+            raise ValueError("ERROR: falta algún archivo diario")
+
+        if len(arch)>=1:
+            print("Archivo diario")
+            for i in range(len(arch)):
+                print(arch[i])
+                pathArch = ruta2 + arch[i]
+                ex1=pd.read_excel(pathArch,sheet_name="GLP_EVP_PEGL_LVGL_COM_PROD_IMP",skiprows=3)
+                ex1=limpiezaMinorista(ex1)
+                archivos.append(ex1)
+                ex2=pd.read_excel(pathArch,sheet_name="LIQ_EVP_DMAY_CCA_CCE",skiprows=3)
+                ex2=limpiezaMinorista(ex2)
+                archivos.append(ex2)
+                os.remove(pathArch)
+
+        ruta_archivo = ruta6 + "fechas.txt"
+        with open(ruta_archivo, 'w') as archivo:
+            archivo.write(f1 + '\n')
+            archivo.write(f2 + '\n')
+        data = pd.concat(archivos, ignore_index=True)
         df_ubi = pd.read_csv(ruta4 + DF_ubi, encoding='utf-8', sep=";")
-        data = limpiezaMasivaMinorista(data, df_ubi)
-        os.remove(pathExcel)
-        print("excel eliminado.")
         
+        data = limpiezaMasivaMinorista(data, df_ubi)
+
+        # Exportando base final
         data_concat_f = pd.concat([datax, data], ignore_index=True)
         data_concat_f.to_csv(ruta4 + BASE_DLC, index=False, encoding="utf-8", sep=";")
-
-
-        return data_concat_f
     
     def processMin1_A2_data_quality(self) -> DataFrame:
         print("data_quality")
         
-        text = '2024-01-26'
-        fecha_manual = pd.to_datetime(text)  # Reemplaza con la fecha que desees
-        nueva_fecha = fecha_manual - timedelta(days=15)
+        nueva_fecha = f1 - timedelta(days=15)
 
         # Base t-1
         d1 = pd.read_csv(ruta6 + DF_fin, encoding="utf-8", sep=";")
-        print("data_quality1")
-        
         d1['fecha_stata'] = pd.to_datetime(d1['fecha_stata'], infer_datetime_format=True, errors='coerce')
         #d11 = d1.loc[d1["ID_DIR"]<100]
-        d11 = d1[(d1['fecha_stata']<=fecha_manual) & (d1["fecha_stata"]>=nueva_fecha)] # aquí está el truco
-        print("data_quality2")
+        d11 = d1[(d1['fecha_stata']<=f2) & (d1["fecha_stata"]>=nueva_fecha)] # aquí está el truco
 
         # Base t
         df = pd.read_csv(ruta4 + BASE_DLC, encoding="utf-8", sep=";")
-        print("data_quality3")
-        
-        df=agg_pan(df,fecha_manual=fecha_manual)
-        print("data_quality4")
+        df=agg_pan(df,"activar")
         df.COD_PROD.value_counts()
 
         # Limpieza
@@ -281,12 +326,13 @@ class FileDatasourceImpl(FileDatasource):
             # exec(f'base_{p} = pd.read_csv("{ruta6}base_final_{k}.csv", encoding="utf-8")')
             # dfs.append(f"base_{p}")
             # exec(f'os.remove("{ruta6}base_final_{k}.csv")')
+            # p += 1
+            
             dataX = pd.read_csv(f"{ruta6}base_final_{k}.csv", encoding="utf-8")
             dfs.append(dataX)
             os.remove(f"{ruta6}base_final_{k}.csv")
             p += 1
-        # dfs2 = [globals()[f"base_{i}"] for i in range(1, len(dfs) + 1) if f"base_{i}" in globals()]
-        # del base_1,base_2,base_3,base_4,base_5,base_6,base_7,base_8,base_9
+        
         df_concatenado = pd.concat(dfs, ignore_index=True)
         del dfs
         #df_concatenado.to_csv(r"..\data\interim\base_final.csv", index=False)
@@ -302,7 +348,7 @@ class FileDatasourceImpl(FileDatasource):
 
         # DF final
         df_concatenado['fecha_stata'] = pd.to_datetime(df_concatenado['fecha_stata'], infer_datetime_format=True, errors='coerce')
-        df_concatenado = df_concatenado.loc[df_concatenado["fecha_stata"]==fecha_manual]
+        df_concatenado = df_concatenado.loc[(df_concatenado["fecha_stata"]>=f1) & (df_concatenado["fecha_stata"]>=f2)]
         d1 = pd.concat([d1,df_concatenado], ignore_index=True)
         d1 = d1.sort_values(by=["ID_DIR","COD_PROD","fecha_stata"])
         d1.COD_PROD.value_counts()
@@ -976,13 +1022,28 @@ class FileDatasourceImpl(FileDatasource):
         d1.to_csv(ruta6 + DF_fin,index=False,encoding='utf-8',sep=";")
     def minfut4_processSeparacion(self):
         # Data
-        print("separando")
         d1 = pd.read_csv(ruta6+DF_fin,encoding='utf-8',sep=";")
         d1 = d1.dropna(subset=["ID_DIR","fecha_stata","COD_PROD","PRECIOVENTA"])
-        # d1["ID_fin"] = d1["ID_DIR"].astype(str) + "-" + d1["COD_PROD"].astype(str) + "-" + d1["fecha_stata"]
-        # d1[["ID_fin","ID_DIR","COD_PROD","fecha_stata","PRECIOVENTA"]].to_csv(ruta4 + DF_min_bi, index=False, encoding="utf-8", sep=";")
-        # d1[["ID_fin","ID_DIR","COD_PROD","fecha_stata","PRECIOVENTA_may"]].to_csv(ruta4 + DF_may_bi, index=False, encoding="utf-8", sep=";")
-        # d1[["ID_fin","ID_DIR","COD_PROD","fecha_stata","dPRECIOVENTA","dvarPRECIOVENTA","raro","raro2"]].to_csv(ruta4 + DF_fin, index=False, encoding="utf-8", sep=";")
+        #d1["ID_fin"] = d1["ID_DIR"].astype(str) + "-" + d1["COD_PROD"].astype(str) + "-" + d1["fecha_stata"]
+        d1 = d1.merge(dir,how="left")
+        d1 = d1.merge(ubi,how="left")
+        d1 = d1[["fecha_stata","PRECIOVENTA","COD_PROD","ID_COL","dPRECIOVENTA","dvarPRECIOVENTA","raro","raro2","ID_DIR","PRECIOVENTA_may","departamento"]]
+        d1.rename(columns={"departamento": "DEPARTAMENTO"}, inplace=True)
+        d1.loc[(d1.DEPARTAMENTO=="LIMA") | (d1.DEPARTAMENTO=="CALLAO"), "DEPARTAMENTO"] = "LIMA Y CALLAO"
+        validos = pd.read_csv(ruta4+DF_val2,encoding="utf-8",sep=";")
+        validos.loc[(validos.DEPARTAMENTO=="LIMA") | (validos.DEPARTAMENTO=="CALLAO"), "DEPARTAMENTO"] = "LIMA Y CALLAO"
+        validos=validos.fillna(0)
+        validos = validos.groupby(['DEPARTAMENTO', 'COD_PROD'])['ok'].mean().reset_index()
+        validos.loc[validos.ok>0.9,"mirar"]=1
+        d1 = d1.merge(validos[["DEPARTAMENTO","COD_PROD","mirar"]],how="left",on=["DEPARTAMENTO","COD_PROD"])
+        d1['promedio'] = d1.groupby(['COD_PROD', 'fecha_stata'])['PRECIOVENTA'].transform('mean')
+        d1['conteo'] = d1.groupby(['COD_PROD', 'fecha_stata'])['PRECIOVENTA'].transform('count')
+        d1=d1.sort_values(by=["COD_PROD","fecha_stata","ID_DIR"])
+        d1["markup_mm"]=d1["PRECIOVENTA"]-(d1["promedio"]*d1["conteo"]-d1["PRECIOVENTA"])/(d1["conteo"]-1)
+        d1[["COD_PROD","fecha_stata","ID_DIR","PRECIOVENTA","promedio","conteo"]]
+        
+        d1.drop(["promedio","conteo"],axis=1,inplace=True)
+        d1=d1.sort_values(by=["fecha_stata"])
         d1.to_csv(ruta4 + DF_fin2, index=False, encoding="utf-8", sep=";")
         print("fin")
 

@@ -519,6 +519,7 @@ class DbDatasourceImpl(DbDatasource):
                     dvarprecioventa = row.get('dvarPRECIOVENTA', '')
                     raro = row.get('raro', '')
                     raro2 = row.get('raro2', '')
+                    markup_mm = row.get('markup_mm', '')
                     precioventa_may = row.get('PRECIOVENTA_may', '')
                     
                     fecha_stata = pd.to_datetime(fecha_stata, errors='coerce')
@@ -534,41 +535,12 @@ class DbDatasourceImpl(DbDatasource):
                         dvarprecioventa = dvarprecioventa,
                         raro = raro,
                         raro2 = raro2,
+                        markup_mm = markup_mm,
                         precioventa_may = precioventa_may,
                     )
                     session.add(indicadorModel)
                 session.commit()
-                    # campos = [
-                    #     str(id_dir),
-                    #     str(fecha_stata),
-                    #     str(cod_prod),
-                    #     str(dprecioventa),
-                    #     str(dvarprecioventa),
-                    #     str(raro),
-                    #     str(raro2),
-                    # ]
-                            
-                    # cadena_unica = '|'.join(campos)
-
-                    # hash_id = hashlib.sha256(cadena_unica.encode()).hexdigest()
                     
-                    # results = session.query(IndicadoresModel).get(hash_id)
-                    
-                    # if not results:
-                    #     indicadorModel = IndicadoresModel(
-                    #         id = hash_id,
-                    #         id_dir = id_dir,
-                    #         fecha_stata = fecha_stata,
-                    #         cod_prod = cod_prod,
-                    #         dprecioventa = dprecioventa,
-                    #         dvarprecioventa = dvarprecioventa,
-                    #         raro = raro,
-                    #         raro2 = raro2,
-                    #     )
-                    #     session.add(indicadorModel)
-                    # else:
-                    #     results.updated_at = datetime.now()
-                    # session.commit()
             
     def validate_and_convert_to_int(self,value):
         try:

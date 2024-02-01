@@ -24,6 +24,7 @@ class IndicadoresModel(Base):
     raro = Column(String, nullable=True)
     raro2 = Column(String, nullable=True)
     precioventa_may = Column(String, nullable=True)
+    markup_mm = Column(String, nullable=True)
     created_at = Column(DateTime(), default=datetime.now())
     
     

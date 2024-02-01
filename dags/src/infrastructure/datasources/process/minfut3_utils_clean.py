@@ -82,7 +82,8 @@ def agg_pan(df,fecha_manual=""):
     df['fecha_stata'].fillna(filas_con_NaT['fecha1'], inplace=True)
     df.drop(["FECHADEREGISTRO"], axis=1, inplace=True)
     if fecha_manual!="":
-        df = df[df['fecha_stata'] == fecha_manual]
+        print("diario")
+        df = df[(df['fecha_stata']<=f2) & (df["fecha_stata"]>=f1)]
     df = df.drop_duplicates()
     df = pd.merge(df, prod, how='left', on='COD_PROD', indicator=True)
     df = df[df['_merge'] == 'both']
@@ -95,7 +96,7 @@ def agg_pan(df,fecha_manual=""):
     df.loc[df['NOM_PROD'] == "GASOHOL 90 PLUS", 'COD_PROD'] = nom_prods[d]
     df.loc[df['NOM_PROD'] == "GASOHOL 95 PLUS", 'COD_PROD'] = nom_prods[c]
     df.loc[df['PRECIOVENTA'] < 0.51, 'PRECIOVENTA'] = pd.NA
-    # df.to_csv(ruta6 + DF_base_comb2, index=False)
+    #df.to_csv(ruta6 + DF_base_comb2, index=False) # Descomentar si se desea Mercado relevante 
     valores_lista = dir.loc[dir["minorista"]==1]
     valores_lista = valores_lista["ID_DIR"]
     df = df[df['ID_DIR'].isin(valores_lista)]
