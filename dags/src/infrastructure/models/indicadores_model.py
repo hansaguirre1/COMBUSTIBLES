@@ -9,8 +9,6 @@ from src.config.db_config import Base
 class IndicadoresModel(Base):
     __tablename__ = "indicador"
 
-    # ID_DIR;fecha_stata;PRECIOVENTA;PRECIOVENTA_;dias_faltantes;COD_PROD;ID_COL;dPRECIOVENTA;dvarPRECIOVENTA;raro;raro2;PRECIOVENTA_may
-    
     id = Column(Integer, primary_key=True, autoincrement=True)
     id_dir = Column(String, nullable=True)
     fecha_stata = Column(DateTime(), nullable=True)
@@ -24,6 +22,8 @@ class IndicadoresModel(Base):
     raro = Column(String, nullable=True)
     raro2 = Column(String, nullable=True)
     precioventa_may = Column(String, nullable=True)
+    departamento = Column(String, nullable=True)
+    mirar = Column(String, nullable=True)
     markup_mm = Column(String, nullable=True)
     created_at = Column(DateTime(), default=datetime.now())
     

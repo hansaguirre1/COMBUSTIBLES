@@ -73,6 +73,12 @@ def process(ii, df_2):
 
 
 def agg_pan(df,fecha_manual=""):
+    with open(ruta6 + "fechas.txt", 'r') as archivo:
+        lineas = archivo.readlines()    
+    f1 = lineas[0].strip()  # strip() elimina espacios en blanco y saltos de línea
+    f1 = pd.to_datetime(f1)
+    f2 = lineas[1].strip()
+    f2 = pd.to_datetime(f2)
     df['fecha_stata'] = pd.to_datetime(
         df['FECHADEREGISTRO'], format='%d/%m/%Y', errors='coerce')
     filas_con_NaT = df[df['fecha_stata'].isna()]

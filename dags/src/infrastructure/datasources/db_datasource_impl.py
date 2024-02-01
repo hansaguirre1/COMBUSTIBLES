@@ -519,6 +519,8 @@ class DbDatasourceImpl(DbDatasource):
                     dvarprecioventa = row.get('dvarPRECIOVENTA', '')
                     raro = row.get('raro', '')
                     raro2 = row.get('raro2', '')
+                    departamento = row.get('DEPARTAMENTO', '')
+                    mirar = row.get('mirar', '')
                     markup_mm = row.get('markup_mm', '')
                     precioventa_may = row.get('PRECIOVENTA_may', '')
                     
@@ -535,6 +537,8 @@ class DbDatasourceImpl(DbDatasource):
                         dvarprecioventa = dvarprecioventa,
                         raro = raro,
                         raro2 = raro2,
+                        departamento = departamento,
+                        mirar = mirar,
                         markup_mm = markup_mm,
                         precioventa_may = precioventa_may,
                     )
