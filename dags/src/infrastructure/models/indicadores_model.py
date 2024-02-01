@@ -13,7 +13,7 @@ class IndicadoresModel(Base):
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     id_dir = Column(String, nullable=True)
-    fecha_stata = Column(String, nullable=True)
+    fecha_stata = Column(DateTime(), nullable=True)
     precioventa = Column(String, nullable=True)
     precioventa_ = Column(String, nullable=True)
     dias_faltantes = Column(String, nullable=True)

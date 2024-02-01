@@ -278,14 +278,17 @@ class FileDatasourceImpl(FileDatasource):
         p = 1
         for k in cod_prods:
             print(k)
-            exec(f'base_{p} = pd.read_csv("{ruta6}base_final_{k}.csv", encoding="utf-8")')
-            dfs.append(f"base_{p}")
-            exec(f'os.remove("{ruta6}base_final_{k}.csv")')
+            # exec(f'base_{p} = pd.read_csv("{ruta6}base_final_{k}.csv", encoding="utf-8")')
+            # dfs.append(f"base_{p}")
+            # exec(f'os.remove("{ruta6}base_final_{k}.csv")')
+            dataX = pd.read_csv(f"{ruta6}base_final_{k}.csv", encoding="utf-8")
+            dfs.append(dataX)
+            os.remove(f"{ruta6}base_final_{k}.csv")
             p += 1
-        dfs2 = [globals()[f"base_{i}"] for i in range(1, len(dfs) + 1) if f"base_{i}" in globals()]
-        del base_1,base_2,base_3,base_4,base_5,base_6,base_7,base_8,base_9
-        df_concatenado = pd.concat(dfs2, ignore_index=True)
-        del dfs2
+        # dfs2 = [globals()[f"base_{i}"] for i in range(1, len(dfs) + 1) if f"base_{i}" in globals()]
+        # del base_1,base_2,base_3,base_4,base_5,base_6,base_7,base_8,base_9
+        df_concatenado = pd.concat(dfs, ignore_index=True)
+        del dfs
         #df_concatenado.to_csv(r"..\data\interim\base_final.csv", index=False)
 
         # Variables finales

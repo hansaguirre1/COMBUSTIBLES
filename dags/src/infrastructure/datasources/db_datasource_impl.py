@@ -27,7 +27,7 @@ import re
 from datetime import datetime
 
 from sqlalchemy.orm import Session
-from sqlalchemy import text, select, func
+from sqlalchemy import text, select, func, desc
 pathProcessed = 'data/processed'
 
 class DbDatasourceImpl(DbDatasource):
@@ -486,11 +486,24 @@ class DbDatasourceImpl(DbDatasource):
     
     def saveIndicadores(self):
         chunksize = 10000
+        with self.session_factory() as session:
+            fecha_mas_reciente = session.query(IndicadoresModel.fecha_stata).order_by(desc(IndicadoresModel.fecha_stata)).first()
         
         dfIndicadores = pd.read_csv(f"{pathProcessed}/df_indicadores_sm.csv", sep=';', chunksize=chunksize)
+        if fecha_mas_reciente:
+            fecha_mas_reciente = fecha_mas_reciente[0]
+        else :
+            fecha_mas_reciente = datetime(2000, 1, 1)
+
+        print(f'la fecha más reciente es {fecha_mas_reciente}')
         
-        with self.session_factory() as session:
+        with self.session_factory() as session:  
+            
             for dfIndicadores_chunk in dfIndicadores:
+                dfIndicadores_chunk['fecha_stata'] = pd.to_datetime(dfIndicadores_chunk['fecha_stata'])
+
+                dfIndicadores_chunk = dfIndicadores_chunk[dfIndicadores_chunk['fecha_stata'] > fecha_mas_reciente]
+                
                 print(f'dfIndicadores_chunk {len(dfIndicadores_chunk)} ')
 
                 for index, row in dfIndicadores_chunk.iterrows():
@@ -508,6 +521,7 @@ class DbDatasourceImpl(DbDatasource):
                     raro2 = row.get('raro2', '')
                     precioventa_may = row.get('PRECIOVENTA_may', '')
                     
+                    fecha_stata = pd.to_datetime(fecha_stata, errors='coerce')
                     indicadorModel = IndicadoresModel(
                         id_dir = id_dir,
                         fecha_stata = fecha_stata,

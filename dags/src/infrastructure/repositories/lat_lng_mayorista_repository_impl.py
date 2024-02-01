@@ -11,11 +11,11 @@ class LatLngMayoristaRepositoryImpl(LatLngMayoristaRepository):
         self.dbDatasource = dbDatasource
     
     def saveDataLatLng(self):
-        self.fileDatasource.dis3_processDistances()
-        self.dbDatasource.saveMayMinGeo()
+        # self.fileDatasource.dis3_processDistances()
+        # self.dbDatasource.saveMayMinGeo()
         
-        self.fileDatasource.min4_a1_processMerge()
-        self.fileDatasource.minfut4_processSeparacion()
+        # self.fileDatasource.min4_a1_processMerge()
+        # self.fileDatasource.minfut4_processSeparacion()
         self.dbDatasource.saveIndicadores()
         # self.dbDatasource.saveMayorista()
         # self.dbDatasource.saveMinorista()
