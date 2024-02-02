@@ -1047,6 +1047,7 @@ class FileDatasourceImpl(FileDatasource):
         validos=validos.fillna(0)
         validos = validos.groupby(['DEPARTAMENTO', 'COD_PROD'])['ok'].mean().reset_index()
         validos.loc[validos.ok>0.9,"mirar"]=1
+        validos.loc[(validos["DEPARTAMENTO"]=="LORETO") & (validos["COD_PROD"]==28),'mirar']=0
         d1 = d1.merge(validos[["DEPARTAMENTO","COD_PROD","mirar"]],how="left",on=["DEPARTAMENTO","COD_PROD"])
         d1['promedio'] = d1.groupby(['COD_PROD', 'fecha_stata'])['PRECIOVENTA'].transform('mean')
         d1['conteo'] = d1.groupby(['COD_PROD', 'fecha_stata'])['PRECIOVENTA'].transform('count')
