@@ -116,7 +116,7 @@ class DbDatasourceImpl(DbDatasource):
             print('Productos no encontrados')
             print(newProductsList)
         # self.addNewProduct(newProductsList=newProductsList)
-    
+      
     def saveReferenciaOsinergmin(self, df: DataFrame):
 
         with self.session_factory() as session:
@@ -464,7 +464,8 @@ class DbDatasourceImpl(DbDatasource):
                 id = id if not pd.isna(id) else 0
                 nom_prod = nom_prod if not pd.isna(nom_prod) else None
                 unidad = unidad if not pd.isna(unidad) else None
-                
+
+            
                 id = self.validate_and_convert_to_int(id)
                 # nom_prod = self.quitar_tildes(nom_prod).strip().lower()
                 # nom_prod = re.sub(r'[^a-zA-Z0-9]', '', nom_prod)
@@ -595,15 +596,17 @@ class DbDatasourceImpl(DbDatasource):
             "PETROLEO INDUSTRIAL Nº 6": "PETROLEO INDUSTRIAL Nº 6",
             "PETROPERU INDUSTRIAL Nº 6": "PETROLEO INDUSTRIAL Nº 6",
             "GASOHOL 84": "GASOHOL 84 PLUS",
-            "GASOHOL 90": "GASOHOL 90 PLUS",
-            "GASOHOL 95": "GASOHOL 95 PLUS",
+            "GASOHOL 90": "GASOHOL REGULAR",
+            "GASOHOL 95": "GASOHOL PREMIUM",
             "GASOHOL 97": "GASOHOL 97 PLUS",
             "GASOHOL 98": "GASOHOL 98 PLUS",
             "GASOLINA 84 SP": "GASOLINA 84",
-            "GASOLINA SUPER 90 SP": "GASOLINA 90",
-            "GASOLINA SUPER 90": "GASOLINA 90",
-            "GASOLINA SUPER 95 SP": "GASOLINA 95",
+            "GASOLINA SUPER 90 SP": "GASOLINA REGULAR",
+            "GASOLINA SUPER 90": "GASOLINA REGULAR",
+            "GASOLINA SUPER 95 SP": "GASOLINA PREMIUM",
             "GASOLINA SUPER EXTRA 97 SP": "GASOLINA 97",
+            "GASOLINA 90": "GASOLINA REGULAR",
+            "GASOLINA 95": "GASOLINA PREMIUM",
             "DIESEL B5 S-50 (**)": "Diesel B5 S-50",
             "DIESEL B5 UV S-50 (**)": "Diesel B5 S-50 UV",
             "DIESEL B5 UV S-50": "Diesel B5 S-50 UV",
@@ -614,8 +617,8 @@ class DbDatasourceImpl(DbDatasource):
             "DIESEL 2 S-50 S-50": "Diesel 2 S-50",
             "DIESEL 2": "DIESEL 2 UV",
             "Gasohol84": "GASOHOL 84 PLUS",
-            "Gasohol90": "GASOHOL 90 PLUS",
-            "Gasohol95": "GASOHOL 95 PLUS",
+            "Gasohol90": "GASOHOL REGULAR",
+            "Gasohol95": "GASOHOL PREMIUM",
             "Gasohol97": "GASOHOL 97 PLUS",
             "Gasohol98": "GASOHOL 98 PLUS",
             "DieselB5UVS-50": "Diesel B5 S-50 UV",
