@@ -85,8 +85,69 @@ validos = pd.read_csv(ruta4+DF_val2,encoding="utf-8",sep=";")
 validos.loc[(validos.DEPARTAMENTO=="LIMA") | (validos.DEPARTAMENTO=="CALLAO"), "DEPARTAMENTO"] = "LIMA Y CALLAO"
 validos=validos.fillna(0)
 validos = validos.groupby(['DEPARTAMENTO', 'COD_PROD'])['ok'].mean().reset_index()
-validos.loc[validos.ok>0.9,"mirar"]=1
+#validos.loc[validos.ok>0.9,"mirar"]=1
+validos["mirar"]=1
+validos.loc[(validos["DEPARTAMENTO"]=="AMAZONAS") & (validos["COD_PROD"]==19),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="ANCASH") & (validos["COD_PROD"]==19),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="ANCASH") & (validos["COD_PROD"]==45),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="ANCASH") & (validos["COD_PROD"]==46),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="APURIMAC") & (validos["COD_PROD"]==45),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="APURIMAC") & (validos["COD_PROD"]==46),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="AREQUIPA") & (validos["COD_PROD"]==45),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="AREQUIPA") & (validos["COD_PROD"]==46),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="AYACUCHO") & (validos["COD_PROD"]==45),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="AYACUCHO") & (validos["COD_PROD"]==46),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="CAJAMARCA") & (validos["COD_PROD"]==19),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="CAJAMARCA") & (validos["COD_PROD"]==45),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="CAJAMARCA") & (validos["COD_PROD"]==46),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="LIMA Y CALLAO") & (validos["COD_PROD"]==19),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="LIMA Y CALLAO") & (validos["COD_PROD"]==45),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="LIMA Y CALLAO") & (validos["COD_PROD"]==46),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="CUSCO") & (validos["COD_PROD"]==19),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="CUSCO") & (validos["COD_PROD"]==45),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="CUSCO") & (validos["COD_PROD"]==46),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="HUANCAVELICA") & (validos["COD_PROD"]==45),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="HUANCAVELICA") & (validos["COD_PROD"]==46),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="HUANUCO") & (validos["COD_PROD"]==19),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="HUANUCO") & (validos["COD_PROD"]==45),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="HUANUCO") & (validos["COD_PROD"]==46),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="ICA") & (validos["COD_PROD"]==19),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="ICA") & (validos["COD_PROD"]==45),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="ICA") & (validos["COD_PROD"]==46),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="JUNIN") & (validos["COD_PROD"]==19),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="JUNIN") & (validos["COD_PROD"]==45),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="JUNIN") & (validos["COD_PROD"]==46),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="LA LIBERTAD") & (validos["COD_PROD"]==19),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="LA LIBERTAD") & (validos["COD_PROD"]==45),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="LA LIBERTAD") & (validos["COD_PROD"]==46),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="LAMBAYEQUE") & (validos["COD_PROD"]==19),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="LAMBAYEQUE") & (validos["COD_PROD"]==45),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="LAMBAYEQUE") & (validos["COD_PROD"]==46),'mirar']=0
 validos.loc[(validos["DEPARTAMENTO"]=="LORETO") & (validos["COD_PROD"]==28),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="LORETO") & (validos["COD_PROD"]==36),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="LORETO") & (validos["COD_PROD"]==48),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="MADRE DE DIOS") & (validos["COD_PROD"]==36),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="MADRE DE DIOS") & (validos["COD_PROD"]==48),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="MOQUEGUA") & (validos["COD_PROD"]==19),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="MOQUEGUA") & (validos["COD_PROD"]==45),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="MOQUEGUA") & (validos["COD_PROD"]==46),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="PASCO") & (validos["COD_PROD"]==19),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="PASCO") & (validos["COD_PROD"]==45),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="PASCO") & (validos["COD_PROD"]==46),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="PIURA") & (validos["COD_PROD"]==19),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="PIURA") & (validos["COD_PROD"]==45),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="PIURA") & (validos["COD_PROD"]==46),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="PUNO") & (validos["COD_PROD"]==28),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="PUNO") & (validos["COD_PROD"]==36),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="PUNO") & (validos["COD_PROD"]==46),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="SAN MARTIN") & (validos["COD_PROD"]==19),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="TUMBES") & (validos["COD_PROD"]==19),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="TUMBES") & (validos["COD_PROD"]==45),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="TUMBES") & (validos["COD_PROD"]==46),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="UCAYALI") & (validos["COD_PROD"]==28),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="UCAYALI") & (validos["COD_PROD"]==36),'mirar']=0
+validos.loc[(validos["DEPARTAMENTO"]=="UCAYALI") & (validos["COD_PROD"]==37),'mirar']=0
+
 #validos.loc[(validos["DEPARTAMENTO"]=="LIMA Y CALLAO") & (validos["COD_PROD"]=46),'mirar']=0
 d1 = d1.merge(validos[["DEPARTAMENTO","COD_PROD","mirar"]],how="left",on=["DEPARTAMENTO","COD_PROD"])
 d1['promedio'] = d1.groupby(['COD_PROD', 'fecha_stata'])['PRECIOVENTA'].transform('mean')
