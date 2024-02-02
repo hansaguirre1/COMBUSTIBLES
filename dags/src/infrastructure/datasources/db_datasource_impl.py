@@ -82,7 +82,7 @@ class DbDatasourceImpl(DbDatasource):
                 for index, row in data_existente.iterrows():
                     precio_con_impuesto = row.get('Precios', '')
                     combustible = row.get('Combustible', '')
-                    planta = row.get('PLANTAS', '')
+                    planta = row.get('Planta', '')
                     fecha = row.get('Fecha', '')
                     
                     combustibleOnlyLetterNumber = self.convertOnlyLettersAndNumbers(combustible)
@@ -740,6 +740,7 @@ class DbDatasourceImpl(DbDatasource):
             "Diesel B5 UV S-50": "Diesel B5 S-50 UV",
             "Petróleo Industrial 6 G.E.": "PETROLEO INDUSTRIAL Nº 6 GE",
             "Petróleo Industrial 6 G.E.": "PETROLEO INDUSTRIAL Nº 6 GE",
+            "Diesel 2": "DIESEL 2 UV",
         }
 
         return conversiones.get(dato, dato)
