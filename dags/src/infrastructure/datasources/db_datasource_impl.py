@@ -60,12 +60,18 @@ class DbDatasourceImpl(DbDatasource):
     def saveMayoristaPetroperu(self, petroperuDataframe: pd.DataFrame):
         newProductsList = []
         product_dict = {}
+        planta_dict = {}
 
         with self.session_factory() as session:
             product_data = session.query(ProductoModel).all()
             for product in product_data:
                 nomProd = self.convertOnlyLettersAndNumbers(product.nom_prod)
                 product_dict[nomProd] = int(product.id)
+                
+            planta_data = session.query(PlantaModel).all()
+            for plantaFor in planta_data:
+                nomPlanta = self.convertOnlyLettersAndNumbers(plantaFor.planta)
+                planta_dict[nomPlanta] = plantaFor.id
                 
             mayorista_data_historic = session.query(PricesMayoristasPetroperuModel).all()
             
@@ -80,16 +86,19 @@ class DbDatasourceImpl(DbDatasource):
                     fecha = row.get('Fecha', '')
                     
                     combustibleOnlyLetterNumber = self.convertOnlyLettersAndNumbers(combustible)
-                    plantaDb= session.query(PlantaModel).filter(PlantaModel.planta == planta).first()
+                    plantaOnlyLetterNumber = self.convertOnlyLettersAndNumbers(planta)
+                    # plantaDb= session.query(PlantaModel).filter(PlantaModel.planta == planta).first()
+                    
+                    plantaId= planta_dict.get(plantaOnlyLetterNumber, '')
                     combustibleId= product_dict.get(combustibleOnlyLetterNumber, 0)
                     if(combustibleId == 0):
+                        print(f'No encontrado {combustibleOnlyLetterNumber}')
                         datos_homogeneizado = self.homogenizar_datos(combustible)
                         combustibleOnlyLetterNumber = self.convertOnlyLettersAndNumbers( datos_homogeneizado)
                         combustibleId= product_dict.get(combustibleOnlyLetterNumber, 0)
                         
                     if(combustibleId == 0):
                         newProductsList.append(combustible)
-                    plantaId = plantaDb.id if plantaDb else 0
                     
                     precio_con_impuesto = str(precio_con_impuesto) if not pd.isna(precio_con_impuesto) else None
                     fecha = str(fecha) if not pd.isna(fecha) else None
@@ -119,9 +128,7 @@ class DbDatasourceImpl(DbDatasource):
                     else:
                         results.updated_at = datetime.now()
                     session.commit()
-            
-        with self.session_factory() as session:
-            
+                        
 
             for index, row in petroperuDataframe.iterrows():
                 precio_con_impuesto = row.get('Precios', '')
@@ -130,7 +137,11 @@ class DbDatasourceImpl(DbDatasource):
                 fecha = row.get('Fecha', '')
                 
                 combustibleOnlyLetterNumber = self.convertOnlyLettersAndNumbers(combustible)
-                plantaDb= session.query(PlantaModel).filter(PlantaModel.planta == planta).first()
+                plantaOnlyLetterNumber = self.convertOnlyLettersAndNumbers(planta)
+                
+                # plantaDb= session.query(PlantaModel).filter(PlantaModel.planta == planta).first()
+                plantaId= planta_dict.get(plantaOnlyLetterNumber, '')
+                
                 combustibleId= product_dict.get(combustibleOnlyLetterNumber, 0)
                 if(combustibleId == 0):
                     datos_homogeneizado = self.homogenizar_datos(combustible)
@@ -139,7 +150,6 @@ class DbDatasourceImpl(DbDatasource):
                     
                 if(combustibleId == 0):
                     newProductsList.append(combustible)
-                plantaId = plantaDb.id if plantaDb else 0
                 
                 precio_con_impuesto = str(precio_con_impuesto) if not pd.isna(precio_con_impuesto) else None
                 fecha = str(fecha) if not pd.isna(fecha) else None
