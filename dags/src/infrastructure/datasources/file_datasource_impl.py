@@ -122,11 +122,11 @@ class FileDatasourceImpl(FileDatasource):
         return data
         
     def saveDataPetroperuToCSV(self, df_combinado: pd.DataFrame):
-        data_existente = pd.read_csv("data/processed/petroperu/Petroperu_Lista.csv", sep=';')
+        data_existente = pd.read_csv("data/processed/Petroperu_Lista.csv", sep=';')
  
         petroperu = pd.concat([data_existente, df_combinado], ignore_index=True)
 
-        petroperu.to_csv("data/processed/petroperu/Petroperu_Lista.csv", index=False, sep=';')
+        petroperu.to_csv("data/processed/Petroperu_Lista.csv", index=False, sep=';')
     
     def saveDataPetroperuToExcel(self, df_combinado: pd.DataFrame):
         df_combinado = df_combinado.rename(columns={df_combinado.columns[1]: "GLP-E" ,
@@ -146,14 +146,14 @@ class FileDatasourceImpl(FileDatasource):
             nuevos_datos.to_excel(writer, sheet_name='Petroperu', index=False)
 
     def saveDataMarcadoresToCsv(self, df_combinado: pd.DataFrame):
-        data = pd.read_csv("data/processed/marcadores/marcadores.csv")
+        data = pd.read_csv("data/processed/marcadores.csv")
         data ["Fecha"] = pd.to_datetime(data["Fecha"], format="%Y-%m-%d")
 
         data_final = pd.concat([data, df_combinado], ignore_index=True)
         data_final["Fecha"] = pd.to_datetime(data_final["Fecha"], format="%Y-%m-%d")
         data_final["Fecha"] = data_final["Fecha"].dt.date
 
-        data_final.to_csv("data/processed/marcadores/marcadores.csv", index=False)
+        data_final.to_csv("data/processed/marcadores.csv", index=False)
         
     def processMin0_A2_tablas_relacionales(self) -> pd.DataFrame:
         # t = datetime.now()
@@ -1033,7 +1033,67 @@ class FileDatasourceImpl(FileDatasource):
         #d1.head()
         d1.to_csv(ruta6 + DF_fin,index=False,encoding='utf-8',sep=";")
     def minfut4_processSeparacion(self):
-        # Data
+        print("separando")
+
+        # Petroperú
+        Precios_Mayoristas = pd.read_csv(ruta4 + DF_petroperu, encoding="utf-8",sep=";")
+        Precios_Mayoristas.rename(columns={"Combustible": "PRODUCTO"},inplace=True)
+        Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GASOHOL 95 PLUS","GASOHOL PREMIUM")
+        Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GASOHOL 90 PLUS","GASOHOL REGULAR")
+        Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GOH95","GASOHOL PREMIUM")
+        Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GOH90","GASOHOL REGULAR")
+        Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GASOLINA 90","GASOLINA REGULAR")
+        Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GASOLINA 95","GASOLINA PREMIUM")
+        Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("G90","GASOLINA REGULAR")
+        Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("G95","GASOLINA PREMIUM")
+        Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("'Cilindros de 10 Kg de GLP","GLP - E")
+        Precios_Mayoristas = Precios_Mayoristas[~(Precios_Mayoristas['PRODUCTO'].str.contains('Cilindros de 5 Kg de GL')) &
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('ASFALTO'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('PETRÓLEO'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('CEMENTO'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('OIL'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('HEXANO'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('Cilindros de 45 Kg de GLP'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('Cilindros de 15 Kg de GLP'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('Cilindros de 3 Kg de GLP'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('GLP - E'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('MARINO'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('TURBO'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('IFO - 380 EXPORT'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('PENTANO'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('BREA'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOLINA 84'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOHOL 84 PLUS'))&
+                                                ~(Precios_Mayoristas['PRODUCTO']=='DIESEL B5')&
+                                                ~(Precios_Mayoristas['PRODUCTO']=='DIESEL B5 GE')&
+                                                ~(Precios_Mayoristas['PRODUCTO']=="Diesel B5 S-50")&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOLINA 97'))&  
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOHOL 97 PLUS'))&  
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOLINA 98 BA'))& 
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOHOL 98 PLUS'))&  
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('Diesel B5 S-50 GE'))&                                                                                
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('SOLVENTE'))&  
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOLINA 100 LL'))&  
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOLINA 98'))&  
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('CGN SOLVENTE'))&  
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('DIESEL 2'))& 
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('PRODUCTO'))&
+                                                ~(Precios_Mayoristas['PRODUCTO'].str.contains('Diesel 2'))]
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOLINA REGULAR", 'COD_PROD'] = 46
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOLINA PREMIUM", 'COD_PROD'] = 45
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOHOL REGULAR", 'COD_PROD'] = 37
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOHOL PREMIUM", 'COD_PROD'] = 36
+        Precios_Mayoristas.loc[(Precios_Mayoristas.PRODUCTO=="Cilindros de 10 Kg de GLP") | (Precios_Mayoristas.PRODUCTO.str.contains("GLP-E")), 'COD_PROD'] = 47
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO.str.contains("GLP-G"), 'COD_PROD'] = 48
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO.str.contains("DIESEL B5 UV S-50"), 'COD_PROD'] = 28
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="DIESEL B5 UV", 'COD_PROD'] = 19
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Diesel B5 UV", 'COD_PROD'] = 19
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Diesel B5 S-50 UV", 'COD_PROD'] = 28
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Diesel B5 UV", 'COD_PROD'] = 19
+        Precios_Mayoristas.rename(columns={"PRODUCTO": "Combustible"},inplace=True)
+        Precios_Mayoristas.to_csv(ruta4 + DF_petroperu, index=False,encoding="utf-8",sep=";")
+        
+        # Separando
         d1 = pd.read_csv(ruta6+DF_fin,encoding='utf-8',sep=";")
         d1 = d1.dropna(subset=["ID_DIR","fecha_stata","COD_PROD","PRECIOVENTA"])
         #d1["ID_fin"] = d1["ID_DIR"].astype(str) + "-" + d1["COD_PROD"].astype(str) + "-" + d1["fecha_stata"]
@@ -1048,15 +1108,34 @@ class FileDatasourceImpl(FileDatasource):
         validos = validos.groupby(['DEPARTAMENTO', 'COD_PROD'])['ok'].mean().reset_index()
         validos.loc[validos.ok>0.9,"mirar"]=1
         validos.loc[(validos["DEPARTAMENTO"]=="LORETO") & (validos["COD_PROD"]==28),'mirar']=0
+        #validos.loc[(validos["DEPARTAMENTO"]=="LIMA Y CALLAO") & (validos["COD_PROD"]=46),'mirar']=0
         d1 = d1.merge(validos[["DEPARTAMENTO","COD_PROD","mirar"]],how="left",on=["DEPARTAMENTO","COD_PROD"])
         d1['promedio'] = d1.groupby(['COD_PROD', 'fecha_stata'])['PRECIOVENTA'].transform('mean')
         d1['conteo'] = d1.groupby(['COD_PROD', 'fecha_stata'])['PRECIOVENTA'].transform('count')
         d1=d1.sort_values(by=["COD_PROD","fecha_stata","ID_DIR"])
         d1["markup_mm"]=d1["PRECIOVENTA"]-(d1["promedio"]*d1["conteo"]-d1["PRECIOVENTA"])/(d1["conteo"]-1)
         d1[["COD_PROD","fecha_stata","ID_DIR","PRECIOVENTA","promedio","conteo"]]
-        
+        #d1p = d1.loc[(d1["ID_DIR"]==188) | (d1["ID_DIR"]==189)]
+        #d1p = d1p.sort_values(by=['ID_DIR', 'COD_PROD', 'fecha_stata'])
+        #zzz
+        # resultados = []
+        # for id_dir in d1['ID_DIR'].unique()[100:102]:
+        #     print(id_dir)
+        #     df_id_dir = d1[d1['ID_DIR'] != id_dir]
+        #     df_si_id_dir = d1[d1['ID_DIR'] == id_dir]
+        #     media_excluyendo_ID_DIR = df_id_dir.groupby(['COD_PROD', 'fecha_stata'])['PRECIOVENTA'].mean().reset_index()
+        #     resultado_temporal = pd.merge(df_si_id_dir[["ID_DIR","COD_PROD","fecha_stata","PRECIOVENTA"]], media_excluyendo_ID_DIR, on=['COD_PROD', 'fecha_stata'], suffixes=('_ID_DIR', '_excluyendo_ID_DIR'), how="left")
+        #     resultado_temporal['Diferencia'] = resultado_temporal['PRECIOVENTA_ID_DIR']-resultado_temporal['PRECIOVENTA_excluyendo_ID_DIR']
+        #     resultados.append(resultado_temporal)
+
+        # resultado_final = pd.concat(resultados, ignore_index=True)
+        # resultado_final = resultado_final.sort_values(by=['ID_DIR', 'COD_PROD', 'fecha_stata'])
+        # #resultado_final.COD_PROD.value_counts()
+        # d1["markup_mm"] = resultado_final["Diferencia"]
         d1.drop(["promedio","conteo"],axis=1,inplace=True)
-        d1=d1.sort_values(by=["fecha_stata"])
+        #d1p = d1.iloc[:10000,:]
+        for i in [3131,6574,7314,6986]:
+            d1 = d1[d1['ID_DIR'] != i]
         d1.to_csv(ruta4 + DF_fin2, index=False, encoding="utf-8", sep=";")
         print("fin")
 

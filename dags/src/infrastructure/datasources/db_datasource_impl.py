@@ -485,7 +485,7 @@ class DbDatasourceImpl(DbDatasource):
                 session.commit()
     
     def saveIndicadores(self):
-        chunksize = 10000
+        chunksize = 50000
         with self.session_factory() as session:
             fecha_mas_reciente = session.query(IndicadoresModel.fecha_stata).order_by(desc(IndicadoresModel.fecha_stata)).first()
         
