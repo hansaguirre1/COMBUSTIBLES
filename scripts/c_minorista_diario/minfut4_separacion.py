@@ -15,8 +15,10 @@ os.chdir(os.getcwd())
 print("separando")
 
 # Petroperú
-Precios_Mayoristas = pd.read_csv(ruta4 + DF_petroperu, encoding="utf-8",sep=";")
+DF_petroperu="Petroperu_Lista.xlsx"
+Precios_Mayoristas = pd.read_excel(ruta4 + DF_petroperu, engine='openpyxl')
 Precios_Mayoristas.rename(columns={"Combustible": "PRODUCTO"},inplace=True)
+Precios_Mayoristas["PRODUCTO"]=Precios_Mayoristas["PRODUCTO"].str.upper()
 Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GASOHOL 95 PLUS","GASOHOL PREMIUM")
 Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GASOHOL 90 PLUS","GASOHOL REGULAR")
 Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GOH95","GASOHOL PREMIUM")
@@ -60,8 +62,12 @@ Precios_Mayoristas = Precios_Mayoristas[~(Precios_Mayoristas['PRODUCTO'].str.con
                                         ~(Precios_Mayoristas['PRODUCTO'].str.contains('Diesel 2'))]
 Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOLINA REGULAR", 'COD_PROD'] = 46
 Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOLINA PREMIUM", 'COD_PROD'] = 45
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOLINA 90", 'COD_PROD'] = 46
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOLINA 95", 'COD_PROD'] = 45
 Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOHOL REGULAR", 'COD_PROD'] = 37
 Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOHOL PREMIUM", 'COD_PROD'] = 36
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOHOL 90", 'COD_PROD'] = 37
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOHOL 95", 'COD_PROD'] = 36
 Precios_Mayoristas.loc[(Precios_Mayoristas.PRODUCTO=="Cilindros de 10 Kg de GLP") | (Precios_Mayoristas.PRODUCTO.str.contains("GLP-E")), 'COD_PROD'] = 47
 Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO.str.contains("GLP-G"), 'COD_PROD'] = 48
 Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO.str.contains("DIESEL B5 UV S-50"), 'COD_PROD'] = 28
@@ -70,7 +76,9 @@ Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Diesel B5 UV", 'COD_PROD'] 
 Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Diesel B5 S-50 UV", 'COD_PROD'] = 28
 Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Diesel B5 UV", 'COD_PROD'] = 19
 Precios_Mayoristas.rename(columns={"PRODUCTO": "Combustible"},inplace=True)
-Precios_Mayoristas.to_csv(ruta4 + DF_petroperu, index=False,encoding="utf-8",sep=";")
+Precios_Mayoristas.Combustible.value_counts()
+Precios_Mayoristas.COD_PROD.value_counts()
+Precios_Mayoristas.to_excel(ruta4 + DF_petroperu, index=False)
 
 # Separando
 d1 = pd.read_csv(ruta6+DF_fin,encoding='utf-8',sep=";")
