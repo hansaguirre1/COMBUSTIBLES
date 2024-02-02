@@ -34,7 +34,7 @@ with DAG(
         remoteRepository: RemoteRepository = container.remote_repository()
         mayoristaPetroperuRepository: MayoristaPetroperuRepository = container.petroperu_repository()
         
-        # remoteRepository.getDataPetroperu(url=url_petroperu)
+        remoteRepository.getDataPetroperu(url=url_petroperu)
         mayoristaPetroperuRepository.saveData()
     
     def processDataPreciosMayorista():
