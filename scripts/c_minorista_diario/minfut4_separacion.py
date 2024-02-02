@@ -13,6 +13,66 @@ os.chdir(os.getcwd())
 
 # Data
 print("separando")
+
+# Petroperú
+Precios_Mayoristas = pd.read_csv(ruta4 + DF_petroperu, encoding="utf-8",sep=";")
+Precios_Mayoristas.rename(columns={"Combustible": "PRODUCTO"},inplace=True)
+Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GASOHOL 95 PLUS","GASOHOL PREMIUM")
+Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GASOHOL 90 PLUS","GASOHOL REGULAR")
+Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GOH95","GASOHOL PREMIUM")
+Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GOH90","GASOHOL REGULAR")
+Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GASOLINA 90","GASOLINA REGULAR")
+Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GASOLINA 95","GASOLINA PREMIUM")
+Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("G90","GASOLINA REGULAR")
+Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("G95","GASOLINA PREMIUM")
+Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("'Cilindros de 10 Kg de GLP","GLP - E")
+Precios_Mayoristas = Precios_Mayoristas[~(Precios_Mayoristas['PRODUCTO'].str.contains('Cilindros de 5 Kg de GL')) &
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('ASFALTO'))&
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('PETRÓLEO'))&
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('CEMENTO'))&
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('OIL'))&
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('HEXANO'))&
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('Cilindros de 45 Kg de GLP'))&
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('Cilindros de 15 Kg de GLP'))&
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('Cilindros de 3 Kg de GLP'))&
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('GLP - E'))&
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('MARINO'))&
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('TURBO'))&
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('IFO - 380 EXPORT'))&
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('PENTANO'))&
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('BREA'))&
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOLINA 84'))&
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOHOL 84 PLUS'))&
+                                        ~(Precios_Mayoristas['PRODUCTO']=='DIESEL B5')&
+                                        ~(Precios_Mayoristas['PRODUCTO']=='DIESEL B5 GE')&
+                                        ~(Precios_Mayoristas['PRODUCTO']=="Diesel B5 S-50")&
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOLINA 97'))&  
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOHOL 97 PLUS'))&  
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOLINA 98 BA'))& 
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOHOL 98 PLUS'))&  
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('Diesel B5 S-50 GE'))&                                                                                
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('SOLVENTE'))&  
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOLINA 100 LL'))&  
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('GASOLINA 98'))&  
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('CGN SOLVENTE'))&  
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('DIESEL 2'))& 
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('PRODUCTO'))&
+                                        ~(Precios_Mayoristas['PRODUCTO'].str.contains('Diesel 2'))]
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOLINA REGULAR", 'COD_PROD'] = 46
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOLINA PREMIUM", 'COD_PROD'] = 45
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOHOL REGULAR", 'COD_PROD'] = 37
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOHOL PREMIUM", 'COD_PROD'] = 36
+Precios_Mayoristas.loc[(Precios_Mayoristas.PRODUCTO=="Cilindros de 10 Kg de GLP") | (Precios_Mayoristas.PRODUCTO.str.contains("GLP-E")), 'COD_PROD'] = 47
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO.str.contains("GLP-G"), 'COD_PROD'] = 48
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO.str.contains("DIESEL B5 UV S-50"), 'COD_PROD'] = 28
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="DIESEL B5 UV", 'COD_PROD'] = 19
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Diesel B5 UV", 'COD_PROD'] = 19
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Diesel B5 S-50 UV", 'COD_PROD'] = 28
+Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Diesel B5 UV", 'COD_PROD'] = 19
+Precios_Mayoristas.COD_PROD.value_counts()
+Precios_Mayoristas.to_csv(ruta4 + DF_petroperu, index=False,encoding="utf-8",sep=";")
+
+# Separando
 d1 = pd.read_csv(ruta6+DF_fin,encoding='utf-8',sep=";")
 d1 = d1.dropna(subset=["ID_DIR","fecha_stata","COD_PROD","PRECIOVENTA"])
 #d1["ID_fin"] = d1["ID_DIR"].astype(str) + "-" + d1["COD_PROD"].astype(str) + "-" + d1["fecha_stata"]
