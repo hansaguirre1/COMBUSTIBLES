@@ -49,7 +49,7 @@ class DbDatasourceImpl(DbDatasource):
                 if not results:
                     plantaModel = PlantaModel(
                         id = hash_id,
-                        planta = planta_name,
+                        planta = planta_name.lower().strip(),
                     )
                     session.add(plantaModel)
                 else:
@@ -70,13 +70,13 @@ class DbDatasourceImpl(DbDatasource):
                 
             planta_data = session.query(PlantaModel).all()
             for plantaFor in planta_data:
-                nomPlanta = self.convertOnlyLettersAndNumbers(plantaFor.planta)
+                nomPlanta = plantaFor.planta
                 planta_dict[nomPlanta] = plantaFor.id
                 
             mayorista_data_historic = session.query(PricesMayoristasPetroperuModel).all()
             
             if(len(mayorista_data_historic) == 0):
-                print('Adding historic data ProductoModel')
+                print('Adding historic data PricesMayoristasPetroperuModel')
                 
                 data_existente = pd.read_csv("data/processed/Petroperu_Lista.csv", sep=';')
                 for index, row in data_existente.iterrows():
@@ -86,17 +86,17 @@ class DbDatasourceImpl(DbDatasource):
                     fecha = row.get('Fecha', '')
                     
                     combustibleOnlyLetterNumber = self.convertOnlyLettersAndNumbers(combustible)
-                    plantaOnlyLetterNumber = self.convertOnlyLettersAndNumbers(planta)
                     # plantaDb= session.query(PlantaModel).filter(PlantaModel.planta == planta).first()
                     
-                    plantaId= planta_dict.get(plantaOnlyLetterNumber, '')
+                    plantaId= planta_dict.get(planta.lower().strip(), '')
+                    
                     combustibleId= product_dict.get(combustibleOnlyLetterNumber, 0)
                     if(combustibleId == 0):
-                        print(f'No encontrado {combustibleOnlyLetterNumber}')
                         datos_homogeneizado = self.homogenizar_datos(combustible)
-                        combustibleOnlyLetterNumber = self.convertOnlyLettersAndNumbers( datos_homogeneizado)
+                        combustibleOnlyLetterNumber = self.convertOnlyLettersAndNumbers(datos_homogeneizado)
                         combustibleId= product_dict.get(combustibleOnlyLetterNumber, 0)
-                        
+                        if(combustibleId == 0):
+                            print(f'No encontrado {datos_homogeneizado}')
                     if(combustibleId == 0):
                         newProductsList.append(combustible)
                     
@@ -140,7 +140,7 @@ class DbDatasourceImpl(DbDatasource):
                 plantaOnlyLetterNumber = self.convertOnlyLettersAndNumbers(planta)
                 
                 # plantaDb= session.query(PlantaModel).filter(PlantaModel.planta == planta).first()
-                plantaId= planta_dict.get(plantaOnlyLetterNumber, '')
+                plantaId= planta_dict.get(planta.lower().strip(), '')
                 
                 combustibleId= product_dict.get(combustibleOnlyLetterNumber, 0)
                 if(combustibleId == 0):
@@ -672,9 +672,7 @@ class DbDatasourceImpl(DbDatasource):
     def convertOnlyLettersAndNumbers(self, value: str) -> str: 
         
         if not isinstance(value, str):
-            return ''
-        if(value == ''):
-            return ''
+            return value
         newValue = self.quitar_tildes(value).strip().lower()
         newValue = re.sub(r'[^a-zA-Z0-9]', '', newValue)
         
@@ -733,9 +731,18 @@ class DbDatasourceImpl(DbDatasource):
             "Gasohol98": "GASOHOL 98 PLUS",
             "DieselB5UVS-50": "Diesel B5 S-50 UV",
             "DieselB5UVS‐50": "Diesel B5 S-50 UV",
+            
+            "Gasohol 84": "GASOHOL 84 PLUS",
+            "Gasohol 90": "GASOHOL REGULAR",
+            "Gasohol 95": "GASOHOL PREMIUM",
+            "Gasohol 97": "GASOHOL 97 PLUS",
+            "Petróleo Industrial 500": "PETROLEO INDUSTRIAL Nº 500",
+            "Diesel B5 UV S-50": "Diesel B5 S-50 UV",
+            "Petróleo Industrial 6 G.E.": "PETROLEO INDUSTRIAL Nº 6 GE",
+            "Petróleo Industrial 6 G.E.": "PETROLEO INDUSTRIAL Nº 6 GE",
         }
 
-        return conversiones.get(dato, None)
+        return conversiones.get(dato, dato)
     
 
     def addNewProduct(self, newProductsList: List[str]):
