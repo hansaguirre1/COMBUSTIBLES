@@ -66,6 +66,62 @@ class DbDatasourceImpl(DbDatasource):
             for product in product_data:
                 nomProd = self.convertOnlyLettersAndNumbers(product.nom_prod)
                 product_dict[nomProd] = int(product.id)
+                
+            mayorista_data_historic = session.query(PricesMayoristasPetroperuModel).all()
+            
+            if(len(mayorista_data_historic) == 0):
+                print('Adding historic data ProductoModel')
+                
+                data_existente = pd.read_csv("data/processed/Petroperu_Lista.csv", sep=';')
+                for index, row in data_existente.iterrows():
+                    precio_con_impuesto = row.get('Precios', '')
+                    combustible = row.get('Combustible', '')
+                    planta = row.get('PLANTAS', '')
+                    fecha = row.get('Fecha', '')
+                    
+                    combustibleOnlyLetterNumber = self.convertOnlyLettersAndNumbers(combustible)
+                    plantaDb= session.query(PlantaModel).filter(PlantaModel.planta == planta).first()
+                    combustibleId= product_dict.get(combustibleOnlyLetterNumber, 0)
+                    if(combustibleId == 0):
+                        datos_homogeneizado = self.homogenizar_datos(combustible)
+                        combustibleOnlyLetterNumber = self.convertOnlyLettersAndNumbers( datos_homogeneizado)
+                        combustibleId= product_dict.get(combustibleOnlyLetterNumber, 0)
+                        
+                    if(combustibleId == 0):
+                        newProductsList.append(combustible)
+                    plantaId = plantaDb.id if plantaDb else 0
+                    
+                    precio_con_impuesto = str(precio_con_impuesto) if not pd.isna(precio_con_impuesto) else None
+                    fecha = str(fecha) if not pd.isna(fecha) else None
+                    
+                    campos = [
+                        str(precio_con_impuesto),
+                        str(combustible),
+                        str(planta),
+                        str(fecha),
+                    ]
+                            
+                    cadena_unica = '|'.join(campos)
+
+                    hash_id = hashlib.sha256(cadena_unica.encode()).hexdigest()
+                    
+                    results = session.query(PricesMayoristasPetroperuModel).get(hash_id)
+                    
+                    if not results:
+                        petroperuEntity = PricesMayoristasPetroperuModel(
+                            id = hash_id,
+                            precio_con_impuesto = precio_con_impuesto,
+                            fecha = fecha,
+                            producto_id = combustibleId,
+                            planta_id = plantaId
+                        )
+                        session.add(petroperuEntity)
+                    else:
+                        results.updated_at = datetime.now()
+                    session.commit()
+            
+        with self.session_factory() as session:
+            
 
             for index, row in petroperuDataframe.iterrows():
                 precio_con_impuesto = row.get('Precios', '')
@@ -231,6 +287,50 @@ class DbDatasourceImpl(DbDatasource):
         return pd.DataFrame(relapasaListToSaveCsv)
     
     def saveMarcadores(self, marcadoresDataframe: pd.DataFrame):
+        with self.session_factory() as session:
+            data_historic = session.query(MarcadorModel).all()
+            
+            if(len(data_historic) == 0):
+                print('Adding historic data marcadores')
+                data_historic_csv = pd.read_csv("data/processed/marcadores.csv")
+                data_historic_csv["Fecha"] = pd.to_datetime(data_historic_csv["Fecha"], format="%Y-%m-%d")
+                for index, row in marcadoresDataframe.iterrows():
+                    tipo_cambio = row.get('TC', '')
+                    wti = row.get('WTI', '')
+                    mont_belvieu = row.get('MontBelvieu', '')
+                    fecha = row.get('Fecha', '')
+                    
+                    tipo_cambio = str(tipo_cambio) if not pd.isna(tipo_cambio) else None
+                    wti = str(wti) if not pd.isna(wti) else None
+                    mont_belvieu = str(mont_belvieu) if not pd.isna(mont_belvieu) else None
+                    fecha = str(fecha) if not pd.isna(fecha) else None
+                    
+                    campos = [
+                        str(tipo_cambio),
+                        str(wti),
+                        str(mont_belvieu),
+                        str(fecha),
+                    ]
+                            
+                    cadena_unica = '|'.join(campos)
+
+                    hash_id = hashlib.sha256(cadena_unica.encode()).hexdigest()
+                    
+                    results = session.query(MarcadorModel).get(hash_id)
+                    
+                    if not results:
+                        marcadorModel = MarcadorModel(
+                            id = hash_id,
+                            tipo_cambio = tipo_cambio,
+                            wti = wti,
+                            mont_belvieu = mont_belvieu,
+                            fecha = fecha,
+                        )
+                        session.add(marcadorModel)
+                    else:
+                        results.updated_at = datetime.now()
+                    session.commit()
+        
         with self.session_factory() as session:
             for index, row in marcadoresDataframe.iterrows():
                 tipo_cambio = row.get('TC', '')
