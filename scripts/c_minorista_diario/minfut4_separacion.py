@@ -113,6 +113,8 @@ d1[["COD_PROD","fecha_stata","ID_DIR","PRECIOVENTA","promedio","conteo"]]
 # d1["markup_mm"] = resultado_final["Diferencia"]
 d1.drop(["promedio","conteo"],axis=1,inplace=True)
 #d1p = d1.iloc[:10000,:]
+for i in [3131,6574,7314,6986]:
+    d1 = d1[d1['ID_DIR'] != i]
 d1.to_csv(ruta4 + DF_fin2, index=False, encoding="utf-8", sep=";")
 print("fin")
 
