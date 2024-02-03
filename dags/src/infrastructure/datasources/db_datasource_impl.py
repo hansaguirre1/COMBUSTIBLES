@@ -70,7 +70,7 @@ class DbDatasourceImpl(DbDatasource):
                 
             planta_data = session.query(PlantaModel).all()
             for plantaFor in planta_data:
-                nomPlanta = plantaFor.planta
+                nomPlanta = self.convertOnlyLettersAndNumbers(plantaFor.planta)
                 planta_dict[nomPlanta] = plantaFor.id
                 
             mayorista_data_historic = session.query(PricesMayoristasPetroperuModel).all()
