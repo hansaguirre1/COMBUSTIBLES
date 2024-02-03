@@ -49,7 +49,7 @@ class DbDatasourceImpl(DbDatasource):
                 if not results:
                     plantaModel = PlantaModel(
                         id = hash_id,
-                        planta = planta_name.lower().strip(),
+                        planta = planta_name,
                     )
                     session.add(plantaModel)
                 else:
@@ -86,9 +86,11 @@ class DbDatasourceImpl(DbDatasource):
                     fecha = row.get('Fecha', '')
                     
                     combustibleOnlyLetterNumber = self.convertOnlyLettersAndNumbers(combustible)
+                    plantaOnlyLetterNumber = self.convertOnlyLettersAndNumbers(planta)
+                    
                     # plantaDb= session.query(PlantaModel).filter(PlantaModel.planta == planta).first()
                     
-                    plantaId= planta_dict.get(planta.lower().strip(), '')
+                    plantaId= planta_dict.get(plantaOnlyLetterNumber, '')
                     
                     combustibleId= product_dict.get(combustibleOnlyLetterNumber, 0)
                     if(combustibleId == 0):
@@ -140,7 +142,7 @@ class DbDatasourceImpl(DbDatasource):
                 plantaOnlyLetterNumber = self.convertOnlyLettersAndNumbers(planta)
                 
                 # plantaDb= session.query(PlantaModel).filter(PlantaModel.planta == planta).first()
-                plantaId= planta_dict.get(planta.lower().strip(), '')
+                plantaId= planta_dict.get(plantaOnlyLetterNumber, '')
                 
                 combustibleId= product_dict.get(combustibleOnlyLetterNumber, 0)
                 if(combustibleId == 0):
