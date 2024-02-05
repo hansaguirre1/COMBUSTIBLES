@@ -20,13 +20,13 @@ echo Proceso georderenciación
 echo Ejecutando: "dis3_distancias.py"
 python ".\b_mayoristas y merge\dis3_distancias.py"
 
-echo #merge mayorista minorista
+echo merge mayorista minorista
 
 echo Ejecutando: "min4_A2_merge diario copy.py"
 python ".\c_minorista_diario\min4_A2_merge diario copy.py"
 
 
-echo separación en tablñas independientes
+echo tratamiento de Petroperu, identificación de combustibles validos y eliminación de missing 
 
 echo Ejecutando: "minfut4_separacion.py"
 python ".\c_minorista_diario\minfut4_separacion.py"
