@@ -164,6 +164,8 @@ d = d.strftime("%Y-%m-%d")
 d = pd.to_datetime(d)
 fecha_manual = pd.to_datetime(datetime.now().date() - timedelta(days=1))
 diferencia_en_dias = (fecha_manual - d).days
+
+
 if len(arch)!=diferencia_en_dias:
     print("=======================================================> ¡ERROR: FALTA ALGÚN ARCHIVO DIARIO!!!!!!!!!!!!!!!!!!!!!!")
 
