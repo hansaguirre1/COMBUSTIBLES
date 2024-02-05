@@ -156,28 +156,7 @@ class FileDatasourceImpl(FileDatasource):
         data_final.to_csv("data/processed/marcadores.csv", index=False)
         
     def processMin0_A2_tablas_relacionales(self) -> pd.DataFrame:
-        # t = datetime.now()
-        # dateStr = t.strftime('%d-%m-%Y')
-        # print("Archivo diario")
-        # datax = pd.read_csv(ruta4 + BASE_DLC,encoding="utf-8",sep=";")
-        
-        # pathExcel = f'data/raw/precios_minoristas/precios_combustibles_minorista_{dateStr}.xlsx'
-        # ex1=pd.read_excel(pathExcel,sheet_name="GLP_EVP_PEGL_LVGL_COM_PROD_IMP",skiprows=3)
-        # ex1=limpiezaMinorista(ex1)
-        # ex2=pd.read_excel(pathExcel,sheet_name="LIQ_EVP_DMAY_CCA_CCE",skiprows=3)
-        # ex2=limpiezaMinorista(ex2)
-        # data = pd.concat([ex1, ex2], ignore_index=True)
-        # df_ubi = pd.read_csv(ruta4 + DF_ubi, encoding='utf-8', sep=";")
-        # data = limpiezaMasivaMinorista(data, df_ubi)
-        # os.remove(pathExcel)
-        # print("excel eliminado.")
-        
-        # data_concat_f = pd.concat([datax, data], ignore_index=True)
-        # data_concat_f.to_csv(ruta4 + BASE_DLC, index=False, encoding="utf-8", sep=";")
-
-
-        # return data_concat_f
-    
+           
 
         # Verificando si es archivo diario o mensual
         archivos2 = os.listdir(ruta2)
@@ -210,7 +189,15 @@ class FileDatasourceImpl(FileDatasource):
         print(f'len(arch) {len(arch)}')
         if len(arch)!=diferencia_en_dias:
             print("ERROR: falta algún archivo diario")
+            print("=======================================================> ¡ERROR: FALTA ALGÚN ARCHIVO DIARIO!!!!!!!!!!!!!!!!!!!!!!")
+
+            print(f'La última actualización fue el: {d}')
+            for día in arch:
+                print(día)
+            print(f'El día a actualizar es: {fecha_manual}')
             raise ValueError("ERROR: falta algún archivo diario")
+        else:
+            print("No faltan archivos días")
 
         if len(arch)>=1:
             print("Archivo diario")
@@ -1033,11 +1020,14 @@ class FileDatasourceImpl(FileDatasource):
         #d1.head()
         d1.to_csv(ruta6 + DF_fin,index=False,encoding='utf-8',sep=";")
     def minfut4_processSeparacion(self):
+        # Data
         print("separando")
 
         # Petroperú
-        Precios_Mayoristas = pd.read_csv(ruta4 + DF_petroperu, encoding="utf-8",sep=";")
+        DF_petroperu="Petroperu_Lista.csv"
+        Precios_Mayoristas = pd.read_csv(ruta4 + DF_petroperu, encoding="utf-8", sep=";")
         Precios_Mayoristas.rename(columns={"Combustible": "PRODUCTO"},inplace=True)
+        Precios_Mayoristas["PRODUCTO"]=Precios_Mayoristas["PRODUCTO"].str.upper()
         Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GASOHOL 95 PLUS","GASOHOL PREMIUM")
         Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GASOHOL 90 PLUS","GASOHOL REGULAR")
         Precios_Mayoristas['PRODUCTO']=Precios_Mayoristas['PRODUCTO'].str.replace("GOH95","GASOHOL PREMIUM")
@@ -1079,10 +1069,16 @@ class FileDatasourceImpl(FileDatasource):
                                                 ~(Precios_Mayoristas['PRODUCTO'].str.contains('DIESEL 2'))& 
                                                 ~(Precios_Mayoristas['PRODUCTO'].str.contains('PRODUCTO'))&
                                                 ~(Precios_Mayoristas['PRODUCTO'].str.contains('Diesel 2'))]
+
+        #Recodificar productos
         Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOLINA REGULAR", 'COD_PROD'] = 46
         Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOLINA PREMIUM", 'COD_PROD'] = 45
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOLINA 90", 'COD_PROD'] = 46
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOLINA 95", 'COD_PROD'] = 45
         Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOHOL REGULAR", 'COD_PROD'] = 37
         Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOHOL PREMIUM", 'COD_PROD'] = 36
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOHOL 90", 'COD_PROD'] = 37
+        Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="GASOHOL 95", 'COD_PROD'] = 36
         Precios_Mayoristas.loc[(Precios_Mayoristas.PRODUCTO=="Cilindros de 10 Kg de GLP") | (Precios_Mayoristas.PRODUCTO.str.contains("GLP-E")), 'COD_PROD'] = 47
         Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO.str.contains("GLP-G"), 'COD_PROD'] = 48
         Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO.str.contains("DIESEL B5 UV S-50"), 'COD_PROD'] = 28
@@ -1090,9 +1086,13 @@ class FileDatasourceImpl(FileDatasource):
         Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Diesel B5 UV", 'COD_PROD'] = 19
         Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Diesel B5 S-50 UV", 'COD_PROD'] = 28
         Precios_Mayoristas.loc[Precios_Mayoristas.PRODUCTO=="Diesel B5 UV", 'COD_PROD'] = 19
+
+
         Precios_Mayoristas.rename(columns={"PRODUCTO": "Combustible"},inplace=True)
-        Precios_Mayoristas.to_csv(ruta4 + DF_petroperu, index=False,encoding="utf-8",sep=";")
-        
+        Precios_Mayoristas.Combustible.value_counts()
+        Precios_Mayoristas.COD_PROD.value_counts()
+        Precios_Mayoristas.to_csv(ruta4 + DF_petroperu, encoding="utf-8", sep=";")
+
         # Separando
         d1 = pd.read_csv(ruta6+DF_fin,encoding='utf-8',sep=";")
         d1 = d1.dropna(subset=["ID_DIR","fecha_stata","COD_PROD","PRECIOVENTA"])
@@ -1106,8 +1106,69 @@ class FileDatasourceImpl(FileDatasource):
         validos.loc[(validos.DEPARTAMENTO=="LIMA") | (validos.DEPARTAMENTO=="CALLAO"), "DEPARTAMENTO"] = "LIMA Y CALLAO"
         validos=validos.fillna(0)
         validos = validos.groupby(['DEPARTAMENTO', 'COD_PROD'])['ok'].mean().reset_index()
-        validos.loc[validos.ok>0.9,"mirar"]=1
+        #validos.loc[validos.ok>0.9,"mirar"]=1
+        validos["mirar"]=1
+        validos.loc[(validos["DEPARTAMENTO"]=="AMAZONAS") & (validos["COD_PROD"]==19),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="ANCASH") & (validos["COD_PROD"]==19),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="ANCASH") & (validos["COD_PROD"]==45),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="ANCASH") & (validos["COD_PROD"]==46),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="APURIMAC") & (validos["COD_PROD"]==45),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="APURIMAC") & (validos["COD_PROD"]==46),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="AREQUIPA") & (validos["COD_PROD"]==45),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="AREQUIPA") & (validos["COD_PROD"]==46),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="AYACUCHO") & (validos["COD_PROD"]==45),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="AYACUCHO") & (validos["COD_PROD"]==46),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="CAJAMARCA") & (validos["COD_PROD"]==19),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="CAJAMARCA") & (validos["COD_PROD"]==45),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="CAJAMARCA") & (validos["COD_PROD"]==46),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="LIMA Y CALLAO") & (validos["COD_PROD"]==19),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="LIMA Y CALLAO") & (validos["COD_PROD"]==45),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="LIMA Y CALLAO") & (validos["COD_PROD"]==46),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="CUSCO") & (validos["COD_PROD"]==19),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="CUSCO") & (validos["COD_PROD"]==45),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="CUSCO") & (validos["COD_PROD"]==46),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="HUANCAVELICA") & (validos["COD_PROD"]==45),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="HUANCAVELICA") & (validos["COD_PROD"]==46),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="HUANUCO") & (validos["COD_PROD"]==19),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="HUANUCO") & (validos["COD_PROD"]==45),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="HUANUCO") & (validos["COD_PROD"]==46),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="ICA") & (validos["COD_PROD"]==19),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="ICA") & (validos["COD_PROD"]==45),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="ICA") & (validos["COD_PROD"]==46),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="JUNIN") & (validos["COD_PROD"]==19),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="JUNIN") & (validos["COD_PROD"]==45),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="JUNIN") & (validos["COD_PROD"]==46),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="LA LIBERTAD") & (validos["COD_PROD"]==19),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="LA LIBERTAD") & (validos["COD_PROD"]==45),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="LA LIBERTAD") & (validos["COD_PROD"]==46),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="LAMBAYEQUE") & (validos["COD_PROD"]==19),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="LAMBAYEQUE") & (validos["COD_PROD"]==45),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="LAMBAYEQUE") & (validos["COD_PROD"]==46),'mirar']=0
         validos.loc[(validos["DEPARTAMENTO"]=="LORETO") & (validos["COD_PROD"]==28),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="LORETO") & (validos["COD_PROD"]==36),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="LORETO") & (validos["COD_PROD"]==48),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="MADRE DE DIOS") & (validos["COD_PROD"]==36),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="MADRE DE DIOS") & (validos["COD_PROD"]==48),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="MOQUEGUA") & (validos["COD_PROD"]==19),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="MOQUEGUA") & (validos["COD_PROD"]==45),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="MOQUEGUA") & (validos["COD_PROD"]==46),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="PASCO") & (validos["COD_PROD"]==19),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="PASCO") & (validos["COD_PROD"]==45),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="PASCO") & (validos["COD_PROD"]==46),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="PIURA") & (validos["COD_PROD"]==19),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="PIURA") & (validos["COD_PROD"]==45),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="PIURA") & (validos["COD_PROD"]==46),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="PUNO") & (validos["COD_PROD"]==28),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="PUNO") & (validos["COD_PROD"]==36),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="PUNO") & (validos["COD_PROD"]==46),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="SAN MARTIN") & (validos["COD_PROD"]==19),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="TUMBES") & (validos["COD_PROD"]==19),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="TUMBES") & (validos["COD_PROD"]==45),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="TUMBES") & (validos["COD_PROD"]==46),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="UCAYALI") & (validos["COD_PROD"]==28),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="UCAYALI") & (validos["COD_PROD"]==36),'mirar']=0
+        validos.loc[(validos["DEPARTAMENTO"]=="UCAYALI") & (validos["COD_PROD"]==37),'mirar']=0
+
         #validos.loc[(validos["DEPARTAMENTO"]=="LIMA Y CALLAO") & (validos["COD_PROD"]=46),'mirar']=0
         d1 = d1.merge(validos[["DEPARTAMENTO","COD_PROD","mirar"]],how="left",on=["DEPARTAMENTO","COD_PROD"])
         d1['promedio'] = d1.groupby(['COD_PROD', 'fecha_stata'])['PRECIOVENTA'].transform('mean')

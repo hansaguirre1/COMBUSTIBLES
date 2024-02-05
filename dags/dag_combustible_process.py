@@ -2,7 +2,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.empty import EmptyOperator
 from datetime import datetime, timedelta
-
+from airflow.sensors.external_task import ExternalTaskSensor
 
 
 with DAG(
@@ -19,7 +19,7 @@ with DAG(
            
         },
         description='Digemid',
-        schedule_interval="0 9 * * *",
+        schedule_interval="0 10 * * 1",
         start_date=datetime(2021, 1, 1, 10, 15),
         catchup=False,
 ) as dag:
@@ -112,7 +112,7 @@ with DAG(
         remoteRepository: RemoteRepository = container.remote_repository()
         minoristaRepository: MinoristaRepository = container.minorista_repository()
         
-        remoteRepository.getDataMinorista(url=url_signeblock)
+        # remoteRepository.getDataMinorista(url=url_signeblock)
         minoristaRepository.saveDataBase()
     
     def processDataLatLngMayorista():
@@ -145,6 +145,12 @@ with DAG(
         container = Container()
         db = container.db()
         db.create_database()
+    
+    listening_process = ExternalTaskSensor(
+        task_id='listening_process',
+        external_dag_id="Descarga-data-minorista-diario",
+        dag=dag,
+        )
     
     start_process = PythonOperator(
         task_id='start-process',
@@ -209,4 +215,4 @@ with DAG(
     end_process = EmptyOperator(task_id='end-process-data')
     
     # start_process >> remote_data_petroperu >> remote_data_marcadores >> remote_data_osinergmin >> remote_data_signeblock >> end_process
-    start_process>> process_data_minoristas >> process_data_combustibles_validos >> process_data_precios_mayorista_petroperu >> process_data_marcadores >> process_data_ubigeo >> process_data_osinergmin_precios_referencia >> process_precio_mayorista   >> process_lat_lng_mayorista_task >> end_process
+    listening_process >> start_process>> process_data_minoristas >> process_data_combustibles_validos >> process_data_precios_mayorista_petroperu >> process_data_marcadores >> process_data_ubigeo >> process_data_osinergmin_precios_referencia >> process_precio_mayorista   >> process_lat_lng_mayorista_task >> end_process

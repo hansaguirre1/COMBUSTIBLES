@@ -11,7 +11,7 @@ from src.infrastructure.repositories.remote_repository_impl import RemoteReposit
 from src.infrastructure.datasources.remote_datasource_impl import RemoteDatasourceImpl
 from src.infrastructure.datasources.db_datasource_impl import DbDatasourceImpl
 from src.infrastructure.datasources.file_datasource_impl import FileDatasourceImpl
-from src.infrastructure.repositories.petroperu_repository_impl import MayoristaPetroperuRepositoryImpl
+from src.infrastructure.repositories.mayorista_petroperu_repository_impl import MayoristaPetroperuRepositoryImpl
 from src.config.db_config import Database
 from dependency_injector import containers, providers
 

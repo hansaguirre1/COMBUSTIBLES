@@ -8,7 +8,7 @@ RUN apt-get update && \
 
 # Set JAVA_HOME environment variable
 # ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64 # cuando es para computadoras con chip intel o amd usar amd64
-ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-arm64
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
 
 USER airflow
 
