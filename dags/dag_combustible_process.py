@@ -146,11 +146,11 @@ with DAG(
         db = container.db()
         db.create_database()
     
-    listening_process = ExternalTaskSensor(
-        task_id='listening_process',
-        external_dag_id="Descarga-data-minorista-diario",
-        dag=dag,
-        )
+    # listening_process = ExternalTaskSensor(
+    #     task_id='listening_process',
+    #     external_dag_id="Descarga-data-minorista-diario",
+    #     dag=dag,
+    #     )
     
     start_process = PythonOperator(
         task_id='start-process',
@@ -215,4 +215,4 @@ with DAG(
     end_process = EmptyOperator(task_id='end-process-data')
     
     # start_process >> remote_data_petroperu >> remote_data_marcadores >> remote_data_osinergmin >> remote_data_signeblock >> end_process
-    listening_process >> start_process>> process_data_minoristas >> process_data_combustibles_validos >> process_data_precios_mayorista_petroperu >> process_data_marcadores >> process_data_ubigeo >> process_data_osinergmin_precios_referencia >> process_precio_mayorista   >> process_lat_lng_mayorista_task >> end_process
+    start_process>> process_data_minoristas >> process_data_combustibles_validos >> process_data_precios_mayorista_petroperu >> process_data_marcadores >> process_data_ubigeo >> process_data_osinergmin_precios_referencia >> process_precio_mayorista   >> process_lat_lng_mayorista_task >> end_process
