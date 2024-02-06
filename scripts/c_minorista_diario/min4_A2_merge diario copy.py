@@ -22,7 +22,7 @@ os.chdir(os.getcwd())
 
 # Finally
 print("Ultimo")
-d1 = pd.read_csv(ruta6 + DF_fin, encoding="utf-8", sep=";")
+d1 = pd.read_csv(ruta6 + DF_fin, encoding="utf-8", sep=";", )
 d1['fecha_stata'] = pd.to_datetime(d1['fecha_stata'], infer_datetime_format=True, errors='coerce')
 #d1=d1.drop(columns={"PRECIOVENTA_may"})
 df = pd.read_csv(ruta4 + DF_dir_may2,encoding='utf-8',sep=";")

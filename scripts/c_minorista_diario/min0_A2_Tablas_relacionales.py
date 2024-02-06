@@ -164,9 +164,19 @@ d = d.strftime("%Y-%m-%d")
 d = pd.to_datetime(d)
 fecha_manual = pd.to_datetime(datetime.now().date() - timedelta(days=1))
 diferencia_en_dias = (fecha_manual - d).days
+
+
 if len(arch)!=diferencia_en_dias:
-    print("ERROR: falta algún archivo diario")
-    error
+    print("=======================================================> ¡ERROR: FALTA ALGÚN ARCHIVO DIARIO!!!!!!!!!!!!!!!!!!!!!!")
+
+    print(f'La última actualización fue el: {d}')
+    for día in arch:
+        print(día)
+    print(f'El día a actualizar es: {fecha_manual}')
+else:
+    print("No faltan archivos días")
+   
+
 
 if len(arch)>=1:
     print("Archivo diario")
