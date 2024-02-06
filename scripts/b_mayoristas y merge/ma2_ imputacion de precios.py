@@ -21,6 +21,38 @@ df["RUC-prov"] = df["RUC"].astype(str)+"-"+df["PROVINCIA"]
 df.COD_PROD.value_counts()
 cod_prods = [ 46, 45, 37, 36, 47, 48, 28, 19]
 
+# Corrección de impuestos
+def corregir_impuestos(df, gasolina, isc):
+    condition=(df.PRODUCTO==gasolina) & (~(df.DEPARTAMENTO=="LORETO") | ~(df.DEPARTAMENTO=="MADRE DE DIOS"))
+
+    condition_2=(df.PRODUCTO==gasolina) & ((df.DEPARTAMENTO=="LORETO") | 
+                                            (df.DEPARTAMENTO=="MADRE DE DIOS"))
+    
+    if gasolina[:3]=="GAS":
+        df.loc[condition, "PRECIOVENTA"]=((df.loc[condition, "PRECIOVENTA"])/1.18-isc)/1.08  
+        df.loc[condition_2, "PRECIOVENTA"]=(df.loc[condition_2, "PRECIOVENTA"])/1.08
+
+    elif gasolina[:1]=="D":
+        df.loc[df.PRODUCTO==gasolina, "PRECIOVENTA"]=(df.loc[df.PRODUCTO==gasolina, "PRECIOVENTA"])/1.18-isc
+
+    elif gasolina[:3]=="GLP" or gasolina[:3]=="Cil":
+        df.loc[df.PRODUCTO==gasolina, "PRECIOVENTA"]=(df.loc[df.PRODUCTO==gasolina, "PRECIOVENTA"])/1.18
+    else:
+        pass
+
+    return df
+
+#aplicar correcciones
+
+df=corregir_impuestos(df,"GASOHOL PREMIUM", 1.13)
+df=corregir_impuestos(df,"GASOHOL REGULAR", 1.16)
+df=corregir_impuestos(df,"GASOLINA PREMIUM", 1.17)
+df=corregir_impuestos(df,"GASOLINA REGULAR", 1.21)
+df=corregir_impuestos(df,"Diesel B5 S-50 UV", 1.49)
+df=corregir_impuestos(df,"DIESEL B5 UV", 1.70)
+df=corregir_impuestos(df,"GLP - G", 0)
+df=corregir_impuestos(df,"Cilindros de 10 Kg de GLP", 0)
+
 #Completar precios y dias por producto
 for k in cod_prods:
     print(k)
