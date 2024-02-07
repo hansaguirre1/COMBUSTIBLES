@@ -53,6 +53,7 @@ df=corregir_impuestos(df,"DIESEL B5 UV", 1.70)
 df=corregir_impuestos(df,"GLP - G", 0)
 df=corregir_impuestos(df,"Cilindros de 10 Kg de GLP", 0)
 
+# df[["fecha_stata","PRECIOVENTA","PRODUCTO"]].to_csv("..\data\interim\prueba_2.csv", encoding="utf-8", sep=";")
 #Completar precios y dias por producto
 for k in cod_prods:
     print(k)
