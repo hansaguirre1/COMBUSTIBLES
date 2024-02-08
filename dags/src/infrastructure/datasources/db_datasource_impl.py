@@ -818,34 +818,16 @@ class DbDatasourceImpl(DbDatasource):
             
             for index, row in mmDataframe.iterrows():
                 
-                id_cod = row.get('ID_COD', '')
-                id_rs = row.get('ID_RS', '')
-                cod_act = row.get('COD_ACT', '')
-                id_dpd = row.get('ID_DPD', '')
-                direccion = row.get('DIRECCION', '')
-                lat = row.get('lat', '')
-                lon = row.get('lon', '')
-                ruc = row.get('RUC', '')
-                razonsocial_geo = row.get('RAZONSOCIAL_geo', '')
-                minorista = row.get('minorista', '')
-                id_dir = row.get('ID_DIR', '')
-                codigoosinerg2 = row.get('CODIGOOSINERG2', '')
-                cod_prod = row.get('COD_PROD', '')
                 ruc_prov = row.get('RUC-prov', '')
+                lat = row.get('latitude', '')
+                lon = row.get('longitude', '')
+                id_dir = row.get('ID_DIR', '')
+                cod_prod = row.get('COD_PROD', '')
                 
                 campos = [
-                    str(id_cod),
-                    str(id_rs),
-                    str(cod_act),
-                    str(id_dpd),
-                    str(direccion),
                     str(lat),
                     str(lon),
-                    str(ruc),
-                    str(razonsocial_geo),
-                    str(minorista),
                     str(id_dir),
-                    str(codigoosinerg2),
                     str(cod_prod),
                     str(ruc_prov),
                 ]
@@ -859,18 +841,9 @@ class DbDatasourceImpl(DbDatasource):
                 if not results:
                     mayMinModel = MayMinGeoModel(
                         id = hash_id,
-                        id_cod = id_cod,
-                        id_rs = id_rs,
-                        cod_act = cod_act,
-                        id_dpd = id_dpd,
-                        direccion = direccion,
                         lat = lat,
                         lon = lon,
-                        ruc = ruc,
-                        razonsocial_geo = razonsocial_geo,
-                        minorista = minorista,
                         id_dir = id_dir,
-                        codigoosinerg2 = codigoosinerg2,
                         cod_prod = cod_prod,
                         ruc_prov = ruc_prov,
                     )

@@ -705,7 +705,39 @@ class FileDatasourceImpl(FileDatasource):
         df["RUC-prov"] = df["RUC"].astype(str)+"-"+df["PROVINCIA"]
         df.COD_PROD.value_counts()
         cod_prods = [ 46, 45, 37, 36, 47, 48, 28, 19]
-        
+        # Quitar impuestos a los precios
+        def corregir_impuestos(df, gasolina, isc):
+            condition=(df.PRODUCTO==gasolina) & (~(df.DEPARTAMENTO=="LORETO") | ~(df.DEPARTAMENTO=="MADRE DE DIOS"))
+
+            condition_2=(df.PRODUCTO==gasolina) & ((df.DEPARTAMENTO=="LORETO") | 
+                                                    (df.DEPARTAMENTO=="MADRE DE DIOS"))
+            
+            if gasolina[:3]=="GAS":
+                df.loc[condition, "PRECIOVENTA"]=((df.loc[condition, "PRECIOVENTA"])/1.18-isc)/1.08  
+                df.loc[condition_2, "PRECIOVENTA"]=(df.loc[condition_2, "PRECIOVENTA"])/1.08
+
+            elif gasolina[:1]=="D":
+                df.loc[df.PRODUCTO==gasolina, "PRECIOVENTA"]=(df.loc[df.PRODUCTO==gasolina, "PRECIOVENTA"])/1.18-isc
+
+            elif gasolina[:3]=="GLP" or gasolina[:3]=="Cil":
+                df.loc[df.PRODUCTO==gasolina, "PRECIOVENTA"]=(df.loc[df.PRODUCTO==gasolina, "PRECIOVENTA"])/1.18
+            else:
+                pass
+
+            return df
+
+        #aplicar correcciones
+
+        df=corregir_impuestos(df,"GASOHOL PREMIUM", 1.13)
+        df=corregir_impuestos(df,"GASOHOL REGULAR", 1.16)
+        df=corregir_impuestos(df,"GASOLINA PREMIUM", 1.17)
+        df=corregir_impuestos(df,"GASOLINA REGULAR", 1.21)
+        df=corregir_impuestos(df,"Diesel B5 S-50 UV", 1.49)
+        df=corregir_impuestos(df,"DIESEL B5 UV", 1.70)
+        df=corregir_impuestos(df,"GLP - G", 0)
+        df=corregir_impuestos(df,"Cilindros de 10 Kg de GLP", 0)
+
+
         # test
         codigos_unicos = df['COD_PROD'].unique()
         print(codigos_unicos)
@@ -943,8 +975,8 @@ class FileDatasourceImpl(FileDatasource):
         #df = df.drop_duplicates(subset=["PROVINCIA","DEPARTAMENTO","RUC"])
         d2 = pd.read_csv(ruta7 + DF_may_fin,encoding='utf-8',sep=';')
         d2.rename(columns={"PRECIOVENTA": "PRECIOVENTA_may2"},inplace=True)
-        fecha_manual = '2024-01-26'
-        d2 = d2[d2['fecha_stata'] == fecha_manual]
+        #fecha_manual = '2024-01-26'
+        #d2 = d2[d2['fecha_stata'] == fecha_manual]
         dataframes_list = []
 
         # def process_k(k):
@@ -981,7 +1013,8 @@ class FileDatasourceImpl(FileDatasource):
                     d2_ = d2_.groupby(['fecha_stata'])["PRECIOVENTA_may2"].mean().reset_index()
                     d2_["ID_DIR"] = df_[j]
                     d2_["COD_PROD"] = k
-                return d2_
+                    result_list.append(d2_)
+                return pd.concat(result_list, ignore_index=True)
             except:
                 pass
 
@@ -1012,13 +1045,15 @@ class FileDatasourceImpl(FileDatasource):
         d1 = d1.merge(dfs, on=["COD_PROD","ID_DIR","fecha_stata"],how="left",indicator=True)
         d1._merge.value_counts()
         d1.drop(["_merge"],axis=1,inplace=True)
-        d1.loc[d1["fecha_stata"]==fecha_manual,"PRECIOVENTA_may"]=d1["PRECIOVENTA_may2"]
+        # d1.loc[d1["fecha_stata"]==fecha_manual,"PRECIOVENTA_may"]=d1["PRECIOVENTA_may2"]
+        d1["PRECIOVENTA_may"]=d1["PRECIOVENTA_may2"]
         d1.drop(["PRECIOVENTA_may2"],axis=1,inplace=True)
         #d1["RUC_mayorista"]=d1["RUC_mayorista"].astype(str).str.rstrip('.0')
         #print(d1.head())
         #d2.rename(columns={"RUC": "RUC_mayorista"},inplace=True)
         #d1.head()
         d1.to_csv(ruta6 + DF_fin,index=False,encoding='utf-8',sep=";")
+        
     def minfut4_processSeparacion(self):
         # Data
         print("separando")
