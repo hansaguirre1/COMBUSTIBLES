@@ -302,9 +302,15 @@ class DbDatasourceImpl(DbDatasource):
         with self.session_factory() as session:
             data_historic = session.query(MarcadorModel).all()
             
+# import pandas as pd
+# dir=os.getcwd()
+# dir
+# data_historic_csv = pd.read_csv(f"{dir}/data/processed/marcadores.csv", sep=";")
+# data_historic_csv["Fecha"] = pd.to_datetime(data_historic_csv["Fecha"], format="%Y-%m-%d")
+
             if(len(data_historic) == 0):
                 print('Adding historic data marcadores')
-                data_historic_csv = pd.read_csv("data/processed/marcadores.csv")
+                data_historic_csv = pd.read_csv("data/processed/marcadores.csv", sep=";")
                 data_historic_csv["Fecha"] = pd.to_datetime(data_historic_csv["Fecha"], format="%Y-%m-%d")
                 for index, row in marcadoresDataframe.iterrows():
                     tipo_cambio = row.get('TC', '')

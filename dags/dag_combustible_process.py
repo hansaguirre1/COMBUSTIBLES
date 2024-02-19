@@ -24,18 +24,7 @@ with DAG(
         catchup=False,
 ) as dag:
     
-    def processDataPreciosMayoristaPetroperu():
-        from src.injection.containers import Container
-        from src.domain.repositories.remote_repository import RemoteRepository
-        from src.domain.repositories.petroperu_repository import MayoristaPetroperuRepository
-        from src.config.get_env import url_petroperu
 
-        container = Container()
-        remoteRepository: RemoteRepository = container.remote_repository()
-        mayoristaPetroperuRepository: MayoristaPetroperuRepository = container.petroperu_repository()
-        
-        remoteRepository.getDataPetroperu(url=url_petroperu)
-        mayoristaPetroperuRepository.saveData()
     
     def processDataPreciosMayorista():
         from src.injection.containers import Container
@@ -48,34 +37,7 @@ with DAG(
         
         remoteRepository.m0_descarga_mayorista()
         preciosMayoristasRepository.saveDataMayoristas()
-        
-    def processDataCombustiblesValidos():
-        from src.injection.containers import Container
-        from src.domain.repositories.remote_repository import RemoteRepository
-        from src.domain.repositories.petroperu_repository import MayoristaPetroperuRepository
-        from src.domain.repositories.combustibles_validos_repository import CombustiblesValidosRepository
-        from src.config.get_env import url_petroperu
-
-        container = Container()
-        remoteRepository: RemoteRepository = container.remote_repository()
-        combustibleValidoRepository: CombustiblesValidosRepository = container.combustible_valido_repository()
-        
-        remoteRepository.cv0_getDataCombustiblesValidos(url = '')
-        combustibleValidoRepository.processDataCombustiblesValidos()
-    
-    def processDataMarcadores():
-        from src.config.get_env import url_bcrp, url_eia
-        from src.injection.containers import Container
-        from src.domain.repositories.remote_repository import RemoteRepository
-        from src.domain.repositories.marcadores_repository import MarcadoresRepository
-
-        container = Container()
-        remoteRepository: RemoteRepository = container.remote_repository()
-        marcadorRepository: MarcadoresRepository = container.marcador_repository()
-        
-        dfMarcadores = remoteRepository.getDataMarcadores(urlBcrp=url_bcrp, urlEia=url_eia)
-        marcadorRepository.saveData(df=dfMarcadores)
-    
+           
     
     def processDataUbigeo():
         from src.config.get_env import url_bcrp, url_eia
@@ -87,19 +49,6 @@ with DAG(
         
         ubigeoRepository.saveDataUbigeo()
     
-    
-    def processDataPreciosReferencialesOsinergmin():
-        from src.domain.repositories.remote_repository import RemoteRepository
-        from src.domain.repositories.referencia_repository import ReferenciaRepository
-
-        from src.config.get_env import url_osinergmin
-        from src.injection.containers import Container
-        
-        container = Container()
-        remoteRepository: RemoteRepository = container.remote_repository()
-        referenciaRepository: ReferenciaRepository = container.referencia_repository()
-        remoteRepository.getDataOsinergmin(url=url_osinergmin)
-        referenciaRepository.saveDataReferencia()
     
     def processDataMinoristas():
         from src.injection.containers import Container
@@ -169,30 +118,8 @@ with DAG(
         python_callable=processDataUbigeo,
         dag=dag,
         )
-    
-    process_data_combustibles_validos = PythonOperator(
-        task_id='process_data_combustibles_validos',
-        python_callable=processDataCombustiblesValidos,
-        dag=dag,
-        )
-    
-    process_data_precios_mayorista_petroperu = PythonOperator(
-        task_id='process_data_precios_mayorista_petroperu',
-        python_callable=processDataPreciosMayoristaPetroperu,
-        dag=dag,
-        )
-    
-    process_data_marcadores = PythonOperator(
-        task_id='process-data-marcadores',
-        python_callable=processDataMarcadores,
-        dag=dag,
-        )
-    
-    process_data_osinergmin_precios_referencia = PythonOperator(
-        task_id='process-data-osinergmin-referencia',
-        python_callable=processDataPreciosReferencialesOsinergmin,
-        dag=dag,
-        )
+
+
     
     process_precio_mayorista= PythonOperator(
         task_id='process_precio_mayorista',
@@ -215,4 +142,4 @@ with DAG(
     end_process = EmptyOperator(task_id='end-process-data')
     
     # start_process >> remote_data_petroperu >> remote_data_marcadores >> remote_data_osinergmin >> remote_data_signeblock >> end_process
-    start_process>> process_data_minoristas >> process_data_combustibles_validos >> process_data_precios_mayorista_petroperu >> process_data_marcadores >> process_data_ubigeo >> process_data_osinergmin_precios_referencia >> process_precio_mayorista   >> process_lat_lng_mayorista_task >> end_process
+    start_process>> process_data_minoristas >> process_data_ubigeo >> process_precio_mayorista   >> process_lat_lng_mayorista_task >> end_process

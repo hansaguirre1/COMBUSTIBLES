@@ -146,7 +146,7 @@ class FileDatasourceImpl(FileDatasource):
             nuevos_datos.to_excel(writer, sheet_name='Petroperu', index=False)
 
     def saveDataMarcadoresToCsv(self, df_combinado: pd.DataFrame):
-        data = pd.read_csv("data/processed/marcadores.csv")
+        data = pd.read_csv("data/processed/marcadores.csv", sep=",")
         data ["Fecha"] = pd.to_datetime(data["Fecha"], format="%Y-%m-%d")
 
         data_final = pd.concat([data, df_combinado], ignore_index=True)
@@ -159,6 +159,8 @@ class FileDatasourceImpl(FileDatasource):
            
 
         # Verificando si es archivo diario o mensual
+        # ruta2=r"F:\test-jc\COMBUSTIBLES\data\raw\precios_minoristas"
+        # import re
         archivos2 = os.listdir(ruta2)
         arch = [archivo for archivo in archivos2 if archivo.startswith("Diario") and archivo.endswith(".xlsx")]
 
@@ -809,8 +811,6 @@ class FileDatasourceImpl(FileDatasource):
         del df_concatenado
         
     def dis3_processDistances(self):
-
-            
         # Ejemplo de DataFrames df1 y df2 con características numéricas
         data2 = pd.read_csv(ruta3 + DF_georef_may, encoding="utf-8", sep=";")
         data2.drop_duplicates(subset=["RUC-prov"],inplace=True)
@@ -820,7 +820,6 @@ class FileDatasourceImpl(FileDatasource):
         data2["RUC"]=data2["RUC"].astype(str)
         data2.to_csv(ruta3 + DF_georef_may, index=False, encoding="utf-8", sep=";")
         data2_ = pd.read_csv(ruta7 + DF_may_fin,encoding='utf-8',sep=';')
-
         # Verificamos el producto
         data1 = pd.read_csv(ruta4 + DF_dir, encoding="utf-8", sep=";")
         data1 = data1.loc[data1["minorista"]==1]
@@ -853,18 +852,24 @@ class FileDatasourceImpl(FileDatasource):
                 d1d2 = pd.DataFrame(d1d2)
                 d1d2.index = data1__["ID_DIR"]
                 d1d2.columns = data2__["id"]
-                arr=d1d2.values.argsort(1)[:,:3]
+                arr=d1d2.values.argsort(1)[:,:5]
                 c1=[]
                 c2=[]
                 c3=[]
+                c4=[]
+                c5=[]
                 for i in range(len(arr)):
                     c1.append(d1d2.columns.tolist()[arr[i,0]])
                     c2.append(d1d2.columns.tolist()[arr[i,1]])
                     c3.append(d1d2.columns.tolist()[arr[i,2]])
+                    c4.append(d1d2.columns.tolist()[arr[i,3]])
+                    c5.append(d1d2.columns.tolist()[arr[i,4]])
                 data1__["COD_PROD"] = k
                 data1__["id1"] = c1
                 data1__["id2"] = c2
                 data1__["id3"] = c3
+                data1__["id4"] = c4
+                data1__["id5"] = c5
                 #data1__ = data1__.merge(data2__[["RUC-prov","id"]],left_on="ID_DIR",right_on="id")
                 # exec(f"base_{p}=data1__.copy()")
                 # dfs.append(f"base_{p}")
@@ -874,15 +879,15 @@ class FileDatasourceImpl(FileDatasource):
             except:
                 pass
             
-        # dfs2 = [globals()[f"base_{i}"] for i in range(1, len(dfs) + 1) if f"base_{i}" in globals()]
+        #dfs2 = [globals()[f"base_{i}"] for i in range(1, len(dfs) + 1) if f"base_{i}" in globals()]
         # df_concatenado = pd.concat(dfs, ignore_index=True)
         
         #del base_1,base_2,base_3,base_4,base_5,base_6,base_7,base_8,base_9
         df_concatenado = pd.concat(dfs, ignore_index=True)
         df_concatenado.rename(columns={"RUC_x": "RUC", "RUC_y": "RUC_mayorista"},inplace=True)
         # del dfs2
-        df_concatenado2 = df_concatenado[["COD_PROD","ID_DIR","id1","id2","id3"]]
-        df_concatenado2 = pd.melt(df_concatenado2, id_vars=['COD_PROD', 'ID_DIR'], value_vars=['id1', 'id2', 'id3'], var_name='variable', value_name='id')
+        df_concatenado2 = df_concatenado[["COD_PROD","ID_DIR","id1","id2","id3", "id4","id5"]]
+        df_concatenado2 = pd.melt(df_concatenado2, id_vars=['COD_PROD', 'ID_DIR'], value_vars=['id1', 'id2', 'id3', "id4","id5"], var_name='variable', value_name='id') 
         df_concatenado2 = df_concatenado2.drop(columns=['variable'])
         df_concatenado2 = df_concatenado2.merge(data2[["RUC-prov","id","latitude","longitude"]],on="id")
         df_concatenado2.to_csv(ruta4 + DF_dir_may, encoding="utf-8", sep=";")
@@ -958,7 +963,7 @@ class FileDatasourceImpl(FileDatasource):
         d1 = pd.read_csv(ruta6 + DF_fin, encoding="utf-8", sep=";")
         #d1=d1.drop(columns={"PRECIOVENTA_may"})
         df = pd.read_csv(ruta4 + DF_dir_may2,encoding='utf-8',sep=";")
-        df = df[["COD_PROD","ID_DIR","id1","id2","id3"]]
+        df = df[["COD_PROD","ID_DIR","id1","id2","id3","id4","id5"]]
         d22 = pd.read_csv(ruta3 + DF_georef_may, encoding="utf-8", sep=";")
         d22 = d22[["RUC-prov","id"]]
 
@@ -971,6 +976,12 @@ class FileDatasourceImpl(FileDatasource):
         df = df.merge(d22,left_on="id3",right_on="id")
         df.drop(["id"],axis=1,inplace=True)
         df.rename(columns={"RUC-prov": "RUC-prov3"},inplace=True)
+        df = df.merge(d22,left_on="id4",right_on="id")
+        df.drop(["id"],axis=1,inplace=True)
+        df.rename(columns={"RUC-prov": "RUC-prov4"},inplace=True)
+        df = df.merge(d22,left_on="id5",right_on="id")
+        df.drop(["id"],axis=1,inplace=True)
+        df.rename(columns={"RUC-prov": "RUC-prov5"},inplace=True)
 
         #df = df.drop_duplicates(subset=["PROVINCIA","DEPARTAMENTO","RUC"])
         d2 = pd.read_csv(ruta7 + DF_may_fin,encoding='utf-8',sep=';')
@@ -1009,7 +1020,9 @@ class FileDatasourceImpl(FileDatasource):
                     ver1 = df__.loc[:, "RUC-prov1"].values[0]
                     ver2 = df__.loc[:, "RUC-prov2"].values[0]
                     ver3 = df__.loc[:, "RUC-prov3"].values[0]
-                    d2_ = d2.loc[((d2["RUC-prov"] == ver1) | (d2["RUC-prov"] == ver2) | (d2["RUC-prov"] == ver3)) & (d2["COD_PROD"] == k)]
+                    ver4 = df__.loc[:, "RUC-prov4"].values[0]
+                    ver5 = df__.loc[:, "RUC-prov5"].values[0]
+                    d2_ = d2.loc[((d2["RUC-prov"] == ver1) | (d2["RUC-prov"] == ver2) | (d2["RUC-prov"] == ver3)| (d2["RUC-prov"] == ver4)| (d2["RUC-prov"] == ver5)) & (d2["COD_PROD"] == k)]
                     d2_ = d2_.groupby(['fecha_stata'])["PRECIOVENTA_may2"].mean().reset_index()
                     d2_["ID_DIR"] = df_[j]
                     d2_["COD_PROD"] = k
@@ -1137,7 +1150,7 @@ class FileDatasourceImpl(FileDatasource):
         d1 = d1[["fecha_stata","PRECIOVENTA","COD_PROD","ID_COL","dPRECIOVENTA","dvarPRECIOVENTA","raro","raro2","ID_DIR","PRECIOVENTA_may","departamento"]]
         d1.rename(columns={"departamento": "DEPARTAMENTO"}, inplace=True)
         d1.loc[(d1.DEPARTAMENTO=="LIMA") | (d1.DEPARTAMENTO=="CALLAO"), "DEPARTAMENTO"] = "LIMA Y CALLAO"
-        validos = pd.read_csv(ruta4+DF_val2,encoding="utf-8",sep=";")
+        validos = pd.read_csv(ruta4+DF_val2,encoding="utf-8",sep=",")
         validos.loc[(validos.DEPARTAMENTO=="LIMA") | (validos.DEPARTAMENTO=="CALLAO"), "DEPARTAMENTO"] = "LIMA Y CALLAO"
         validos=validos.fillna(0)
         validos = validos.groupby(['DEPARTAMENTO', 'COD_PROD'])['ok'].mean().reset_index()
