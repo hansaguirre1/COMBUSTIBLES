@@ -19,7 +19,7 @@ with DAG(
            
         },
         description='Digemid',
-        schedule_interval="0 10 * * 1",
+        schedule_interval="0 12 * * 1",
         start_date=datetime(2021, 1, 1, 10, 15),
         catchup=False,
 ) as dag:

@@ -958,8 +958,7 @@ class FileDatasourceImpl(FileDatasource):
     def min4_a1_processMerge(self):
         # Finally
         print("Ultimo")
-        fecha_manual = '2024-01-26'
-
+        # fecha_manual = '2024-01-26'
         d1 = pd.read_csv(ruta6 + DF_fin, encoding="utf-8", sep=";")
         #d1=d1.drop(columns={"PRECIOVENTA_may"})
         df = pd.read_csv(ruta4 + DF_dir_may2,encoding='utf-8',sep=";")
@@ -1017,13 +1016,33 @@ class FileDatasourceImpl(FileDatasource):
                 result_list = []
                 for j in range(len(df_)):
                     df__ = df.loc[(df["COD_PROD"] == k) & (df["ID_DIR"] == df_[j])]
+
+                    #filtrar proveedores más cercanos
                     ver1 = df__.loc[:, "RUC-prov1"].values[0]
                     ver2 = df__.loc[:, "RUC-prov2"].values[0]
                     ver3 = df__.loc[:, "RUC-prov3"].values[0]
                     ver4 = df__.loc[:, "RUC-prov4"].values[0]
                     ver5 = df__.loc[:, "RUC-prov5"].values[0]
                     d2_ = d2.loc[((d2["RUC-prov"] == ver1) | (d2["RUC-prov"] == ver2) | (d2["RUC-prov"] == ver3)| (d2["RUC-prov"] == ver4)| (d2["RUC-prov"] == ver5)) & (d2["COD_PROD"] == k)]
+                    #calcular el precio promedio ponderado
+                    
+                    d2_ = d2_.dropna()
+                    d2_.loc[d2_['RUC-prov']==ver1, 'ranking'] = 1
+                    d2_.loc[d2_['RUC-prov']==ver2, 'ranking'] = 2
+                    d2_.loc[d2_['RUC-prov']==ver3, 'ranking'] = 3
+                    d2_.loc[d2_['RUC-prov']==ver4, 'ranking'] = 4
+                    d2_.loc[d2_['RUC-prov']==ver5, 'ranking'] = 5
+                    d2_['r_min']= d2_.groupby(['fecha_stata'])["ranking"].transform(lambda x:x.min())            
+                    d2_=d2_.sort_values(['fecha_stata', 'ranking']).reset_index()
+                    d2_['inicio']=1
+                    d2_['p'] = d2_['inicio'][d2_['ranking'] == d2_['r_min']]
+                    
+                    #d2_['fecha_stata'] = pd.to_datetime(d2_['fecha_stata'])
+                    d2_['p'] = d2_['p'].fillna(d2_.groupby('fecha_stata').cumcount() + 1)
+                    d2_=d2_[d2_.p<=3]
                     d2_ = d2_.groupby(['fecha_stata'])["PRECIOVENTA_may2"].mean().reset_index()
+
+                    #filtrar
                     d2_["ID_DIR"] = df_[j]
                     d2_["COD_PROD"] = k
                     result_list.append(d2_)
